@@ -61,9 +61,10 @@ section{padding:clamp(24px,4vw,40px) 0}
 h2{font-size:clamp(22px,2.6vw,28px);letter-spacing:-.02em;margin:0 0 4px;font-weight:750;display:flex;align-items:center;gap:10px}
 h2 svg{color:var(--cyan)}
 .sub{color:var(--mut);margin:0 0 18px;font-size:15px}
-.bar-r{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:0}
-.tline{font-size:12.5px;color:var(--mut);padding:0 12px;white-space:nowrap}
-@media(max-width:700px){.bar-r{order:3;width:100%;margin-left:0;align-items:stretch}.tline{white-space:normal;padding:0 2px 2px}.tl2{display:none}}
+.bar-l{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bar-l1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tline{font-size:12.5px;color:var(--mut);line-height:1.35}
+@media(max-width:700px){.tl2{display:none}}
 h1.h2{font-size:clamp(22px,2.6vw,28px);line-height:1.2;letter-spacing:-.02em;margin:0 0 6px;font-weight:750;display:flex;align-items:center;gap:10px}
 h1.h2 svg{color:var(--cyan)}
 .grid{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--min,320px)),1fr))}
@@ -277,10 +278,13 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 </svg>
 
 <div class="bar" id="top"><div class="wrap">
-  <a class="brand" href="#top">Clubhouse <span>Tonight</span></a>
-  <span class="chip mini" id="upd"></span>
-  <span class="chip mini stale" id="stale">Refresh overdue</span>
-  <div class="bar-r"><span class="tline">Every new Bravo episode, WWHL guest and Peacock drop.<span class="tl2"> Updated daily.</span></span><nav class="nav"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav></div>
+  <div class="bar-l">
+    <div class="bar-l1"><a class="brand" href="#top">Clubhouse <span>Tonight</span></a>
+    <span class="chip mini" id="upd"></span>
+    <span class="chip mini stale" id="stale">Refresh overdue</span></div>
+    <span class="tline">Every new Bravo episode, WWHL guest and Peacock drop.<span class="tl2"> Updated daily.</span></span>
+  </div>
+  <nav class="nav"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav>
 </div></div>
 
 <noscript><div class="wrap" style="padding:24px 0">Showing this morning's schedule. Turn on JavaScript for live times and countdowns.</div></noscript>

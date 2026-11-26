@@ -61,9 +61,10 @@ section{padding:clamp(24px,4vw,40px) 0}
 h2{font-size:clamp(22px,2.6vw,28px);letter-spacing:-.02em;margin:0 0 4px;font-weight:750;display:flex;align-items:center;gap:10px}
 h2 svg{color:var(--cyan)}
 .sub{color:var(--mut);margin:0 0 18px;font-size:15px}
-.bar-r{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:0}
-.tline{font-size:12.5px;color:var(--mut);padding:0 12px;white-space:nowrap}
-@media(max-width:700px){.bar-r{order:3;width:100%;margin-left:0;align-items:stretch}.tline{white-space:normal;padding:0 2px 2px}.tl2{display:none}}
+.bar-l{display:flex;flex-direction:column;gap:2px;min-width:0}
+.bar-l1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tline{font-size:12.5px;color:var(--mut);line-height:1.35}
+@media(max-width:700px){.tl2{display:none}}
 h1.h2{font-size:clamp(22px,2.6vw,28px);line-height:1.2;letter-spacing:-.02em;margin:0 0 6px;font-weight:750;display:flex;align-items:center;gap:10px}
 h1.h2 svg{color:var(--cyan)}
 .grid{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--min,320px)),1fr))}
@@ -277,10 +278,13 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 </svg>
 
 <div class="bar" id="top"><div class="wrap">
-  <a class="brand" href="#top">Clubhouse <span>Tonight</span></a>
-  <span class="chip mini" id="upd"><svg class="i"><use href="#i-check"></use></svg>Updated Nov 25</span>
-  <span class="chip mini stale" id="stale">Refresh overdue</span>
-  <div class="bar-r"><span class="tline">Every new Bravo episode, WWHL guest and Peacock drop.<span class="tl2"> Updated daily.</span></span><nav class="nav"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav></div>
+  <div class="bar-l">
+    <div class="bar-l1"><a class="brand" href="#top">Clubhouse <span>Tonight</span></a>
+    <span class="chip mini" id="upd"><svg class="i"><use href="#i-check"></use></svg>Updated Nov 25</span>
+    <span class="chip mini stale" id="stale">Refresh overdue</span></div>
+    <span class="tline">Every new Bravo episode, WWHL guest and Peacock drop.<span class="tl2"> Updated daily.</span></span>
+  </div>
+  <nav class="nav"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav>
 </div></div>
 
 <noscript><div class="wrap" style="padding:24px 0">Showing this morning's schedule. Turn on JavaScript for live times and countdowns.</div></noscript>
@@ -297,8 +301,8 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 <section id="coming"><div class="wrap">
   <h2><svg class="i"><use href="#i-spark"/></svg>Coming up</h2>
   <div class="grid" id="prem" style="--min:340px;align-items:start"><article class="prem glass"><div class="ph"><span class="badge" style="background:linear-gradient(145deg,#c86bff,#ff3fa4)">WS</span><div><h3>Wife Swap: The Real Housewives Edition S2</h3><div class="ds">Wed, Dec 30 · Wed 9:00 PM · two-episode premiere, then Wednesdays</div></div></div>
-<div class="cd" id="cd0"><div><b>34</b><span>days</span></div><div><b>23</b><span>hrs</span></div><div><b>35</b><span>min</span></div></div><ul class="list"><li><b>Dec 30</b><span>Lisa Barlow and Angela Oakley</span></li><li><b>Jan 6</b><span>Gina Kirschenheiter</span></li><li><b>Jan 13</b><span>Stephanie Hollman</span></li><li><b>Jan 20</b><span>Phaedra Parks</span></li><li><b>Jan 27</b><span>Crystal Kung-Minkoff · finale</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i"><use href="#i-check"></use></svg>Bravo</span><a class="pk trl" href="https://www.bravotv.com/the-daily-dish/wife-swap-real-housewives-edition-season-2-everything-to-know"><svg class="i"><use href="#i-film"></use></svg>Trailer</a></div></article><article class="prem glass"><div class="ph"><span class="badge" style="background:linear-gradient(145deg,#ffd23f,#ff8a3d)">NJ</span><div><h3>The Real Housewives of New Jersey S15</h3><div class="ds">Tue, Jan 19 · Tuesday · time not announced; 8:00 PM expected (RHONY's slot)</div></div></div>
-<div class="cd" id="cd1"><div><b>54</b><span>days</span></div><div><b>22</b><span>hrs</span></div><div><b>35</b><span>min</span></div></div><ul class="list"><li><b>Cast</b><span>Teresa, Melissa and Dolores, plus five new Housewives</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i"><use href="#i-check"></use></svg>Bravo</span></div></article></div>
+<div class="cd" id="cd0"><div><b>34</b><span>days</span></div><div><b>23</b><span>hrs</span></div><div><b>34</b><span>min</span></div></div><ul class="list"><li><b>Dec 30</b><span>Lisa Barlow and Angela Oakley</span></li><li><b>Jan 6</b><span>Gina Kirschenheiter</span></li><li><b>Jan 13</b><span>Stephanie Hollman</span></li><li><b>Jan 20</b><span>Phaedra Parks</span></li><li><b>Jan 27</b><span>Crystal Kung-Minkoff · finale</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i"><use href="#i-check"></use></svg>Bravo</span><a class="pk trl" href="https://www.bravotv.com/the-daily-dish/wife-swap-real-housewives-edition-season-2-everything-to-know"><svg class="i"><use href="#i-film"></use></svg>Trailer</a></div></article><article class="prem glass"><div class="ph"><span class="badge" style="background:linear-gradient(145deg,#ffd23f,#ff8a3d)">NJ</span><div><h3>The Real Housewives of New Jersey S15</h3><div class="ds">Tue, Jan 19 · Tuesday · time not announced; 8:00 PM expected (RHONY's slot)</div></div></div>
+<div class="cd" id="cd1"><div><b>54</b><span>days</span></div><div><b>22</b><span>hrs</span></div><div><b>34</b><span>min</span></div></div><ul class="list"><li><b>Cast</b><span>Teresa, Melissa and Dolores, plus five new Housewives</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i"><use href="#i-check"></use></svg>Bravo</span></div></article></div>
 </div></section>
 
 <section id="more"><div class="wrap">
