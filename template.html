@@ -175,6 +175,7 @@ footer{padding:32px 0 48px;color:var(--mut);font-size:14px}
 .src a{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);text-decoration:none}
 .src a:hover{color:var(--cyan)}
 .fine{margin-top:18px;color:var(--dim);font-size:13px}
+#covered a{color:var(--mut);text-decoration:none}#covered a:hover{color:var(--ink);text-decoration:underline}
 .flinks{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0}
 .flinks a{color:var(--ink);font-weight:600;text-decoration:none;font-size:14px}
 .flinks a:hover{text-decoration:underline}
@@ -361,8 +362,9 @@ const byDate=d=>EPISODES.filter(e=>e[0]===d).sort((a,b)=>a[1].localeCompare(b[1]
 const safeB=s=>esc(s).replace(/&lt;(\/?)b&gt;/g,"<$1b>");
 const short=o=>fd(o,{month:"short",day:"numeric"});
 
-const covered=[...new Set([...EPISODES.filter(e=>e[0]>=addDays(today,-2)).map(e=>e[2]),...GRID.flatMap(g=>g[1].map(s=>s[1])),...PREMIERES.map(p=>p.show).filter(Boolean),"WWHL"])].map(fn).sort();
-$("covered").textContent="Covering "+covered.join(", ")+".";
+const slugOf=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+const covered=[...new Set([...EPISODES.map(e=>e[2]),...GRID.flatMap(g=>g[1].map(s=>s[1])),...PREMIERES.map(p=>p.show).filter(Boolean),"WWHL"])].sort((a,b)=>fn(a).localeCompare(fn(b)));
+$("covered").innerHTML="Show schedules: "+covered.map(s=>`<a href="/${slugOf(s)}">${esc(fn(s))}</a>`).join(", ")+".";
 $("upd").innerHTML=`${ic("check")}Updated ${esc(short(UPDATED))}`;
 if(diff(UPDATED,today)>8)$("stale").style.display="inline-flex";
 
@@ -376,12 +378,12 @@ const srcA=u=>u?`<a class="srcl" href="${esc(u)}">${ic("link")}Source</a>`:"";
 const trl=show=>TRAILERS[show]?`<a class="pk trl" href="${esc(TRAILERS[show])}">${ic("film")}Trailer</a>`:"";
 
 /* rows */
-const epRow=e=>`<div class="row xr" tabindex="0" role="button" aria-expanded="false">${badge(e[2])}<div><div class="top"><span class="nm" title="${esc(fn(e[2]))}">${esc(e[2])}</span><span class="tm">${tH(e[1])}</span></div><div class="ds dsx"><span>${esc(e[3])}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more">${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln">${pill(e[4])}${pk(e[0],e[2],e[6],e[7])}</div></div></div></div>`;
+const epRow=e=>`<div class="row xr" tabindex="0" role="button" aria-expanded="false">${badge(e[2])}<div><div class="top"><span class="nm" title="${esc(fn(e[2]))}">${esc(e[2])}</span><span class="tm">${tH(e[1])}</span></div><div class="ds dsx"><span>${esc(e[3])}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more">${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln">${pill(e[4])}${pk(e[0],e[2],e[6],e[7])}<a class="srcl" href="/${slugOf(e[2])}">${ic("list")}All episodes</a></div></div></div></div>`;
 const wwFor=d=>{const w=D(d).getUTCDay();if(w===5||w===6)return null;
   const off=WWHL.off.find(o=>d>=o[0]&&d<=o[1]);if(off)return{off:1,ds:off[2].split(" · ")[0],st:off[3]};
   const g=WWHL.guests[d];if(g)return{nm:g[0],ds:"Watch What Happens Live",st:g[1]};
   return{nm:"Guests TBA",ds:"Watch What Happens Live · lineup posts the weekend before",st:null}};
-const wwRow=(w,d)=>w.off?`<div class="wwq">${ic("mic")}<div><div><b>WWHL</b> \u00b7 ${esc(w.ds)}</div><div class="metaln" style="margin-top:6px">${pill(w.st)}</div></div></div>`:`<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge ww">WWHL</span><div><div class="top"><span class="nm">${esc(w.nm)}</span><span class="tm dim">~${tH(WWHL.time)}</span></div><div class="ds dsx"><span>${esc(w.ds)}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more"><div class="metaln">${w.st?pill(w.st):""}${pk(d,"WWHL")}</div></div></div></div>`;
+const wwRow=(w,d)=>w.off?`<div class="wwq">${ic("mic")}<div><div><b>WWHL</b> \u00b7 ${esc(w.ds)}</div><div class="metaln" style="margin-top:6px">${pill(w.st)}</div></div></div>`:`<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge ww">WWHL</span><div><div class="top"><span class="nm">${esc(w.nm)}</span><span class="tm dim">~${tH(WWHL.time)}</span></div><div class="ds dsx"><span>${esc(w.ds)}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more"><div class="metaln">${w.st?pill(w.st):""}${pk(d,"WWHL")}<a class="srcl" href="/wwhl">${ic("list")}All guests</a></div></div></div></div>`;
 
 /* After Show rows: same night as a new episode of that show */
 const asFor=(d,eps)=>AFTERSHOWS.filter(a=>a.on&&a.time&&eps.some(e=>e[2]===a.show)).map(a=>({t:a.time,html:`<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge as-b" style="background:linear-gradient(145deg,${sh(a.show)[1]},${sh(a.show)[2]})">${ic("chat")}</span><div><div class="top"><span class="nm">${esc(a.show)} After Show</span><span class="tm">${tH(a.time)}</span></div><div class="ds dsx"><span>Online only \u00b7 BravoTV.com + YouTube</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more"><div class="metaln">${pill(a.st)}<a class="pk" href="${esc(a.url)}">${ic("play")}Watch online</a>${pk(d,a.show)}</div></div></div></div>`}));
@@ -393,7 +395,7 @@ const dropOf=e=>e[6]||addDays(e[0],1);
 const isLive=d=>d<today||(d===today&&now.h*60+now.m>=360);
 const chev=ic("down").replace('class="i"','class="i chv"');
 const pkRow=e=>{const u=e[7]||sh(e[2])[4],live=isLive(dropOf(e));
-  return `<div class="row xr" tabindex="0" role="button" aria-expanded="false">${badge(e[2])}<div><div class="top"><span class="nm" title="${esc(fn(e[2]))}">${esc(e[2])}</span><span class="tm">${live?'<span class="lv">Streaming</span>':tH("06:00")}</span></div><div class="ds dsx"><span>${esc(e[3])}</span>${chev}</div><div class="more">${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln"><span class="aired">${ic("tv")}${e[6]?"Early drop · airs on Bravo":"Aired on Bravo"} ${esc(fd(e[0],{weekday:"short"}))} ${esc(tTxt(e[1]))}</span>${u?(live?`<a class="pk live" href="${esc(u)}">${ic("play")}Watch on Peacock</a>`:`<a class="pk" href="${esc(u)}">${ic("clock")}Drops ${esc(fd(dropOf(e),{weekday:"short"}))} 6 AM</a>`):""}</div></div></div></div>`};
+  return `<div class="row xr" tabindex="0" role="button" aria-expanded="false">${badge(e[2])}<div><div class="top"><span class="nm" title="${esc(fn(e[2]))}">${esc(e[2])}</span><span class="tm">${live?'<span class="lv">Streaming</span>':tH("06:00")}</span></div><div class="ds dsx"><span>${esc(e[3])}</span>${chev}</div><div class="more">${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln"><span class="aired">${ic("tv")}${e[6]?"Early drop · airs on Bravo":"Aired on Bravo"} ${esc(fd(e[0],{weekday:"short"}))} ${esc(tTxt(e[1]))}</span>${u?(live?`<a class="pk live" href="${esc(u)}">${ic("play")}Watch on Peacock</a>`:`<a class="pk" href="${esc(u)}">${ic("clock")}Drops ${esc(fd(dropOf(e),{weekday:"short"}))} 6 AM</a>`):""}<a class="srcl" href="/${slugOf(e[2])}">${ic("list")}All episodes</a></div></div></div></div>`};
 const wwPkRow=(w,d)=>{const live=isLive(d);return `<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge ww">WWHL</span><div><div class="top"><span class="nm">${esc(w.nm)}</span><span class="tm">${live?'<span class="lv">Streaming</span>':tH("06:00")}</span></div><div class="ds dsx"><span>Watch What Happens Live</span>${chev}</div><div class="more"><div class="metaln">${w.st?pill(w.st):""}${live?`<a class="pk live" href="${esc(WWHL.peacock)}">${ic("play")}Watch on Peacock</a>`:`<a class="pk" href="${esc(WWHL.peacock)}">${ic("clock")}Drops ${esc(fd(d,{weekday:"short"}))} 6 AM</a>`}</div></div></div></div>`};
 function renderDays(){
   const pk7=VIEW==="peacock";let out="";
