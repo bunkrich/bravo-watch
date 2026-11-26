@@ -11,9 +11,9 @@ setTimeout(function(){
   ids.forEach(function(id){
     var el=document.getElementById(id); if(!el) return;
     var c=el.cloneNode(true);
-    c.querySelectorAll('.rv').forEach(function(n){n.classList.remove('rv','in');n.style.transitionDelay='';if(!n.getAttribute('style'))n.removeAttribute('style')});
     c.querySelectorAll('details[open]').forEach(function(d){d.removeAttribute('open')});
     c.querySelectorAll('[aria-expanded="true"]').forEach(function(n){n.setAttribute('aria-expanded','false')});
+    c.querySelectorAll('.xr.open').forEach(function(n){n.classList.remove('open')});
     out[id]=c.innerHTML;
   });
   var pre=document.createElement('pre'); pre.id='__pr'; pre.textContent=JSON.stringify(out);

@@ -5,25 +5,26 @@
    Two sources that disagree = "chk" until Bravo settles it. Synopses: short paraphrase in our own words, never copied. */
 const UPDATED = "2026-11-26";
 const LISTED_THROUGH = "2026-12-09"; /* last date episode listings are filled in */
-const SHOWS = { /* code, colour pair, icon, Peacock page */
+const SHOWS = { /* code, colour pair [bright, deep] taken from each show's current Bravo key art/logo, icon, Peacock page */
+  "WWHL":["WWHL","#22d3f0","#e8112d","mic","https://www.peacocktv.com/watch-online/tv/watch-what-happens-live-with-andy-cohen/8809822949267363112"],
   "Still Flipping Out":["SFO","#a78bfa","#6d28d9","tv","https://www.peacocktv.com/watch-online/tv/still-flipping-out/7620720323445966112"],
-  "RHUGT: Roaring 20th":["UGT","#f472b6","#be185d","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-ultimate-girls-trip/7959978440999457112/seasons/5"],
+  "RHUGT: Roaring 20th":["UGT","#f5c46b","#8a5a12","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-ultimate-girls-trip/7959978440999457112/seasons/5"],
   "Next Gen NYC":["NGN","#60a5fa","#1d4ed8","tv","https://www.peacocktv.com/watch-online/tv/next-gen-nyc/4677501932570333112"],
-  "RHORI":["RI","#22d3ee","#0e7490","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-rhode-island/8574798914766255112/seasons/1"],
-  "Ladies of London: The New Reign":["LOL","#e879f9","#7e22ce","crown","https://www.peacocktv.com/watch-online/tv/ladies-of-london/5120482410719617112"],
+  "RHORI":["RI","#5fe3d3","#1f6aa5","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-rhode-island/8574798914766255112/seasons/1"],
+  "Ladies of London: The New Reign":["LOL","#c48bff","#5b21b6","crown","https://www.peacocktv.com/watch-online/tv/ladies-of-london/5120482410719617112"],
   "Southern Hospitality":["SH","#34d399","#047857","glass","https://www.peacocktv.com/watch-online/tv/southern-hospitality/6614170128718896112"],
-  "Below Deck Down Under":["BDU","#38bdf8","#0369a1","anchor","https://www.peacocktv.com/watch-online/tv/below-deck-down-under/7603676207447885112/seasons/4"],
+  "Below Deck Down Under":["BDU","#3fd4ff","#0b5c9e","anchor","https://www.peacocktv.com/watch-online/tv/below-deck-down-under/7603676207447885112/seasons/4"],
   "The Valley: Persian Style":["VPS","#fb923c","#c2410c","tv","https://www.peacocktv.com/watch-online/tv/the-valley-persian-style/8097961647034034112"],
-  "RHOSLC":["SLC","#ff3fa4","#9b2cff","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-salt-lake-city/8062314053813296112"],
-  "RHONY":["NY","#2de2e6","#3a5bff","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-new-york-city/8023583101930400112/seasons/16"],
-  "RHOP":["POT","#ff8a3d","#ff3f6c","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-potomac/8038056425113847112/seasons/11"],
-  "RHONJ":["NJ","#ffd23f","#ff8a3d","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-new-jersey/6825525389042832112"],
-  "Below Deck":["BD","#1fb6ff","#0a5cd6","anchor","https://www.peacocktv.com/stream-tv/below-deck"],
-  "Southern Charm":["SC","#47f0a0","#0f9d8a","glass","https://www.peacocktv.com/watch-online/tv/southern-charm/8058982241606202112/seasons/12"],
+  "RHOSLC":["SLC","#5ab0ff","#2337b8","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-salt-lake-city/8062314053813296112"],
+  "RHONY":["NY","#ff2d55","#a3001f","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-new-york-city/8023583101930400112/seasons/16"],
+  "RHOP":["POT","#ff8ccc","#c2307a","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-potomac/8038056425113847112/seasons/11"],
+  "RHONJ":["NJ","#ffa451","#6d2fb0","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-new-jersey/6825525389042832112"],
+  "Below Deck":["BD","#ffc53d","#1e3a8a","anchor","https://www.peacocktv.com/stream-tv/below-deck"],
+  "Southern Charm":["SC","#b4e06c","#3d6b1d","glass","https://www.peacocktv.com/watch-online/tv/southern-charm/8058982241606202112/seasons/12"],
   "Vanderpump Rules: Lisa Las Vegas":["LV","#fbbf24","#b45309","star",""],
-  "Small Town Trouble: Texas":["STT","#ff6b3d","#c2185b","star","https://www.peacocktv.com/watch-online/tv/small-town-trouble-texas/4841643441022334112"],
-  "Married at First Sight":["MAF","#f9a8d4","#be123c","star","https://www.peacocktv.com/watch-online/tv/married-at-first-sight/6006834051739908112/seasons/20"],
-  "Wife Swap: RH Edition":["WS","#c86bff","#ff3fa4","house","https://www.peacocktv.com/watch-online/tv/wife-swap-the-real-housewives-edition/6519457940197890112"]
+  "Small Town Trouble: Texas":["STT","#ff7a3d","#8c2a12","star","https://www.peacocktv.com/watch-online/tv/small-town-trouble-texas/4841643441022334112"],
+  "Married at First Sight":["MAF","#ff6b8b","#b3134a","star","https://www.peacocktv.com/watch-online/tv/married-at-first-sight/6006834051739908112/seasons/20"],
+  "Wife Swap: RH Edition":["WS","#ffe14a","#ff8a00","house","https://www.peacocktv.com/watch-online/tv/wife-swap-the-real-housewives-edition/6519457940197890112"]
 };
 const FULL = { /* official full show names, used on the page for search. Every show used anywhere needs one (check.js enforces it). */
   "RHOSLC":"The Real Housewives of Salt Lake City",

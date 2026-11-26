@@ -53,6 +53,18 @@ def at_ny(date, hhmm, minutes=0):
     return (dt.datetime.combine(D(date), dt.time(h, m), NY) + dt.timedelta(minutes=minutes)).isoformat()
 
 
+def _lum(h):
+    v = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    v = [c / 12.92 if c <= .03928 else ((c + .055) / 1.055) ** 2.4 for c in v]
+    return .2126 * v[0] + .7152 * v[1] + .0722 * v[2]
+
+
+def needs_ink(c1, c2):
+    """Dark badge text when white would be too faint on the middle of the show's gradient."""
+    mid = "#" + "".join(f"{(int(c1[i:i + 2], 16) + int(c2[i:i + 2], 16)) // 2:02x}" for i in (1, 3, 5))
+    return 1.05 / (_lum(mid) + .05) < 3
+
+
 def wwhl_airing(w, night):
     """[ep, "YYYY-MM-DD HH:MM", st] or None for a WWHL viewing night."""
     return (w.get("airings") or {}).get(night)
@@ -65,35 +77,48 @@ def wwhl_when(night, at):
     return f"{t12(t)} ET"
 
 
-CSS = """:root{--ink:#f5f1ff;--mut:#aea3c8;--dim:#8579a1;--line:rgba(255,255,255,.12);--glass:rgba(255,255,255,.06);--pink:#ff4fae;--sun:#ffd25a;--cyan:#3ee6ea}
-*{box-sizing:border-box}body{margin:0;color:var(--ink);background:#0b0718;font:16px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
-body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(40vmax 40vmax at 8% 0%,rgba(255,79,174,.26),transparent 60%),radial-gradient(38vmax 38vmax at 100% 30%,rgba(62,230,234,.16),transparent 60%),radial-gradient(40vmax 40vmax at 40% 110%,rgba(255,210,90,.12),transparent 60%)}
-a{color:inherit}.wrap{width:min(820px,100% - 2*max(16px,4vw));margin-inline:auto}
-.bar{position:sticky;top:0;z-index:5;background:rgba(11,7,24,.55);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid var(--line)}
+CSS = """:root{--bg:#07041a;--ink:#f7f3ff;--mut:#b9aed6;--dim:#9488b5;--line:rgba(255,255,255,.11);--glass:rgba(255,255,255,.055);--pea1:#ffe000;--pea2:#ffa800;
+--font:system-ui,-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--num:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,sans-serif;--ease:cubic-bezier(.2,.7,.2,1)}
+*,*::before,*::after{box-sizing:border-box}html{background:var(--bg);color-scheme:dark;padding-top:env(safe-area-inset-top);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100vh;min-height:100dvh;color:var(--ink);background:var(--bg);font:16px/1.6 var(--font);-webkit-font-smoothing:antialiased}
+/* every show page is lit in that show's own colours (from its Bravo key art) */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(46vmax 46vmax at 0% -6%,color-mix(in srgb,var(--c1) 34%,transparent),transparent 62%),radial-gradient(42vmax 42vmax at 104% 30%,color-mix(in srgb,var(--c2) 30%,transparent),transparent 62%),radial-gradient(40vmax 40vmax at 40% 112%,rgba(166,122,255,.16),transparent 62%),var(--bg)}
+@supports not (color:color-mix(in srgb,red 50%,blue)){body::before{background:radial-gradient(46vmax 46vmax at 0% -6%,rgba(255,79,174,.26),transparent 62%),radial-gradient(42vmax 42vmax at 104% 30%,rgba(77,201,255,.16),transparent 62%),var(--bg)}}
+a{color:inherit}:focus-visible{outline:2px solid var(--c1);outline-offset:2px}
+.wrap{width:min(820px,100% - 2*max(16px,4vw,env(safe-area-inset-left),env(safe-area-inset-right)));margin-inline:auto}
+.bar{position:sticky;top:0;z-index:5;background:rgba(7,4,26,.6);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border-bottom:1px solid var(--line)}
 .bar .wrap{display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:12px}
-.brand{font-weight:800;letter-spacing:-.02em;font-size:20px;text-decoration:none;white-space:nowrap}
-.brand span{background:linear-gradient(90deg,var(--pink),var(--sun));-webkit-background-clip:text;background-clip:text;color:transparent}
-.back{font-size:14px;font-weight:600;color:var(--mut);text-decoration:none;padding:8px 12px;border-radius:99px}.back:hover{background:rgba(255,255,255,.1);color:var(--ink)}
-.hero{display:flex;gap:16px;align-items:center;margin:34px 0 8px}
-.badge{flex:none;width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-weight:800;font-size:15px;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
-h1{font-size:clamp(26px,4.4vw,38px);line-height:1.12;letter-spacing:-.03em;margin:0}
-.lead{color:var(--mut);margin:6px 0 22px;font-size:16.5px}
-.card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:20px 22px;margin:0 0 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 30px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px)}
-h2{font-size:19px;margin:0 0 10px;letter-spacing:-.01em}
-.k{font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--pink)}
-.next .when{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:2px 0}.next .ttl{font-weight:700}
+.brand{font-weight:800;letter-spacing:-.025em;font-size:20px;text-decoration:none;white-space:nowrap}
+.brand span{color:#ff4fae;background:linear-gradient(90deg,#ff4fae,#ffd25a);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.back{display:inline-flex;align-items:center;min-height:40px;font-size:14px;font-weight:650;color:var(--mut);text-decoration:none;padding:0 14px;border-radius:99px}.back:hover{background:rgba(255,255,255,.1);color:var(--ink)}
+.hero{display:flex;gap:18px;align-items:center;margin:34px 0 8px}
+.badge{flex:none;width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font:800 17px/1 var(--font);letter-spacing:-.01em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);background:linear-gradient(145deg,var(--c1),var(--c2));box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -10px 18px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.12),0 0 34px -4px var(--c1)}
+.badge.sm{font-size:13.5px}.badge.ink{color:#160c02;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+h1{font-size:clamp(27px,4.6vw,40px);line-height:1.1;letter-spacing:-.03em;margin:0;text-wrap:balance}
+.lead{color:var(--mut);margin:8px 0 24px;font-size:16.5px;text-wrap:pretty}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:20px 22px;margin:0 0 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 32px rgba(0,0,0,.28);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%)}
+.card.next{border-color:color-mix(in srgb,var(--c1) 55%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--c1) 16%,transparent),var(--glass) 60%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 42px -16px var(--c1),0 12px 32px rgba(0,0,0,.28)}
+h2{font-size:19px;margin:0 0 10px;letter-spacing:-.015em}
+.k{font-size:12.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--c1)}
+.next .when{font:800 23px/1.25 var(--num);letter-spacing:-.02em;margin:4px 0}.next .ttl{font-weight:700}
 .mut{color:var(--mut)}p{margin:0 0 8px}
-ul.eps{list-style:none;margin:0;padding:0}ul.eps li{display:grid;grid-template-columns:120px 1fr;gap:4px 14px;padding:11px 0;border-top:1px solid var(--line)}ul.eps li:first-child{border-top:0}
-.dt{font-weight:700;font-size:14px}.dt span{display:block;color:var(--sun);font-weight:700}
-.ep b{display:block}.ep .syn{color:var(--mut);font-size:14px}
-@media(max-width:560px){ul.eps li{grid-template-columns:1fr}}
-.pk{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:7px 12px;border-radius:99px;font-size:13px;font-weight:800;text-decoration:none;background:rgba(255,255,255,.08);border:1px solid var(--line)}
-.pk.live{color:#0b0718;background:linear-gradient(90deg,var(--sun),var(--cyan));border:0}
+ul.eps{list-style:none;margin:0;padding:0}ul.eps li{display:grid;grid-template-columns:128px 1fr;gap:4px 14px;padding:12px 0;border-top:1px solid var(--line)}ul.eps li:first-child{border-top:0}
+.dt{font-weight:700;font-size:14px}.dt span{display:block;color:#ffd25a;font:700 14px/1.4 var(--num)}
+.ep b{display:block}.ep .syn{color:var(--mut);font-size:14px;text-wrap:pretty}
+@media(max-width:560px){ul.eps li{grid-template-columns:1fr}.hero{gap:14px;margin-top:26px}.badge{width:56px;height:56px;border-radius:16px;font-size:15px}.card{padding:18px}}
+.pk{display:inline-flex;align-items:center;gap:6px;min-height:36px;margin-top:8px;padding:0 14px;border-radius:99px;font-size:13px;font-weight:800;text-decoration:none;background:rgba(255,255,255,.08);border:1px solid var(--line)}
+.pk.live{color:#1a1200;background:linear-gradient(90deg,var(--pea1),var(--pea2));border:0;box-shadow:0 0 18px -4px var(--pea2)}
 .tag{display:inline-block;font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.1);color:var(--mut);margin-left:6px;vertical-align:1px}
-.shows{display:flex;flex-wrap:wrap;gap:8px}.shows a{padding:8px 12px;border-radius:99px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:14px;font-weight:700;text-decoration:none}
-.shows a:hover{background:rgba(255,255,255,.14)}
-.cta{display:inline-block;margin-top:4px;padding:12px 18px;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--sun));color:#0b0718;font-weight:800;text-decoration:none}
-footer{padding:22px 0 48px;color:var(--dim);font-size:13px}footer a{color:var(--mut)}"""
+.shows{display:flex;flex-wrap:wrap;gap:8px}.shows a{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;border-radius:99px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:14px;font-weight:700;text-decoration:none;transition:border-color .2s,box-shadow .2s}
+.shows a::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c1);box-shadow:0 0 8px var(--c1)}
+.shows a:hover{border-color:var(--c1);box-shadow:0 0 16px -6px var(--c1)}
+.cta{display:inline-flex;align-items:center;min-height:44px;margin-top:6px;padding:0 20px;border-radius:99px;background:linear-gradient(90deg,#ff4fae,#ffd25a);color:#140b24;font-weight:800;text-decoration:none;box-shadow:0 0 22px -6px #ff4fae}
+footer{padding:22px 0 calc(48px + env(safe-area-inset-bottom));color:var(--dim);font-size:13px}footer a{color:var(--mut)}
+@media (color-gamut:p3){@supports (color:oklch(from red l c h)){.badge{background:linear-gradient(145deg,oklch(from var(--c1) l calc(c * 1.22) h),oklch(from var(--c2) l calc(c * 1.18) h))}}}
+@supports (animation-timeline:view()){@media (prefers-reduced-motion:no-preference){.card{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 35%}@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}}}
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.22s}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}"""
 
 TRACK = """<script>(()=>{let me=false;try{me=!!localStorage.getItem("umami.disabled")}catch(e){}
 const LIVE=["clubhousetonight.com","www.clubhousetonight.com"].includes(location.hostname);if(me||!LIVE)return;
@@ -125,12 +150,18 @@ def run():
             active.append(s)
     active.append("WWHL")
 
-    def badge(s):
+    def colours(s):
         m = shows_meta.get(s)
-        code, c1, c2 = (m[0], m[1], m[2]) if m else ((s if s == "WWHL" else re.sub(r"[^A-Z]", "", s)[:3] or s[:2].upper()), "#7b6be0", "#3f2f9c")
-        if s == "WWHL":
-            c1, c2 = "#ffd25a", "#ff4fae"
-        return f'<span class="badge" style="background:linear-gradient(145deg,{c1},{c2})">{e(code)}</span>'
+        return (m[0], m[1], m[2]) if m else (re.sub(r"[^A-Z]", "", s)[:3] or s[:2].upper(), "#7b6be0", "#3f2f9c")
+
+    def cvars(s):
+        _, c1, c2 = colours(s)
+        return f"--c1:{c1};--c2:{c2}"
+
+    def badge(s):
+        code, c1, c2 = colours(s)
+        cls = (" ink" if needs_ink(c1, c2) else "") + (" sm" if len(code) > 3 else "")
+        return f'<span class="badge{cls}" aria-hidden="true">{e(code)}</span>'
 
     def peacock_url(s):
         if s == "WWHL":
@@ -197,7 +228,7 @@ def run():
                 end = at_ny(a[1][:10], a[1][11:], 60)
                 who = f"Guests: {e(g[0])}" if g else "Guests not announced yet"
                 return (f'<section class="card next" data-end="{e(end)}"{" hidden" if hidden else ""}><div class="k">{e(label)}</div>'
-                        f'<div class="when">{e(nice(d))} · {e(wwhl_when(d, a[1]))}</div><div class="ttl">{who}</div>'
+                        f'<div class="when">{e(nice(d))} · {e(wwhl_when(d, a[1]).replace("Late " + D(d).strftime("%a") + " · ", "late night, "))}</div><div class="ttl">{who}</div>'
                         f'<p class="mut">Episode {e(a[0])} · on Peacock {e(nice((D(d) + dt.timedelta(days=1)).isoformat()))} at 6:00 AM.</p></section>')
             if upn:
                 sections.append(card(upn[0], "Tonight's episode" if upn[0] == tstr else "Next episode"))
@@ -214,7 +245,7 @@ def run():
                     btn = f'<a class="pk live" href="{e(w.get("peacock"))}">▶ Watch on Peacock</a>' if live and w.get("peacock") else ""
                     return (f'<li><div class="dt">{e(nice(d))}<span>{tm}</span></div><div class="ep"><b>{e(g[0]) if g else "Guests not announced yet"}</b>'
                             + (f'<div class="syn">Episode {e(a[0])}</div>' if a else "") + btn + '</div></li>')
-                sections.append(f'<section class="card"><h2>WWHL Nights &amp; Guests</h2><ul class="eps">{"".join(li(d) for d in reversed(nights))}</ul></section>')
+                sections.append(f'<section class="card"><h2>WWHL Nights &amp; Guests</h2><ul class="eps">{"".join(li(d) for d in [x for x in nights if x >= tstr] + sorted([x for x in nights if x < tstr], reverse=True))}</ul></section>')
             if offs:
                 sections.append('<section class="card"><h2>Weeks Off</h2>' + "".join(f'<p>{e(nice(o[0]))} – {e(nice(o[1]))}: {e(o[2])}</p>' for o in offs) + '</section>')
             title = "WWHL Guests This Week: Watch What Happens Live Schedule"
@@ -260,7 +291,7 @@ def run():
             title = f"{name} Schedule: New Episode Dates, Times & Peacock" if len(name) < 40 else f"{short} Schedule: {name} New Episodes & Peacock"
             desc = f"When is the next new episode of {name}? Air dates and times on Bravo, episode titles and exactly when each one drops on Peacock. Updated daily."
 
-        nav = "".join(f'<a href="/{slug(x)}">{e(fn(x) if len(fn(x)) <= 28 else x)}</a>' for x in active if x != s)
+        nav = "".join(f'<a href="/{slug(x)}" style="{cvars(x)}">{e(fn(x) if len(fn(x)) <= 28 else x)}</a>' for x in active if x != s)
         ld = {"@context": "https://schema.org", "@type": "TVSeries", "name": name, "url": f"{SITE}/{sl}",
               "productionCompany": {"@type": "Organization", "name": "Bravo"}}
         if season:
@@ -283,7 +314,7 @@ def run():
 <script type="application/ld+json">{json.dumps(ld)}</script>
 <style>html{{background:#0b0718;padding-top:env(safe-area-inset-top)}}{CSS}</style>
 </head>
-<body data-show="{e(s)}">
+<body data-show="{e(s)}" style="{cvars(s)}">
 <div class="bar"><div class="wrap"><a class="brand" href="/">Clubhouse <span>Tonight</span></a><a class="back" href="/">← Tonight's schedule</a></div></div>
 <main class="wrap">
   <div class="hero">{badge(s)}<h1>{e(name)}</h1></div>
@@ -313,7 +344,7 @@ def run():
         if a:
             g = ww.get("guests", {}).get(dd)
             late = a[1][:10] > dd
-            bravo.append({"show": "WWHL", "code": "WWHL", "color": "#ffd25a", "time": (D(a[1][:10]).strftime("%a ") if late else "") + t12(a[1][11:]),
+            bravo.append({"show": "WWHL", "code": "WWHL", "color": (shows_meta.get("WWHL") or ["", "#22d3f0"])[1], "time": (D(a[1][:10]).strftime("%a ") if late else "") + t12(a[1][11:]),
                           "title": g[0] if g else "Guests TBA", "url": f"{SITE}/wwhl"})
         peacock = []
         for x in sorted([x for x in c["EPISODES"] if not streaming(x) and drop_of(x) == dd], key=lambda x: x[1]):
@@ -322,7 +353,7 @@ def run():
         prev = (D(dd) - dt.timedelta(days=1)).isoformat()
         if wwhl_airing(ww, prev):
             g = ww.get("guests", {}).get(prev)
-            peacock.append({"show": "WWHL", "code": "WWHL", "color": "#ffd25a", "time": "6:00 AM", "title": g[0] if g else "Guests TBA", "url": ww.get("peacock", "")})
+            peacock.append({"show": "WWHL", "code": "WWHL", "color": (shows_meta.get("WWHL") or ["", "#22d3f0"])[1], "time": "6:00 AM", "title": g[0] if g else "Guests TBA", "url": ww.get("peacock", "")})
         days.append({"date": dd, "bravo": bravo, "peacock": peacock})
     json.dump({"updated": c["UPDATED"], "site": SITE, "days": days}, open("schedule.json", "w"), separators=(",", ":"))
     json.dump(pages, open("showpages.json", "w"))
