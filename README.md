@@ -1,4 +1,6 @@
-# Bravo Watch Calendar
+# Clubhouse Tonight
+
+Formerly Bravo Watch Calendar.
 
 Live at https://clubhousetonight.com, a fast, single-file schedule of what's new on Bravo each night, with Peacock drop times, WWHL guests, After Shows, premieres and reunions.
 
