@@ -71,13 +71,13 @@ h1.h2{font-size:clamp(22px,2.6vw,28px);line-height:1.2;letter-spacing:-.02em;mar
 .wkh h1{margin:0}
 h1.h2 span{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:inherit}
 .wkc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.pastb{display:inline-flex;align-items:center;gap:6px;font:700 13.5px/1 inherit;color:var(--mut);background:var(--glass);border:1px solid var(--line);border-radius:99px;padding:10px 14px;cursor:pointer;box-shadow:var(--hi)}
+.pastb{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-weight:700;font-size:13.5px;line-height:1;color:var(--mut);background:var(--glass);border:1px solid var(--line);border-radius:99px;padding:10px 14px;cursor:pointer;box-shadow:var(--hi)}
 .pastb:hover,.pastb[aria-pressed="true"]{color:var(--ink);background:var(--glass2)}
 .day.past{opacity:.78}
 .day.past .dh b{color:var(--mut)}
 .pastb:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .seg{display:inline-flex;padding:3px;border-radius:99px;background:var(--glass);border:1px solid var(--line);box-shadow:var(--hi)}
-.seg button{font:700 13.5px/1 inherit;color:var(--mut);background:none;border:0;border-radius:99px;padding:8px 14px;cursor:pointer}
+.seg button{font-family:inherit;font-weight:700;font-size:13.5px;line-height:1;color:var(--mut);background:none;border:0;border-radius:99px;padding:8px 14px;cursor:pointer}
 .seg button[aria-pressed="true"]{color:#0b0718;background:linear-gradient(90deg,var(--pink),var(--sun))}
 .pkv .seg button[aria-pressed="true"]{background:linear-gradient(90deg,var(--sun),var(--cyan))}
 .seg button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
@@ -331,7 +331,7 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 </div></section>
 
 <footer><div class="wrap">
-  <p class="flinks"><a href="/about">About &amp; contact</a><a href="/about#contact">Send a schedule fix</a><a href="/about#privacy">Privacy</a></p>
+  <p class="flinks"><a href="/about">About &amp; contact</a><a href="/about#contact">Send a schedule fix</a><a href="/widget">iPhone widget</a><a href="/about#privacy">Privacy</a></p>
   <p class="fine" id="covered"></p>
   <p class="fine">All times Eastern. Updated every morning. Not affiliated with Bravo, NBCUniversal or Peacock; show names and trademarks belong to their owners. Episode details are summarized in our own words, with links to official sources. Bravo's own schedule comes first; anything not confirmed by Bravo is tagged.</p>
 </div></footer>
@@ -427,6 +427,10 @@ $("prem").innerHTML=prem.map((p,i)=>`<article class="prem glass"><div class="ph"
 const tick=()=>{const n=nyNow();prem.forEach((p,i)=>{const[hh,mm]=(p.time||"20:00").split(":").map(Number);let m=diff(n.d,p.date)*1440+hh*60+mm-(n.h*60+n.m);if(m<0)m=0;
   const el=$("cd"+i);if(el){const dd=Math.floor(m/1440),wk=Math.floor(dd/7),hr=Math.floor(m%1440/60);const u=(v,s,p)=>[v,v===1?s:p];const parts=wk?[u(wk,"week","weeks"),u(dd%7,"day","days"),u(hr,"hr","hrs")]:[u(dd,"day","days"),u(hr,"hr","hrs")];el.innerHTML=parts.map(([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`).join("")}})};
 tick();const timer=setInterval(tick,60000);
+/* keep an open tab current: reload when the day changes or 6:00 AM Peacock drops pass */
+const stamp=n=>n.d+(n.h>=6?"b":"a");const loadStamp=stamp(now);
+const freshen=()=>{if(stamp(nyNow())!==loadStamp)location.reload()};
+setInterval(freshen,5*60000);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")freshen()});
 
 /* collapsible sections */
 const sec=(id,icon,title,preview,html)=>`<details class="sec glass" id="${id}"><summary><span class="si">${ic(icon)}</span><span class="st2"><b>${esc(title)}</b><span>${esc(preview)}</span></span><svg class="i chev"><use href="#i-down"/></svg></summary><div class="body">${html}</div></details>`;

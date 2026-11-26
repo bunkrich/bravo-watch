@@ -14,7 +14,11 @@ pages=showpages.run()
 for p in old:
   if p not in pages and os.path.exists(p+".html"): os.remove(p+".html")
 
-urls=[("https://clubhousetonight.com/",lm,"daily")]+[(f"https://clubhousetonight.com/{p}",lm,"daily") for p in pages]+[("https://clubhousetonight.com/about","","")]
+# widget setup page (code embedded from widget.js so it never drifts)
+import html as _h
+code=open("widget.js").read()
+open("widget.html","w").write(open("widget.tpl.html").read().replace("/*WIDGET_CODE*/",_h.escape(code)))
+urls=[("https://clubhousetonight.com/",lm,"daily")]+[(f"https://clubhousetonight.com/{p}",lm,"daily") for p in pages]+[("https://clubhousetonight.com/about","",""),("https://clubhousetonight.com/widget","","")]
 body="".join(f"<url><loc>{u}</loc>"+(f"<lastmod>{l}</lastmod>" if l else "")+(f"<changefreq>{c}</changefreq>" if c else "")+"</url>" for u,l,c in urls)
 open("sitemap.xml","w").write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>\n')
 print("built index.html + sitemap.xml", lm)

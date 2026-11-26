@@ -248,6 +248,24 @@ def run():
 """
         open(f"{sl}.html", "w").write(page)
         pages.append(sl)
+    # compact feed for the home-screen widget
+    days = []
+    for i in range(-1, 9):
+        dd = (today + dt.timedelta(days=i)).isoformat()
+        bravo = []
+        for x in sorted([x for x in c["EPISODES"] if x[0] == dd], key=lambda x: x[1]):
+            m = shows_meta.get(x[2]) or [x[2][:3], "#7b6be0", "#3f2f9c"]
+            bravo.append({"show": x[2], "code": m[0], "color": m[1], "time": t12(x[1]), "title": x[3], "url": f"{SITE}/{slug(x[2])}"})
+        wd = D(dd).weekday()  # Mon=0 .. Sun=6
+        if wd not in (4, 5) and not any(o[0] <= dd <= o[1] for o in c["WWHL"].get("off", [])):
+            g = c["WWHL"].get("guests", {}).get(dd)
+            bravo.append({"show": "WWHL", "code": "WWHL", "color": "#ffd25a", "time": "~" + t12(c["WWHL"].get("time", "23:00")), "title": g[0] if g else "Guests TBA", "url": f"{SITE}/wwhl"})
+        peacock = []
+        for x in sorted([x for x in c["EPISODES"] if drop_of(x) == dd], key=lambda x: x[1]):
+            m = shows_meta.get(x[2]) or [x[2][:3], "#7b6be0", "#3f2f9c"]
+            peacock.append({"show": x[2], "code": m[0], "color": m[1], "time": "6:00 AM", "title": x[3], "url": (x[7] if len(x) > 7 and x[7] else "") or peacock_url(x[2])})
+        days.append({"date": dd, "bravo": bravo, "peacock": peacock})
+    json.dump({"updated": c["UPDATED"], "site": SITE, "days": days}, open("schedule.json", "w"), separators=(",", ":"))
     json.dump(pages, open("showpages.json", "w"))
     print(f"show pages: {len(pages)} ({', '.join(pages)})")
     return pages

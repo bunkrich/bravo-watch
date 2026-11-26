@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0718">
+<title>Bravo Schedule iPhone Widget · Clubhouse Tonight</title>
+<meta name="description" content="Put tonight's Bravo lineup, WWHL guests or Peacock drops on your iPhone home screen with a free widget. Setup takes two minutes.">
+<link rel="canonical" href="https://clubhousetonight.com/widget">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+:root{--ink:#f5f1ff;--mut:#aea3c8;--dim:#8579a1;--line:rgba(255,255,255,.12);--glass:rgba(255,255,255,.06);--pink:#ff4fae;--sun:#ffd25a;--cyan:#3ee6ea}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:#0b0718;font:16px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(40vmax 40vmax at 8% 0%,rgba(255,79,174,.26),transparent 60%),radial-gradient(38vmax 38vmax at 100% 30%,rgba(62,230,234,.16),transparent 60%)}
+a{color:inherit}.wrap{width:min(760px,100% - 2*max(16px,4vw));margin-inline:auto}
+.bar{position:sticky;top:0;z-index:5;background:rgba(11,7,24,.55);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;min-height:60px}
+.brand{font-weight:800;letter-spacing:-.02em;font-size:20px;text-decoration:none}.brand span{background:linear-gradient(90deg,var(--pink),var(--sun));-webkit-background-clip:text;background-clip:text;color:transparent}
+.back{font-size:14px;font-weight:600;color:var(--mut);text-decoration:none}
+h1{font-size:clamp(28px,5vw,40px);line-height:1.1;letter-spacing:-.03em;margin:36px 0 8px}
+.lead{color:var(--mut);margin:0 0 22px;font-size:17px}
+.card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:20px 22px;margin:0 0 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 30px rgba(0,0,0,.25)}
+h2{font-size:19px;margin:0 0 10px}
+ol{margin:0;padding-left:22px}li{margin:8px 0}b{color:var(--ink)}.mut{color:var(--mut)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;cursor:pointer;font-family:inherit;font-weight:800;font-size:16px;line-height:1;padding:14px 20px;border-radius:99px;color:#0b0718;background:linear-gradient(90deg,var(--pink),var(--sun));text-decoration:none}
+.btn2{background:rgba(255,255,255,.1);color:var(--ink);border:1px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
+textarea{width:100%;height:160px;margin-top:12px;font:12px/1.4 ui-monospace,Menlo,monospace;color:var(--mut);background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:14px;padding:12px}
+.ok{display:none;color:#9ff5cf;font-weight:700;margin-left:4px}.copied .ok{display:inline}
+code{font-family:ui-monospace,Menlo,monospace;background:rgba(255,255,255,.08);padding:1px 6px;border-radius:6px}
+footer{padding:22px 0 48px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<div class="bar"><div class="wrap"><a class="brand" href="/">Clubhouse <span>Tonight</span></a><a class="back" href="/">← Tonight's schedule</a></div></div>
+<main class="wrap">
+  <h1>Bravo on your home screen</h1>
+  <p class="lead">A free iPhone widget that shows the next new episodes (or Peacock drops) at a glance. Tap it to open the full schedule. It updates itself.</p>
+
+  <section class="card">
+    <h2>1. Get the free Scriptable app</h2>
+    <p class="mut">Scriptable is a free, well-known iPhone app that runs small widgets like this one.</p>
+    <div class="row"><a class="btn btn2" href="https://apps.apple.com/us/app/scriptable/id1405459188">Open in the App Store</a></div>
+  </section>
+
+  <section class="card" id="code">
+    <h2>2. Copy the widget</h2>
+    <div class="row"><button class="btn" id="copy" type="button">Copy widget code</button><span class="ok">Copied ✓</span></div>
+    <ol>
+      <li>Open <b>Scriptable</b> and tap <b>+</b> (top right).</li>
+      <li>Paste the code, then tap the title at the top and name it <b>Clubhouse Tonight</b>.</li>
+      <li>Tap <b>▶</b> to preview it, then <b>Done</b>.</li>
+    </ol>
+    <textarea id="src" readonly>/*WIDGET_CODE*/</textarea>
+  </section>
+
+  <section class="card">
+    <h2>3. Add it to your home screen</h2>
+    <ol>
+      <li>Long-press an empty spot on your home screen, tap <b>Edit</b> → <b>Add Widget</b>.</li>
+      <li>Search <b>Scriptable</b>, pick the <b>Large</b> (most nights) or <b>Medium</b> size, and tap <b>Add Widget</b>.</li>
+      <li>Long-press the new widget → <b>Edit Widget</b> → set <b>Script</b> to <b>Clubhouse Tonight</b>.</li>
+      <li>Set <b>When Interacting</b> to <b>Open URL</b> and <b>URL</b> to <code>https://clubhousetonight.com</code> so a tap opens the schedule.</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>Peacock person?</h2>
+    <p>In <b>Edit Widget</b>, type <code>peacock</code> in <b>Parameter</b>. The widget switches to Peacock drop times (6:00 AM the morning after). You can add one of each.</p>
+  </section>
+</main>
+<footer><div class="wrap">Times are Eastern. Not affiliated with Bravo, NBCUniversal, Peacock or Scriptable. · <a href="/about">About &amp; contact</a></div></footer>
+<script>
+document.getElementById("copy").addEventListener("click",async()=>{const t=document.getElementById("src");let ok=false;
+try{await navigator.clipboard.writeText(t.value);ok=true}catch(e){t.select();try{ok=document.execCommand("copy")}catch(_){}}
+if(ok)document.getElementById("code").classList.add("copied");try{window.umami&&umami.track("widget_copy")}catch(e){}});
+(()=>{let me=false;try{me=!!localStorage.getItem("umami.disabled")}catch(e){}if(me||!["clubhousetonight.com","www.clubhousetonight.com"].includes(location.hostname))return;
+const c=document.createElement("script");c.defer=true;c.src="https://static.cloudflareinsights.com/beacon.min.js";c.dataset.cfBeacon=JSON.stringify({token:"e327c2f1f9b24f13bec12fed2dfbdeb0"});document.head.appendChild(c);
+const s=document.createElement("script");s.defer=true;s.src="https://cloud.umami.is/script.js";s.dataset.websiteId="cfb9dce1-a6ac-41b5-8f97-0c982d277fe9";s.dataset.domains="clubhousetonight.com,www.clubhousetonight.com";document.head.appendChild(s)})();
+</script>
+</body>
+</html>
