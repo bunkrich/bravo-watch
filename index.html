@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Bravo Watch Calendar</title>
+<style>
+/* VOICE everyday guide: calm, fast, glanceable
+   IDEA frosted-glass TV guide floating over a Miami-night colour wash
+   PICTURE the 7-night grid itself, tonight lit up
+   COLOUR night #0b0718, neon pink #ff4fae, cyan #3ee6ea, sun #ffd25a over soft colour blobs
+   TYPE system UI stack only (no web fonts, instant load), tabular numbers for times
+   LAYOUT sticky glass bar; one 12-col-free CSS grid system: auto-fill card grids that line up at every width */
+:root{--bg:#0b0718;--ink:#f5f1ff;--mut:#aea3c8;--dim:#7d7299;--line:rgba(255,255,255,.12);--glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.1);--hi:inset 0 1px 0 rgba(255,255,255,.16);--pink:#ff4fae;--cyan:#3ee6ea;--sun:#ffd25a;--ok:#4be8a0;--rep:#ffb547;--chk:#ff7090;--r:20px;--gap:clamp(12px,2vw,18px);--time:5.4rem;--bd:44px}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;overflow-x:clip;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(40vmax 40vmax at 8% 0%,rgba(255,79,174,.28),transparent 60%),radial-gradient(38vmax 38vmax at 100% 20%,rgba(62,230,234,.18),transparent 60%),radial-gradient(45vmax 45vmax at 60% 110%,rgba(255,138,61,.18),transparent 60%),var(--bg)}
+a{color:inherit}
+svg.i{width:1.05em;height:1.05em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wrap{width:min(1200px,100% - 2*max(16px,4vw));margin-inline:auto}
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--hi),0 10px 30px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%)}
+/* bar */
+.bar{position:sticky;top:0;z-index:10;background:rgba(11,7,24,.55);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:16px;min-height:60px}
+.brand{font-weight:800;letter-spacing:-.02em;font-size:18px;text-decoration:none;white-space:nowrap;flex:none}
+.brand span{color:var(--pink)}
+.nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-left:auto}
+.nav::-webkit-scrollbar{display:none}
+.nav a{flex:none;text-decoration:none;font-size:14px;font-weight:600;color:var(--mut);padding:8px 12px;border-radius:99px}
+.nav a:hover,.nav a:focus-visible{color:var(--ink);background:var(--glass2);outline:none}
+/* header */
+header{padding:clamp(28px,5vw,56px) 0 8px}
+h1{font-size:clamp(32px,5vw,48px);line-height:1.05;letter-spacing:-.03em;margin:0;font-weight:800}
+h1 span{background:linear-gradient(90deg,var(--pink),var(--sun));-webkit-background-clip:text;background-clip:text;color:transparent}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--mut);padding:6px 12px;border-radius:99px;background:var(--glass);border:1px solid var(--line);white-space:nowrap}
+.chip svg{color:var(--cyan)}
+.stale{display:none;background:rgba(255,79,174,.18);border-color:rgba(255,79,174,.5);color:#ffd0e8}
+/* sections */
+section{padding:clamp(24px,4vw,40px) 0}
+h2{font-size:clamp(22px,2.6vw,28px);letter-spacing:-.02em;margin:0 0 4px;font-weight:750;display:flex;align-items:center;gap:10px}
+h2 svg{color:var(--cyan)}
+.sub{color:var(--mut);margin:0 0 18px;font-size:15px}
+.grid{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--min,320px)),1fr))}
+/* rows: badge | details; time sits top-right so it never eats width */
+.row{display:grid;grid-template-columns:var(--bd) minmax(0,1fr);gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.nm{font-weight:700;font-size:15.5px;line-height:1.3}
+.tm{flex:none;font-size:15px;font-weight:750;letter-spacing:-.01em;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--sun)}
+.tm .ap{font-size:11px;font-weight:700;margin-left:2px;color:var(--mut)}
+.tm.dim{color:var(--mut)}
+.badge{flex:none;width:var(--bd);min-width:var(--bd);height:var(--bd);aspect-ratio:1;border-radius:12px;display:grid;place-items:center;font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 4px 12px rgba(0,0,0,.25)}
+.badge.ww{background:linear-gradient(145deg,#fff,#cbbfe6);color:#1b1230;font-size:10.5px}
+.ds{color:var(--mut);font-size:13.5px;line-height:1.35;margin-top:2px}
+.syn{font-size:13.5px;line-height:1.45;color:#ddd5f2;margin-top:6px}
+.metaln{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:99px;white-space:nowrap}
+.pill svg{width:11px;height:11px;stroke-width:2.8}
+.p-ok{color:var(--ok);background:rgba(75,232,160,.12)}.p-li{color:#d2c8ec;background:rgba(255,255,255,.08)}.p-rep{color:var(--rep);background:rgba(255,181,71,.13)}.p-chk{color:var(--chk);background:rgba(255,112,144,.14)}
+.pk{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#d2c8ec;text-decoration:none;padding:3px 9px 3px 7px;border-radius:99px;background:var(--glass);border:1px solid var(--line);max-width:100%}
+.pk svg{width:11px;height:11px}
+a.pk:hover{border-color:var(--cyan);color:#fff}
+.pk.live{color:var(--ok);border-color:rgba(75,232,160,.4)}
+/* day cards */
+.days{align-items:start}
+.day{padding:4px 18px 8px;display:flex;flex-direction:column}
+.wwq{display:flex;gap:8px;align-items:flex-start;padding:10px 0 12px;border-top:1px solid var(--line);font-size:13.5px;color:var(--dim)}
+.wwq b{color:var(--mut);font-weight:700}
+.dh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:14px 0 6px}
+.dh b{font-size:19px;font-weight:750;letter-spacing:-.01em}
+.dh span{font-size:13px;font-weight:600;color:var(--mut);white-space:nowrap}
+.day.now{background:linear-gradient(160deg,rgba(255,79,174,.16),rgba(255,255,255,.05));border-color:rgba(255,79,174,.45)}
+.day.now .dh b{color:var(--pink)}
+.quiet{display:flex;gap:8px;align-items:center;color:var(--dim);font-size:14.5px;padding:10px 0 12px}
+/* premieres */
+.prem{padding:18px;display:flex;flex-direction:column;gap:10px}
+.ph{display:flex;align-items:center;gap:12px}
+.ph h3{margin:0;font-size:17px;line-height:1.25;font-weight:750}
+.ph .ds{margin-top:3px}
+.cd{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cd div{text-align:center;padding:8px 4px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid var(--line)}
+.cd b{display:block;font-size:26px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--sun);line-height:1.1}
+.cd span{font-size:11.5px;color:var(--mut);font-weight:600}
+.list{list-style:none;margin:0;padding:0;font-size:14px}
+.list li{display:grid;grid-template-columns:4.2rem minmax(0,1fr);gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.list b{color:var(--cyan);font-weight:650;font-variant-numeric:tabular-nums}
+.event{padding:16px 18px;display:grid;grid-template-columns:var(--bd) minmax(0,1fr);gap:12px;align-items:start;border-color:rgba(62,230,234,.35)}
+.event .badge{background:linear-gradient(145deg,var(--cyan),#2a9df4)}
+.event h3{margin:0;font-size:16px;font-weight:700;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+/* after shows */
+.as{padding:18px;display:flex;flex-direction:column;gap:12px}
+.as.on{border-color:rgba(75,232,160,.4)}
+.st{font-size:12.5px;font-weight:700;color:var(--dim)}
+.as.on .st{color:var(--ok)}
+.kv{display:grid;grid-template-columns:4.2rem minmax(0,1fr);gap:6px 10px;font-size:14px;margin:0}
+.kv dt{color:var(--mut)}
+.kv dd{margin:0;font-weight:600}
+.note{font-size:13.5px;line-height:1.45;color:var(--mut);margin:0}
+/* lineup */
+.week{display:grid;gap:10px;grid-template-columns:repeat(7,minmax(0,1fr))}
+.wd{padding:14px 12px;display:flex;flex-direction:column;gap:12px}
+.wd h3{margin:0;font-size:15px;font-weight:750;display:flex;justify-content:space-between;align-items:center}
+.wd h3 em{font-style:normal;font-size:11px;font-weight:800;color:var(--pink)}
+.wd.now{border-color:rgba(255,79,174,.5)}
+.slot{display:grid;grid-template-columns:36px minmax(0,1fr);gap:10px;align-items:center}
+.slot .badge{--bd:36px;font-size:11px;border-radius:11px}
+.slot .tm{font-size:14px;display:block}
+.slot .n{font-size:13px;font-weight:600;line-height:1.25}
+.slot .x{font-size:11.5px;color:var(--cyan);line-height:1.3}
+.wd .no{color:var(--dim);font-size:13px;margin:0}
+/* feeds */
+.two{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.feed{list-style:none;margin:0;padding:6px 18px}
+.feed li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;padding:12px 0;border-top:1px solid var(--line);align-items:start}
+.feed li:first-child{border-top:0}
+.fi{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--glass2)}
+.fi svg{width:15px;height:15px}
+.i-ok{color:var(--ok)}.i-li{color:#d2c8ec}.i-rep{color:var(--rep)}.i-chk{color:var(--chk)}
+.feed .k{font-size:12.5px;font-weight:600;color:var(--mut)}
+.feed .v{font-size:14.5px;line-height:1.4}
+/* history */
+.hist{list-style:none;margin:0;padding:0;--min:250px}
+.hist li{padding:12px 14px;display:grid;grid-template-columns:var(--bd) minmax(0,1fr);gap:12px;align-items:center}
+.hd{font-size:12.5px;font-weight:700;color:var(--sun);font-variant-numeric:tabular-nums}
+.hn{font-weight:700;font-size:14.5px;line-height:1.25}
+.hs{font-size:12.5px;color:var(--mut)}
+/* footer */
+footer{padding:32px 0 48px;color:var(--mut);font-size:14px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-bottom:18px}
+.src{display:grid;gap:0 24px;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr))}
+.src a{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);text-decoration:none}
+.src a:hover{color:var(--cyan)}
+.fine{margin-top:18px;color:var(--dim);font-size:13px}
+@media(max-width:1000px){.week{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:640px){:root{--bd:38px}.week{grid-template-columns:repeat(2,minmax(0,1fr))}.day{padding:2px 14px 6px}.bar .wrap{gap:10px}.nav a{padding:8px 9px;font-size:13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.glass{background:rgba(30,22,52,.92)}.bar{background:rgba(11,7,24,.95)}}
+/* collapsible sections */
+.stack{display:grid;gap:10px}
+details.sec{padding:0;overflow:hidden}
+details.sec>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:16px 18px;min-height:56px}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px;border-radius:var(--r)}
+.si{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--glass2);color:var(--cyan)}
+.st2 b{display:block;font-size:16px;font-weight:750;letter-spacing:-.01em}
+.st2 span{display:block;font-size:13px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{width:18px;height:18px;color:var(--mut);transition:transform .2s}
+details[open] .chev{transform:rotate(180deg)}
+.body{padding:2px 18px 16px;border-top:1px solid var(--line)}
+.body .grid{margin-top:14px}
+.inner{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px}
+/* compact lineup */
+.lr{display:grid;grid-template-columns:3rem minmax(0,1fr);gap:12px;padding:11px 0;border-top:1px solid var(--line);align-items:baseline}
+.lr:first-child{border-top:0}
+.lr .dn{font-weight:750;font-size:14px;color:var(--mut)}
+.lr.now .dn{color:var(--pink)}
+.slots{display:flex;flex-wrap:wrap;gap:4px 18px}
+.sl{font-size:14.5px;display:inline-flex;flex-wrap:wrap;gap:0 6px;align-items:baseline}
+.sl .tm{font-size:13.5px}
+.sl em{font-style:normal;font-size:12.5px;color:var(--cyan)}
+.lr .none{color:var(--dim);font-size:14px}
+/* reunions */
+.ru{display:grid;grid-template-columns:var(--bd) minmax(0,1fr);gap:12px;padding:12px 0;border-top:1px solid var(--line);align-items:center}
+.ru:first-child{border-top:0}
+.trl{color:var(--sun)!important}
+.srcl{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--cyan);text-decoration:none;margin-top:4px}
+.srcl svg{width:11px;height:11px}
+.srcl:hover{text-decoration:underline}
+.metaln .srcl{margin-top:0}
+.pl{text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.pl svg{width:10px;height:10px;color:var(--cyan)}
+.pl:hover b,.pl:hover{color:var(--cyan)}
+/* Next 7 nights: 7 columns on wide screens, one column otherwise */
+@media(min-width:1200px){
+#week .wrap{width:min(1760px,100% - 2*max(16px,2.5vw))}
+.days{grid-template-columns:repeat(7,minmax(0,1fr));align-items:stretch;gap:10px}
+.day{padding:2px 12px 8px}
+.dh{flex-direction:column;align-items:flex-start;gap:0;padding:12px 0 6px}
+.dh b{font-size:17px}
+.days .row{grid-template-columns:minmax(0,1fr);gap:0;padding:10px 0}
+.days .row>.badge{display:none}
+.days .top{flex-direction:column;align-items:flex-start;gap:0}
+.days .top .tm{order:-1;font-size:13.5px}
+.days .nm{font-size:14.5px}
+.days .ds,.days .syn{font-size:12.5px}
+.days .syn{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.days .metaln{gap:4px}
+.days .pk{font-size:11px;padding:2px 7px 2px 6px}
+.days .wwq{font-size:12.5px}
+.days .quiet{font-size:13px}
+}
+@media(max-width:1199px){.days{grid-template-columns:minmax(0,1fr)}}
+.wwq>svg{margin-top:2px}
+/* section bands: each section gets its own accent wash so they separate but flow */
+section{position:relative;isolation:isolate;padding:clamp(32px,5vw,56px) 0}
+section::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 20%,transparent) 0%,color-mix(in srgb,var(--ac) 7%,transparent) 40%,transparent 100%);border-top:1px solid color-mix(in srgb,var(--ac) 65%,transparent);box-shadow:0 -1px 18px color-mix(in srgb,var(--ac) 35%,transparent)}
+#week{--ac:var(--pink)}#lineup{--ac:#b18cff}#coming{--ac:var(--cyan)}#more{--ac:var(--sun)}
+section h2 svg{color:var(--ac);filter:drop-shadow(0 0 8px color-mix(in srgb,var(--ac) 60%,transparent))}
+section h2{margin-bottom:6px}
+#coming .prem{border-color:color-mix(in srgb,var(--cyan) 30%,var(--line))}
+#more .si{color:var(--sun);background:color-mix(in srgb,var(--sun) 12%,transparent)}
+#lu .lr{padding:13px 0}
+#lu .lr .dn{font-size:15px}
+#lu .sl{font-size:15.5px}
+/* combined header bar */
+.bar .wrap{flex-wrap:wrap;gap:8px 14px;padding:10px 0}
+.brand{font-size:clamp(18px,2.2vw,22px);font-weight:800;letter-spacing:-.02em}
+.brand span{background:linear-gradient(90deg,var(--pink),var(--sun));-webkit-background-clip:text;background-clip:text;color:transparent}
+.chip.mini{font-size:12px;padding:4px 10px}
+#week{padding-top:clamp(24px,3.5vw,40px)}
+@media(max-width:700px){.bar .nav{order:3;width:100%;margin-left:0}.bar .wrap{gap:6px 10px}}
+/* scroll reveal: soft fade-up, once */
+.rv{opacity:0;transform:translateY(12px);filter:blur(3px);transition:opacity .55s ease,transform .6s cubic-bezier(.2,.7,.2,1),filter .55s ease}
+.rv.in{opacity:1;transform:none;filter:none}
+h2.rv{letter-spacing:.03em;transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1),filter .6s ease,letter-spacing .9s cubic-bezier(.2,.7,.2,1)}
+h2.rv.in{letter-spacing:-.02em}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;filter:none;transition:none}}
+.as-b svg{width:20px;height:20px}
+section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
+/* tap-to-expand rows in Next 7 nights */
+.days .xr{cursor:pointer;border-radius:10px;transition:background .2s}
+.days .xr:hover{background:rgba(255,255,255,.035)}
+.days .xr:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.dsx{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.chv{width:15px;height:15px;flex:none;color:var(--dim);margin-top:1px;transition:transform .2s}
+.xr[aria-expanded=true] .chv{transform:rotate(180deg);color:var(--mut)}
+.days .more{display:none}
+.days .xr[aria-expanded=true] .more{display:block}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+<symbol id="i-mega" viewBox="0 0 24 24"><path d="m3 11 18-5v12L3 14v-3z"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></symbol>
+<symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="m7 4 13 8-13 8z"/></symbol>
+<symbol id="i-film" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 12h20"/></symbol>
+<symbol id="i-tv" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="m17 2-5 5-5-5"/></symbol>
+<symbol id="i-swap" viewBox="0 0 24 24"><path d="m16 3 4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16"/></symbol>
+<symbol id="i-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="5"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+<symbol id="i-ticket" viewBox="0 0 24 24"><path d="M2 9a3 3 0 0 0 0 6v3a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-3a3 3 0 0 0 0-6V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/></symbol>
+<symbol id="i-chair" viewBox="0 0 24 24"><path d="M6 19v2M18 19v2M5 11V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6M3 11h18v5H3z"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-4-1L3 20l1.2-4A8.4 8.4 0 0 1 3 11.5 8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+</svg>
+
+<div class="bar" id="top"><div class="wrap">
+  <a class="brand" href="#top">Bravo <span>Watch Calendar</span></a>
+  <span class="chip mini" id="upd"></span>
+  <span class="chip mini stale" id="stale">Refresh overdue</span>
+  <nav class="nav"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav>
+</div></div>
+
+<section id="week"><div class="wrap">
+  <h2><svg class="i"><use href="#i-cal"/></svg>Next 7 Nights on Bravo</h2>
+  <div class="grid days" id="days"></div>
+</div></section>
+
+<section id="lineup"><div class="wrap">
+  <h2><svg class="i"><use href="#i-tv"/></svg>Current weekly lineup</h2>
+    <div id="lu"></div>
+</div></section>
+
+<section id="coming"><div class="wrap">
+  <h2><svg class="i"><use href="#i-spark"/></svg>Coming up</h2>
+  <div class="grid" id="prem" style="--min:340px;align-items:start"></div>
+</div></section>
+
+<section id="more"><div class="wrap">
+  <h2><svg class="i"><use href="#i-list"/></svg>More</h2>
+  <div class="stack" id="stack"></div>
+</div></section>
+
+<footer><div class="wrap">
+  <p class="fine">All times Eastern. Updated every morning. Not affiliated with Bravo, NBCUniversal or Peacock; show names and trademarks belong to their owners. Episode details are summarized in our own words, with links to official sources. Bravo's own schedule comes first; anything not confirmed by Bravo is tagged.</p>
+</div></footer>
+
+<script>
+{
+/* ===== DATA: edit this block each day =====
+   SOURCE PRIORITY (accuracy): 1) Bravo: bravotv.com/schedule (today's episodes, titles, synopses, "Network Premiere" = new),
+   Daily Dish schedule/premiere posts, official Bravo social; 2) Peacock episode pages (after air); 3) TV listings
+   (whenitsout, TV Weekly) for future titles = status "li"; 4) press/fan reports (EntertainmentNow, Bravo and Cocktails) = "rep".
+   Two sources that disagree = "chk" until Bravo settles it. Synopses: short paraphrase in our own words, never copied. */
+const UPDATED = "2026-11-25";
+const LISTED_THROUGH = "2026-12-09"; /* last date episode listings are filled in */
+const SHOWS = { /* code, colour pair, icon, Peacock page */
+  "Still Flipping Out":["SFO","#a78bfa","#6d28d9","tv","https://www.peacocktv.com/watch-online/tv/still-flipping-out/7620720323445966112"],
+  "RHUGT: Roaring 20th":["UGT","#f472b6","#be185d","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-ultimate-girls-trip/7959978440999457112/seasons/5"],
+  "Next Gen NYC":["NGN","#60a5fa","#1d4ed8","tv","https://www.peacocktv.com/watch-online/tv/next-gen-nyc/4677501932570333112"],
+  "RHORI":["RI","#22d3ee","#0e7490","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-rhode-island/8574798914766255112/seasons/1"],
+  "Ladies of London: The New Reign":["LOL","#e879f9","#7e22ce","crown","https://www.peacocktv.com/watch-online/tv/ladies-of-london/5120482410719617112"],
+  "Southern Hospitality":["SH","#34d399","#047857","glass","https://www.peacocktv.com/watch-online/tv/southern-hospitality/6614170128718896112"],
+  "Below Deck Down Under":["BDU","#38bdf8","#0369a1","anchor","https://www.peacocktv.com/watch-online/tv/below-deck-down-under/7603676207447885112/seasons/4"],
+  "The Valley: Persian Style":["VPS","#fb923c","#c2410c","tv","https://www.peacocktv.com/watch-online/tv/the-valley-persian-style/8097961647034034112"],
+  "RHOSLC":["SLC","#ff3fa4","#9b2cff","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-salt-lake-city/8062314053813296112"],
+  "RHONY":["NY","#2de2e6","#3a5bff","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-new-york-city/8023583101930400112/seasons/16"],
+  "RHOP":["POT","#ff8a3d","#ff3f6c","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-potomac/8038056425113847112/seasons/11"],
+  "RHONJ":["NJ","#ffd23f","#ff8a3d","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-new-jersey/6825525389042832112"],
+  "Below Deck":["BD","#1fb6ff","#0a5cd6","anchor","https://www.peacocktv.com/stream-tv/below-deck"],
+  "Southern Charm":["SC","#47f0a0","#0f9d8a","glass","https://www.peacocktv.com/watch-online/tv/southern-charm/8058982241606202112/seasons/12"],
+  "Small Town Trouble: Texas":["STT","#ff6b3d","#c2185b","star","https://www.peacocktv.com/watch-online/tv/small-town-trouble-texas/4841643441022334112"],
+  "Wife Swap: RH Edition":["WS","#c86bff","#ff3fa4","house","https://www.peacocktv.com/watch-online/tv/wife-swap-the-real-housewives-edition/6519457940197890112"]
+};
+const TRAILERS = { /* show -> official trailer page */
+  "RHONY":"https://www.bravotv.com/the-daily-dish/rhony-season-16-midseason-trailer-hailey-glassman-cries-lindsay-hubbard-cameo",
+  "RHOSLC":"https://www.bravotv.com/the-daily-dish/rhoslc-season-7-trailer-teases-whitney-angie-bronwyn-splits",
+  "RHOP":"https://www.bravotv.com/the-daily-dish/rhop-season-11-everything-to-know",
+  "Southern Charm":"https://www.bravotv.com/the-daily-dish/southern-charm-season-12-everything-to-know",
+  "Small Town Trouble: Texas":"https://www.peacocktv.com/watch-online/tv/small-town-trouble-texas/4841643441022334112",
+  "Wife Swap: RH Edition":"https://www.bravotv.com/the-daily-dish/wife-swap-real-housewives-edition-season-2-everything-to-know"
+};
+const REUNIONS = [ /* show, title, status text, st, source URL */
+  ["RHONY","RHONY Season 16 reunion","Taped Nov 19 in NYC; air date and number of parts not announced","ok","https://www.bravotv.com/index%2ephp/the-daily-dish/rhony-season-16-reunion-everything-to-know"],
+  ["RHOSLC","RHOSLC Season 7 reunion","In the works: Bravo opened a fan vote for a reunion question on Nov 11; no taping or air date announced","ok","https://www.bravotv.com/index%2Ephp/the-daily-dish/cast/ashley-quai"],
+  ["RHOP","RHOP Season 11 reunion","Nothing announced yet","chk",""]
+];
+const PEACOCK_DROP = "06:00"; /* new episodes land on Peacock the next morning */
+const WWHL = { /* Watch What Happens Live, Sun-Thu after the last original */
+  time:"23:00", /* usual start; Bravo says it shifts nightly with the lineup */
+  peacock:"https://www.peacocktv.com/watch-online/tv/watch-what-happens-live-with-andy-cohen/8809822949267363112",
+  off:[["2026-11-22","2026-11-28","Off for Thanksgiving week \u00b7 no new episodes listed","rep"]],
+  guests:{ /* "YYYY-MM-DD":["Guest & Guest","st"] */
+    "2026-11-15":["Jeff Lewis & Stacey Rusch","ok"],"2026-11-16":["Jamie Dornan & Anthony Mackie","ok"],"2026-11-17":["Christina Ricci & Sai De Silva","ok"],"2026-11-18":["Julia Garner & Mary Cosby","ok"],"2026-11-19":["Jennifer Lawrence & Josh Hutcherson","ok"]
+  }
+};
+const HISTORY = [ /* past premieres, newest first: date, show, season, night/time, source */
+  ["2026-11-18","Small Town Trouble: Texas","S1 series premiere","Wed 9:00 PM \u00b7 two hours"],
+  ["2026-11-12","Southern Charm","S12","Thu 9:00 PM"],
+  ["2026-10-11","RHOP","S11","Sun 8:00 PM"],
+  ["2026-09-28","Still Flipping Out","S1 series premiere","Mon 9:00 PM"],
+  ["2026-09-16","RHOSLC","S7","Wed 8:00 PM"],
+  ["2026-09-08","RHONY","S16","Tue 8:00 PM"],
+  ["2026-08-09","RHUGT: Roaring 20th","Ultimate Girls Trip","Sun 8:00 PM"],
+  ["2026-06-24","Next Gen NYC","S2","Wed"],
+  ["2026-04-02","RHORI","S1 series premiere","Thu, then Sun 9:00 PM"],
+  ["2026-03-05","Ladies of London: The New Reign","Series premiere","Thu 9:00 PM \u00b7 two hours"],
+  ["2026-03-04","Southern Hospitality","S4","Wed"],
+  ["2026-02-02","Below Deck Down Under","S4","Mon 8:00 PM"],
+  ["2026-01-08","The Valley: Persian Style","S1 series premiere","Thu 9:00 PM"]
+];
+const EPISODES = [ /* date, time, show, "S E · title · note", status, synopsis (optional, fill when Bravo/Peacock posts it) */
+  ["2026-11-25","20:00","RHOSLC","S7 E11 \u00b7 Maui Mystery, Solved","ok","The group hunts for whoever has been leaking info to Mary, Meredith lands a big DJ gig, and the Maui trip exposes the culprit."],
+  ["2026-11-25","21:00","Small Town Trouble: Texas","S1 E2 \u00b7 Double Date and Double Standards","ok","A night at a lesbian bar stirs up jealousy for Aaryn and Annari, Hailey weighs a career change, and old feuds cool off at Honky Tonk Thursday."],
+  ["2026-11-26","20:00","Southern Charm","S12 E3 \u00b7 No Bunny Business \u00b7 an hour early for Thanksgiving","li",""],
+  ["2026-11-29","20:00","RHOP","S11 E8 \u00b7 Surprise Surprise","li",""],
+  ["2026-11-30","20:00","Below Deck","S13 E8 \u00b7 Shape Up or Ship Out","li",""],
+  ["2026-12-01","20:00","RHONY","S16 E12 \u00b7 back after a Thanksgiving-week break","li",""],
+  ["2026-12-02","20:00","RHOSLC","S7 E12 \u00b7 Lei Down the Law","li",""],
+  ["2026-12-02","21:00","Small Town Trouble: Texas","S1 E3 \u00b7 All Hail the Corn Queen","li",""],
+  ["2026-12-03","21:00","Southern Charm","S12 E4 \u00b7 back at 9:00 PM","li",""],
+  ["2026-12-06","20:00","RHOP","S11 E9 \u00b7 Sorori-Tea! FUN","li",""],
+  ["2026-12-07","20:00","Below Deck","S13 E9 \u00b7 Smoke and Mirrors","li",""],
+  ["2026-12-08","20:00","RHONY","S16 E13","li",""],
+  ["2026-12-09","20:00","RHOSLC","S7 E13","li",""],
+  ["2026-12-09","21:00","Small Town Trouble: Texas","S1 E4 \u00b7 The Forbidden Apple","li",""],
+  ["2026-12-13","20:00","RHOP","S11 E10","li",""],
+  ["2026-12-14","20:00","Below Deck","S13 E10 \u00b7 Nauti Boys","li",""],
+  ["2026-12-30","21:00","Wife Swap: RH Edition","S2 E1\u20132 \u00b7 Nine Kids and a Baby Gorgeous / Mommy Cheerest","ok","Lisa Barlow and Angela Oakley swap lives in the two-episode premiere."],
+  ["2027-01-06","21:00","Wife Swap: RH Edition","S2 E3 \u00b7 There's No Crying in Trapeze!","ok","Featuring Gina Kirschenheiter."],
+  ["2027-01-13","21:00","Wife Swap: RH Edition","S2 E4 \u00b7 Everything's Running Smoothie","ok","Featuring Stephanie Hollman."],
+  ["2027-01-19","","RHONJ","S15 premiere \u00b7 time not announced","ok",""],
+  ["2027-01-20","21:00","Wife Swap: RH Edition","S2 E5 \u00b7 Ranch Realness","ok","Featuring Phaedra Parks."],
+  ["2027-01-27","21:00","Wife Swap: RH Edition","S2 E6 \u00b7 9021-Oh No \u00b7 finale","ok","Featuring Crystal Kung-Minkoff."]
+];
+const PREMIERES = [
+  {date:"2026-12-30",time:"21:00",show:"Wife Swap: RH Edition",title:"Wife Swap: The Real Housewives Edition S2",when:"Wed 9:00 PM · two-episode premiere, then Wednesdays",st:"ok",
+   eps:[["Dec 30","Lisa Barlow and Angela Oakley"],["Jan 6","Gina Kirschenheiter"],["Jan 13","Stephanie Hollman"],["Jan 20","Phaedra Parks"],["Jan 27","Crystal Kung-Minkoff · finale"]]},
+  {date:"2027-01-19",time:"20:00",show:"RHONJ",title:"The Real Housewives of New Jersey S15",when:"Tuesday · time not announced; 8:00 PM expected (RHONY's slot)",st:"ok",
+   eps:[["Cast","Teresa, Melissa and Dolores, plus five new Housewives"]]}
+];
+const EVENTS = [ /* ISO date or text, name, detail, st, source URL */
+  ["2026-12-14","Watch Party by Bravo, NYC","VERSA NYC \u00b7 advance screening of a new RHOSLC S7 episode, surprise Bravolebs and games. Tickets through Bravo.","ok","https://www.bravotv.com/the-daily-dish/rhoslc-season-7-episode-watch-party-date-location-tickets-details"],
+  ["Fall 2027","BravoCon 2027","Returns in fall 2027; dates and city not announced","ok","https://www.bravotv.com/index%2ephp/the-daily-dish/andy-cohen-teases-bravocon-2027-date-details"]
+];
+const AFTERSHOWS = [ /* on:true + time = shown in Next 7 nights on every night that show has a new episode */
+  {show:"RHONY",title:"RHONY After Show S16",on:true,time:"21:00",url:"https://www.bravotv.com/the-daily-dish/how-to-watch-rhony-after-show-season-16",when:"Tuesdays, 9:00 PM",where:"BravoTV.com + YouTube; Peacock Wed 6:00 AM",next:"Dec 1, after RHONY E12",note:"Cast trios and solo sit-downs breaking down each episode. Started after Episode 5.",st:"ok"},
+  {show:"Southern Charm",title:"Southern Charm After Show S12",on:false,when:"Not announced",where:"Last season: BravoTV.com + YouTube, Wed 10:00 PM",next:"Watch for a mid-season launch",note:"Season 11's After Show started mid-season (Jan. 7), so Season 12's may follow the same pattern.",st:"rep"},
+  {show:"RHOSLC",title:"RHOSLC After Show S7",on:false,when:"No Season 7 After Show announced",where:"Past seasons: BravoTV.com + YouTube",next:"—",note:"Bravo hasn't listed one for this season.",st:"chk"}
+];
+const GRID = [
+  ["Sun",[["20:00","RHOP","S11",""]]],
+  ["Mon",[["20:00","Below Deck","S13",""]]],
+  ["Tue",[["20:00","RHONY","S16","RHONJ takes over Jan 19"],["21:00","RHONY","After Show","Online only"]]],
+  ["Wed",[["20:00","RHOSLC","S7",""],["21:00","Small Town Trouble: Texas","S1","Wife Swap S2 from Dec 30"]]],
+  ["Thu",[["21:00","Southern Charm","S12",""]]],
+  ["Fri",[]],
+  ["Sat",[]]
+];
+const CHANGES = [ /* logged, change (may use <b>), status, source URL */
+  ["Nov 25","<b>Southern Charm</b> Ep. 3 moves an hour early to 8:00 PM on Thanksgiving; back to 9:00 PM Dec 3","li","https://www.iwantmytvmagazine.com/listings/bravo"],
+  ["Nov 25","<b>RHONY</b> skipped Nov 24 for Thanksgiving week; returns Dec 1 with Ep. 12 and its After Show","li","https://whenitsout.com/tv/channel/bravo/"],
+  ["Nov 25","<b>WWHL</b> off for Thanksgiving week (Nov 22\u201328); last new episode listed Nov 19","rep","https://www.peacocktv.com/watch-online/tv/watch-what-happens-live-with-andy-cohen/8809822949267363112"],
+  ["Nov 20","<b>Wife Swap S2</b> takes Wed 9:00 PM from Dec 30, Small Town Trouble's slot. STT's end date isn't announced","ok","https://www.bravotv.com/the-daily-dish/wife-swap-real-housewives-edition-season-2-everything-to-know"],
+  ["Nov 16","<b>RHONJ S15</b> pushed from December to Tue Jan 19","ok","https://www.bravotv.com/the-daily-dish/when-does-rhonj-season-15-premiere-air-date-revealed"],
+  ["Nov","<b>Still Flipping Out</b> S1 ended; Mon 9:00 PM is open","li","https://whenitsout.com/tv/channel/bravo/"]
+];
+const RADAR = [ /* item, detail, status, source URL */
+  ["RHOBH S16","Expected February, after RHOSLC; Leah Remini and Tracy Tutor reported joining","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/"],
+  ["RHOA S18","Expected March, after RHOP","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/"],
+  ["RHORI S2","Renewed in May; expected April","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/"],
+  ["Summer House S11 \u00b7 Married to Medicine S13","Renewed at May upfronts; no dates","ok","https://www.nbcuniversal.com/article/bravo-unveils-new-series-vanderpump-rules-lisa-las-vegas-and-secrets-lies-texas-wives-alongside"],
+  ["New series","Secrets, Lies, Texas Wives and Vanderpump Rules: Lisa Las Vegas, announced at upfronts","ok","https://www.nbcuniversal.com/article/bravo-unveils-new-series-vanderpump-rules-lisa-las-vegas-and-secrets-lies-texas-wives-alongside"],
+  ["Holiday weeks","Skips around Christmas and New Year's not announced yet","chk","https://www.bravotv.com/the-daily-dish/bravo-winter-2026-schedule-full-lineup"]
+];
+const SOURCES = [
+  ["Bravo: Winter 2026 schedule","https://www.bravotv.com/the-daily-dish/bravo-winter-2026-schedule-full-lineup"],
+  ["Bravo: Wife Swap S2 episode guide","https://www.bravotv.com/the-daily-dish/wife-swap-real-housewives-edition-season-2-everything-to-know"],
+  ["Bravo: RHONJ S15 premiere date","https://www.bravotv.com/the-daily-dish/when-does-rhonj-season-15-premiere-air-date-revealed"],
+  ["Bravo: RHONY S16 After Show","https://www.bravotv.com/the-daily-dish/how-to-watch-rhony-after-show-season-16"],
+  ["Bravo: RHONY S16 reunion","https://www.bravotv.com/index%2ephp/the-daily-dish/rhony-season-16-reunion-everything-to-know"],
+  ["Bravo: Southern Charm S11 After Show","https://www.bravotv.com/index%2ephp/the-daily-dish/southern-charm-after-show-season-11-trailer-premiere-date-how-to-watch-details"],
+  ["Bravo: RHOSLC Watch Party NYC","https://www.bravotv.com/the-daily-dish/rhoslc-season-7-episode-watch-party-date-location-tickets-details"],
+  ["Bravo: daily schedule","https://www.bravotv.com/schedule"],
+  ["EntertainmentNow: 2027 Housewives schedule","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/"],
+  ["NBCUniversal: 2026 upfront renewals","https://www.nbcuniversal.com/article/bravo-unveils-new-series-vanderpump-rules-lisa-las-vegas-and-secrets-lies-texas-wives-alongside"],
+  ["Bravo: BravoCon 2027","https://www.bravotv.com/index%2ephp/the-daily-dish/andy-cohen-teases-bravocon-2027-date-details"],
+  ["Bravo: Who's on WWHL this week","https://www.bravotv.com/the-daily-dish/whos-on-wwhl-this-week-schedule-guests-clips-details"],
+  ["Seat42F: weekly WWHL guest lineups","https://seat42f.com/watch-what-happens-live-guests-november-15-19-2026/"],
+  ["Peacock: WWHL episodes","https://www.peacocktv.com/watch-online/tv/watch-what-happens-live-with-andy-cohen/8809822949267363112"],
+  ["Peacock: Bravo collection","https://www.peacocktv.com/collections/bravo"],
+  ["TV Weekly listings","https://www.iwantmytvmagazine.com/listings/bravo"],
+  ["WhenItsOut episode listings","https://whenitsout.com/tv/channel/bravo/"]
+];
+/* ===== END DATA ===== */
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ic=n=>`<svg class="i"><use href="#i-${n}"/></svg>`;
+const ST={ok:["Bravo","check"],li:["Listing","list"],rep:["Reported","mega"],chk:["Check","alert"]};
+const pill=k=>`<span class="pill p-${k}">${ic(ST[k][1])}${ST[k][0]}</span>`;
+const sh=n=>SHOWS[n]||[n.replace(/[^A-Z]/g,"").slice(0,3)||n.slice(0,2).toUpperCase(),"#7b6be0","#3f2f9c","tv",""];
+const badge=n=>{const s=sh(n);return `<span class="badge" style="background:linear-gradient(145deg,${s[1]},${s[2]})">${esc(s[0])}</span>`};
+const parts=t=>{let[h,m]=t.split(":").map(Number);const p=h>=12?"PM":"AM";h=h%12||12;return[h+":"+String(m).padStart(2,"0"),p]};
+const tH=t=>{if(!t)return"TBA";const[a,p]=parts(t);return`${a}<span class="ap">${p}</span>`};
+const tTxt=t=>parts(t).join(" ");
+const nyNow=()=>{const f=new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date());const g=t=>f.find(x=>x.type===t).value;return{d:`${g("year")}-${g("month")}-${g("day")}`,h:+g("hour"),m:+g("minute")}};
+const D=s=>new Date(s+"T12:00:00Z");
+const addDays=(s,n)=>{const d=D(s);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+const fd=(s,o)=>D(s).toLocaleDateString("en-US",Object.assign({timeZone:"UTC"},o));
+const diff=(a,b)=>Math.round((D(b)-D(a))/864e5);
+const now=nyNow(),today=now.d;
+const byDate=d=>EPISODES.filter(e=>e[0]===d).sort((a,b)=>a[1].localeCompare(b[1]));
+const safeB=s=>esc(s).replace(/&lt;(\/?)b&gt;/g,"<$1b>");
+const short=o=>fd(o,{month:"short",day:"numeric"});
+
+$("upd").innerHTML=`${ic("check")}Updated ${esc(short(UPDATED))}`;
+if(diff(UPDATED,today)>8)$("stale").style.display="inline-flex";
+
+/* links */
+const pk=(d,show,early)=>{const u=show==="WWHL"?WWHL.peacock:sh(show)[4];const drop=early||addDays(d,1);
+  const live=drop<today||(drop===today&&now.h*60+now.m>=360);
+  const lbl=live?"Streaming now":`${early?"Early · ":""}${fd(drop,{weekday:"short"})} 6 AM`;
+  const inner=`${ic("play")}Peacock ${esc(lbl)}`;
+  return u?`<a class="pk${live?" live":""}" href="${esc(u)}">${inner}</a>`:`<span class="pk">${inner}</span>`};
+const srcA=u=>u?`<a class="srcl" href="${esc(u)}">${ic("link")}Source</a>`:"";
+const trl=show=>TRAILERS[show]?`<a class="pk trl" href="${esc(TRAILERS[show])}">${ic("film")}Trailer</a>`:"";
+
+/* rows */
+const epRow=e=>`<div class="row xr" tabindex="0" role="button" aria-expanded="false">${badge(e[2])}<div><div class="top"><span class="nm">${esc(e[2])}</span><span class="tm">${tH(e[1])}</span></div><div class="ds dsx"><span>${esc(e[3])}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more">${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln">${pill(e[4])}${pk(e[0],e[2],e[6])}</div></div></div></div>`;
+const wwFor=d=>{const w=D(d).getUTCDay();if(w===5||w===6)return null;
+  const off=WWHL.off.find(o=>d>=o[0]&&d<=o[1]);if(off)return{off:1,ds:off[2].split(" · ")[0],st:off[3]};
+  const g=WWHL.guests[d];if(g)return{nm:g[0],ds:"Watch What Happens Live",st:g[1]};
+  return{nm:"Guests TBA",ds:"Watch What Happens Live · lineup posts the weekend before",st:null}};
+const wwRow=(w,d)=>w.off?`<div class="wwq">${ic("mic")}<div><div><b>WWHL</b> \u00b7 ${esc(w.ds)}</div><div class="metaln" style="margin-top:6px">${pill(w.st)}</div></div></div>`:`<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge ww">WWHL</span><div><div class="top"><span class="nm">${esc(w.nm)}</span><span class="tm dim">~${tH(WWHL.time)}</span></div><div class="ds dsx"><span>${esc(w.ds)}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more"><div class="metaln">${w.st?pill(w.st):""}${pk(d,"WWHL")}</div></div></div></div>`;
+
+/* After Show rows: same night as a new episode of that show */
+const asFor=(d,eps)=>AFTERSHOWS.filter(a=>a.on&&a.time&&eps.some(e=>e[2]===a.show)).map(a=>({t:a.time,html:`<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge as-b" style="background:linear-gradient(145deg,${sh(a.show)[1]},${sh(a.show)[2]})">${ic("chat")}</span><div><div class="top"><span class="nm">${esc(a.show)} After Show</span><span class="tm">${tH(a.time)}</span></div><div class="ds dsx"><span>Online only \u00b7 BravoTV.com + YouTube</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more"><div class="metaln">${pill(a.st)}<a class="pk" href="${esc(a.url)}">${ic("play")}Watch online</a>${pk(d,a.show)}</div></div></div></div>`}));
+/* 7 nights */
+let out="";
+for(let i=0;i<7;i++){const d=addDays(today,i),eps=byDate(d),w=wwFor(d);
+  const lbl=i===0?"Tonight":i===1?"Tomorrow":fd(d,{weekday:"long"});
+  out+=`<article class="day glass${i===0?" now":""}"><div class="dh"><b>${esc(lbl)}</b><span>${esc(short(d))}</span></div>`+
+   (eps.length?[...eps.map(e=>({t:e[1],html:epRow(e)})),...asFor(d,eps)].sort((x,y)=>x.t.localeCompare(y.t)).map(x=>x.html).join(""):`<div class="quiet">${ic(d<=LISTED_THROUGH?"tv":"clock")}${d<=LISTED_THROUGH?"Nothing new on Bravo":"Listings not published yet"}</div>`)+
+   (w?wwRow(w,d):"")+`</article>`}
+$("days").innerHTML=out;
+
+/* premieres */
+const prem=PREMIERES.filter(p=>p.date>=today);
+$("prem").innerHTML=prem.map((p,i)=>`<article class="prem glass"><div class="ph">${badge(p.show)}<div><h3>${esc(p.title)}</h3><div class="ds">${esc(fd(p.date,{weekday:"short",month:"short",day:"numeric"}))} · ${esc(p.when)}</div></div></div>
+<div class="cd" id="cd${i}"></div><ul class="list">${p.eps.map(x=>`<li><b>${esc(x[0])}</b><span>${esc(x[1])}</span></li>`).join("")}</ul><div class="metaln" style="margin-top:0">${pill(p.st)}${p.early?`<span class="pk live">${ic("play")}Early on Peacock ${esc(short(p.early))}</span>`:""}${trl(p.show)}</div></article>`).join("")||`<p class="sub">No dated premieres right now.</p>`;
+const tick=()=>{const n=nyNow();prem.forEach((p,i)=>{const[hh,mm]=(p.time||"20:00").split(":").map(Number);let m=diff(n.d,p.date)*1440+hh*60+mm-(n.h*60+n.m);if(m<0)m=0;
+  const el=$("cd"+i);if(el)el.innerHTML=[[Math.floor(m/1440),"days"],[Math.floor(m%1440/60),"hrs"],[m%60,"min"]].map(([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`).join("")})};
+tick();const timer=setInterval(tick,60000);
+
+/* collapsible sections */
+const sec=(id,icon,title,preview,html)=>`<details class="sec glass" id="${id}"><summary><span class="si">${ic(icon)}</span><span class="st2"><b>${esc(title)}</b><span>${esc(preview)}</span></span><svg class="i chev"><use href="#i-down"/></svg></summary><div class="body">${html}</div></details>`;
+const feed=(arr,f)=>`<ul class="feed inner" style="margin-top:14px">${arr.map(c=>`<li><span class="fi i-${c[2]}">${ic(ST[c[2]][1])}</span><div>${f(c)}</div></li>`).join("")}</ul>`;
+const on=AFTERSHOWS.filter(a=>a.on);
+const asHtml=`<div class="grid" style="--min:280px">${AFTERSHOWS.map(a=>`<article class="as inner${a.on?" on":""}"><div class="ph">${badge(a.show)}<div><h3>${esc(a.title)}</h3><div class="st">${a.on?"● Running now":"Not running"}</div></div></div><dl class="kv"><dt>When</dt><dd>${esc(a.when)}</dd><dt>Where</dt><dd>${esc(a.where)}</dd><dt>Next</dt><dd>${esc(a.next)}</dd></dl><p class="note">${esc(a.note)}</p><div class="metaln" style="margin-top:auto">${pill(a.st)}</div></article>`).join("")}</div>`;
+const evs=EVENTS.filter(e=>e[0]>=today||!/^\d/.test(e[0]));
+const ruHtml=`<div class="inner" style="padding:4px 16px;margin-top:14px">${REUNIONS.map(r=>`<div class="ru">${badge(r[0])}<div><div class="nm">${esc(r[1])}</div><div class="ds">${esc(r[2])}</div><div class="metaln">${pill(r[3])}${srcA(r[4])}</div></div></div>`).join("")}${evs.map(e=>`<div class="ru"><span class="badge" style="background:linear-gradient(145deg,var(--cyan),#2a9df4)">${ic("ticket")}</span><div><div class="nm">${esc(e[1])}</div><div class="ds">${/^\d/.test(e[0])?`<b style="color:var(--cyan)">${esc(fd(e[0],{weekday:"short",month:"short",day:"numeric"}))}</b> · `:""}${esc(e[2])}</div><div class="metaln">${pill(e[3])}${srcA(e[4])}</div></div></div>`).join("")}</div>`;
+const dow=D(today).getUTCDay();
+const luHtml=`<div class="inner" style="padding:2px 16px;margin-top:14px">${GRID.map((g,i)=>`<div class="lr${i===dow?" now":""}"><span class="dn">${g[0]}</span>${g[1].length?`<div class="slots">${g[1].map(s=>`<span class="sl"><span class="tm">${tH(s[0])}</span>${sh(s[1])[4]&&!/After Show/.test(s[2])?`<a class="pl" href="${esc(sh(s[1])[4])}"><b>${esc(s[1])}</b>${ic("play")}</a>`:`<b>${esc(s[1])}</b>`}<span style="color:var(--mut)">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>`).join("")}</div>`:`<span class="none">No new originals</span>`}</div>`).join("")}</div><p class="note" style="margin-top:10px">WWHL follows Sunday to Thursday, around 11:00 PM.</p>`;
+$("lu").innerHTML=luHtml.replace('class="inner" style="padding:2px 16px;margin-top:14px"','class="glass" style="padding:4px 20px"');
+const chHtml=feed(CHANGES,c=>`<div class="k">${esc(c[0])} · ${ST[c[2]][0]}</div><div class="v">${safeB(c[1])}</div>${srcA(c[3])}`);
+const raHtml=feed(RADAR,c=>`<div class="v"><b>${esc(c[0])}</b></div><div class="k">${esc(c[1])} · ${ST[c[2]][0]}</div>${srcA(c[3])}`);
+const hiHtml=`<ol class="grid hist">${HISTORY.map(x=>`<li class="inner">${badge(x[1])}<div><div class="hd">${esc(fd(x[0],{month:"short",day:"numeric",year:"numeric"}))}</div><div class="hn">${sh(x[1])[4]?`<a class="pl" href="${esc(sh(x[1])[4])}">${esc(x[1])}${ic("play")}</a>`:esc(x[1])}</div><div class="hs">${esc(x[2])} · ${esc(x[3])}</div></div></li>`).join("")}</ol>`;
+const srcHtml=`<div class="legend" style="margin-top:14px">${Object.keys(ST).map(k=>`<span>${pill(k)} ${{ok:"announced by Bravo",li:"TV listing",rep:"press or fan report",chk:"sources disagree"}[k]}</span>`).join("")}</div><div class="src">${SOURCES.map(s=>`<a href="${esc(s[1])}">${ic("link")}${esc(s[0])}</a>`).join("")}</div>`;
+const firstChange=CHANGES[0]?CHANGES[0][1].replace(/<\/?b>/g,""):"No recent changes";
+$("stack").innerHTML=[
+  sec("s-after","chat","After Shows",on.length?on.map(a=>`${a.title.replace(" After Show","")} · ${a.when}`).join(" · "):"None running right now",asHtml),
+  sec("s-reunion","chair","Reunions & events",[REUNIONS[0]&&`${REUNIONS[0][0]} reunion: ${REUNIONS[0][2].split(";")[0]}`,evs[0]&&`${evs[0][1]}`].filter(Boolean).join(" · "),ruHtml),
+  sec("s-changes","swap","Schedule changes",firstChange,chHtml),
+  sec("s-radar","radar","On the radar",`${RADAR.length} shows and events waiting on dates`,raHtml),
+  sec("s-history","clock","Premiere history",`${HISTORY.length} premieres in 2026`,hiHtml),
+  sec("s-src","link","Sources & legend","Where every date comes from",srcHtml)
+].join("");
+/* remember open sections */
+let openS=[];try{openS=JSON.parse(localStorage.getItem("bravoOpen")||"[]")}catch(e){}
+document.querySelectorAll("details.sec").forEach(d=>{if(openS.includes(d.id))d.open=true;d.addEventListener("toggle",()=>{const ids=[...document.querySelectorAll("details.sec[open]")].map(x=>x.id);try{localStorage.setItem("bravoOpen",JSON.stringify(ids))}catch(e){}})});
+/* expand rows on tap */
+const daysEl=$("days");
+const toggleRow=r=>r.setAttribute("aria-expanded",r.getAttribute("aria-expanded")==="true"?"false":"true");
+daysEl.addEventListener("click",e=>{if(e.target.closest("a"))return;const r=e.target.closest(".xr");if(r)toggleRow(r)});
+daysEl.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const r=e.target.closest(".xr");if(r&&e.target===r){e.preventDefault();toggleRow(r)}});
+/* scroll reveal */
+if("IntersectionObserver" in window&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
+  const els=[...document.querySelectorAll("section h2, section .sub, .day, .prem, #lu .lr, details.sec")];
+  els.forEach(el=>{const sib=[...el.parentElement.children].indexOf(el);el.style.transitionDelay=Math.min(sib,6)*55+"ms";el.classList.add("rv")});
+  const revealObs=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("in");revealObs.unobserve(en.target)}}),{rootMargin:"0px 0px -6% 0px",threshold:.08});
+  els.forEach(el=>revealObs.observe(el));
+}
+}
+</script>
+<!-- ANALYTICS: Cloudflare Web Analytics beacon goes here (cookie-free) -->
+</body>
+</html>
