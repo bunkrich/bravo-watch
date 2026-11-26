@@ -158,6 +158,9 @@ footer{padding:32px 0 48px;color:var(--mut);font-size:14px}
 .src a{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);text-decoration:none}
 .src a:hover{color:var(--cyan)}
 .fine{margin-top:18px;color:var(--dim);font-size:13px}
+.flinks{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0}
+.flinks a{color:var(--ink);font-weight:600;text-decoration:none;font-size:14px}
+.flinks a:hover{text-decoration:underline}
 @media(max-width:1000px){.week{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:640px){:root{--bd:38px}.week{grid-template-columns:repeat(2,minmax(0,1fr))}.day{padding:2px 14px 6px}.bar .wrap{gap:10px}.nav a{padding:8px 9px;font-size:13px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
@@ -309,6 +312,7 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 </div></section>
 
 <footer><div class="wrap">
+  <p class="flinks"><a href="/about">About &amp; contact</a><a href="/about#contact">Send a schedule fix</a><a href="/about#privacy">Privacy</a></p>
   <p class="fine">All times Eastern. Updated every morning. Not affiliated with Bravo, NBCUniversal or Peacock; show names and trademarks belong to their owners. Episode details are summarized in our own words, with links to official sources. Bravo's own schedule comes first; anything not confirmed by Bravo is tagged.</p>
 </div></footer>
 

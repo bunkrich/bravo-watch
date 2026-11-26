@@ -158,6 +158,9 @@ footer{padding:32px 0 48px;color:var(--mut);font-size:14px}
 .src a{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);text-decoration:none}
 .src a:hover{color:var(--cyan)}
 .fine{margin-top:18px;color:var(--dim);font-size:13px}
+.flinks{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0}
+.flinks a{color:var(--ink);font-weight:600;text-decoration:none;font-size:14px}
+.flinks a:hover{text-decoration:underline}
 @media(max-width:1000px){.week{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:640px){:root{--bd:38px}.week{grid-template-columns:repeat(2,minmax(0,1fr))}.day{padding:2px 14px 6px}.bar .wrap{gap:10px}.nav a{padding:8px 9px;font-size:13px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
@@ -301,8 +304,8 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 <section id="coming"><div class="wrap">
   <h2><svg class="i"><use href="#i-spark"/></svg>Coming up</h2>
   <div class="grid" id="prem" style="--min:340px;align-items:start"><article class="prem glass"><div class="ph"><span class="badge" style="background:linear-gradient(145deg,#c86bff,#ff3fa4)">WS</span><div><h3>Wife Swap: The Real Housewives Edition S2</h3><div class="ds">Wed, Dec 30 · Wed 9:00 PM · two-episode premiere, then Wednesdays</div></div></div>
-<div class="cd" id="cd0"><div><b>34</b><span>days</span></div><div><b>23</b><span>hrs</span></div><div><b>34</b><span>min</span></div></div><ul class="list"><li><b>Dec 30</b><span>Lisa Barlow and Angela Oakley</span></li><li><b>Jan 6</b><span>Gina Kirschenheiter</span></li><li><b>Jan 13</b><span>Stephanie Hollman</span></li><li><b>Jan 20</b><span>Phaedra Parks</span></li><li><b>Jan 27</b><span>Crystal Kung-Minkoff · finale</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i"><use href="#i-check"></use></svg>Bravo</span><a class="pk trl" href="https://www.bravotv.com/the-daily-dish/wife-swap-real-housewives-edition-season-2-everything-to-know"><svg class="i"><use href="#i-film"></use></svg>Trailer</a></div></article><article class="prem glass"><div class="ph"><span class="badge" style="background:linear-gradient(145deg,#ffd23f,#ff8a3d)">NJ</span><div><h3>The Real Housewives of New Jersey S15</h3><div class="ds">Tue, Jan 19 · Tuesday · time not announced; 8:00 PM expected (RHONY's slot)</div></div></div>
-<div class="cd" id="cd1"><div><b>54</b><span>days</span></div><div><b>22</b><span>hrs</span></div><div><b>34</b><span>min</span></div></div><ul class="list"><li><b>Cast</b><span>Teresa, Melissa and Dolores, plus five new Housewives</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i"><use href="#i-check"></use></svg>Bravo</span></div></article></div>
+<div class="cd" id="cd0"><div><b>34</b><span>days</span></div><div><b>23</b><span>hrs</span></div><div><b>33</b><span>min</span></div></div><ul class="list"><li><b>Dec 30</b><span>Lisa Barlow and Angela Oakley</span></li><li><b>Jan 6</b><span>Gina Kirschenheiter</span></li><li><b>Jan 13</b><span>Stephanie Hollman</span></li><li><b>Jan 20</b><span>Phaedra Parks</span></li><li><b>Jan 27</b><span>Crystal Kung-Minkoff · finale</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i"><use href="#i-check"></use></svg>Bravo</span><a class="pk trl" href="https://www.bravotv.com/the-daily-dish/wife-swap-real-housewives-edition-season-2-everything-to-know"><svg class="i"><use href="#i-film"></use></svg>Trailer</a></div></article><article class="prem glass"><div class="ph"><span class="badge" style="background:linear-gradient(145deg,#ffd23f,#ff8a3d)">NJ</span><div><h3>The Real Housewives of New Jersey S15</h3><div class="ds">Tue, Jan 19 · Tuesday · time not announced; 8:00 PM expected (RHONY's slot)</div></div></div>
+<div class="cd" id="cd1"><div><b>54</b><span>days</span></div><div><b>22</b><span>hrs</span></div><div><b>33</b><span>min</span></div></div><ul class="list"><li><b>Cast</b><span>Teresa, Melissa and Dolores, plus five new Housewives</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i"><use href="#i-check"></use></svg>Bravo</span></div></article></div>
 </div></section>
 
 <section id="more"><div class="wrap">
@@ -311,6 +314,7 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 </div></section>
 
 <footer><div class="wrap">
+  <p class="flinks"><a href="/about">About &amp; contact</a><a href="/about#contact">Send a schedule fix</a><a href="/about#privacy">Privacy</a></p>
   <p class="fine">All times Eastern. Updated every morning. Not affiliated with Bravo, NBCUniversal or Peacock; show names and trademarks belong to their owners. Episode details are summarized in our own words, with links to official sources. Bravo's own schedule comes first; anything not confirmed by Bravo is tagged.</p>
 </div></footer>
 
