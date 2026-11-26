@@ -83,6 +83,10 @@ h1.h2 span{background:none;-webkit-background-clip:border-box;background-clip:bo
 .seg button{font-family:inherit;font-weight:700;font-size:13.5px;line-height:1;color:var(--mut);background:none;border:0;border-radius:99px;padding:8px 14px;cursor:pointer}
 .seg button[aria-pressed="true"]{color:#0b0718;background:linear-gradient(90deg,var(--pink),var(--sun))}
 .pkv .seg button[aria-pressed="true"]{background:linear-gradient(90deg,var(--sun),var(--cyan))}
+.wkh h1{flex-wrap:wrap;row-gap:8px}
+.seg-h{padding:4px;margin-left:2px;vertical-align:middle}
+.seg-h button{font-size:clamp(17px,2.1vw,22px);font-weight:800;letter-spacing:-.02em;padding:7px 14px}
+@media(max-width:480px){.wkh h1{font-size:21px;gap:7px}.wkh h1 svg{width:20px;height:20px}.seg-h{padding:3px}.seg-h button{font-size:15px;padding:6px 10px}}
 .seg button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .fn{font-size:12.5px;font-weight:700;color:var(--ink);opacity:.85;margin:2px 0 4px}
 .aired{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--mut)}
@@ -313,8 +317,8 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 
 <noscript><div class="wrap" style="padding:24px 0">Showing this morning's schedule. Turn on JavaScript for live times and countdowns.</div></noscript>
 <section id="week"><div class="wrap">
-  <div class="wkh"><h1 class="h2"><svg class="i"><use href="#i-cal"/></svg><span id="wkT">Next 7 Nights on Bravo</span></h1>
-  <div class="wkc"><button type="button" class="pastb" id="pastB" aria-pressed="false"><svg class="i"><use href="#i-clock"/></svg> Past 7 days</button><div class="seg" role="group" aria-label="Show the schedule for"><button type="button" data-v="bravo" aria-pressed="true">On Bravo</button><button type="button" data-v="peacock" aria-pressed="false">On Peacock</button></div></div></div>
+  <div class="wkh"><h1 class="h2"><svg class="i"><use href="#i-cal"/></svg><span id="wkT">Next 7 Nights</span><span>on</span><span class="seg seg-h" role="group" aria-label="Show the schedule for"><button type="button" data-v="bravo" aria-pressed="true">Bravo</button><button type="button" data-v="peacock" aria-pressed="false">Peacock</button></span></h1>
+  <div class="wkc"><button type="button" class="pastb" id="pastB" aria-pressed="false"><svg class="i"><use href="#i-clock"/></svg> Past 7 days</button></div></div>
   <div class="grid days" id="days"></div>
 </div></section>
 
@@ -414,7 +418,7 @@ function renderDays(){
     }
     out+=`<article class="day glass${i===0?" now":""}${i<0?" past":""}"><div class="dh"><b>${esc(lbl)}</b><span>${esc(short(d))}</span></div>${body}</article>`}
   $("days").innerHTML=out;
-  $("wkT").textContent=pk7?"Next 7 Days on Peacock":"Next 7 Nights on Bravo";
+  $("wkT").textContent=pk7?"Next 7 Days":"Next 7 Nights";
   const pb=$("pastB");if(pb){pb.setAttribute("aria-pressed",String(PAST));pb.lastChild.textContent=PAST?" Hide past 7 days":" Past 7 days"}
   document.documentElement.classList.toggle("pkv",pk7);
   document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===VIEW)));
