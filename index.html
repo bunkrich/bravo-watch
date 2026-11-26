@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>Clubhouse Tonight · What's on Bravo tonight, this week & on Peacock</title>
-<meta name="description" content="Every Bravo show airing the next 7 nights, upcoming premieres, WWHL guests, After Shows and Peacock drop times. Updated every morning.">
+<title>Bravo Schedule Tonight & This Week · Clubhouse Tonight</title>
+<meta name="description" content="What's on Bravo tonight and all week: every new episode with air times, WWHL guests, After Shows and exact Peacock drop times. Updated every morning.">
 <link rel="canonical" href="https://clubhousetonight.com/">
+<meta name="robots" content="max-image-preview:large">
 <meta name="theme-color" content="#0b0718">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -60,7 +61,11 @@ section{padding:clamp(24px,4vw,40px) 0}
 h2{font-size:clamp(22px,2.6vw,28px);letter-spacing:-.02em;margin:0 0 4px;font-weight:750;display:flex;align-items:center;gap:10px}
 h2 svg{color:var(--cyan)}
 .sub{color:var(--mut);margin:0 0 18px;font-size:15px}
-.tag{color:var(--mut);margin:0 0 16px;font-size:15px;line-height:1.45;text-wrap:balance}
+.bar-r{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:0}
+.tline{font-size:12.5px;color:var(--mut);padding:0 12px;white-space:nowrap}
+@media(max-width:700px){.bar-r{order:3;width:100%;margin-left:0;align-items:stretch}.tline{white-space:normal;padding:0 2px 2px}.tl2{display:none}}
+h1.h2{font-size:clamp(22px,2.6vw,28px);line-height:1.2;letter-spacing:-.02em;margin:0 0 6px;font-weight:750;display:flex;align-items:center;gap:10px}
+h1.h2 svg{color:var(--cyan)}
 .grid{display:grid;gap:var(--gap);grid-template-columns:repeat(auto-fill,minmax(min(100%,var(--min,320px)),1fr))}
 /* rows: badge | details; time sits top-right so it never eats width */
 .row{display:grid;grid-template-columns:var(--bd) minmax(0,1fr);gap:12px;align-items:start;padding:12px 0;border-top:1px solid var(--line)}
@@ -275,13 +280,12 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
   <a class="brand" href="#top">Clubhouse <span>Tonight</span></a>
   <span class="chip mini" id="upd"></span>
   <span class="chip mini stale" id="stale">Refresh overdue</span>
-  <nav class="nav"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav>
+  <div class="bar-r"><span class="tline">Every new Bravo episode, WWHL guest and Peacock drop.<span class="tl2"> Updated daily.</span></span><nav class="nav"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav></div>
 </div></div>
 
 <noscript><div class="wrap" style="padding:24px 0">This calendar needs JavaScript to show the schedule. Turn it on and reload.</div></noscript>
 <section id="week"><div class="wrap">
-  <p class="tag">Every new Bravo episode, WWHL guest and Peacock drop. Updated daily.</p>
-  <h2><svg class="i"><use href="#i-cal"/></svg>Next 7 Nights on Bravo</h2>
+  <h1 class="h2"><svg class="i"><use href="#i-cal"/></svg>Next 7 Nights on Bravo</h1>
   <div class="grid days" id="days"></div>
 </div></section>
 
@@ -547,7 +551,8 @@ daysEl.addEventListener("click",e=>{if(e.target.closest("a"))return;const r=e.ta
 daysEl.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const r=e.target.closest(".xr");if(r&&e.target===r){e.preventDefault();toggleRow(r)}});
 /* scroll reveal */
 if("IntersectionObserver" in window&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
-  const els=[...document.querySelectorAll("section h2, section .sub, .day, .prem, #lu .lr, details.sec")];
+  const els=[...document.querySelectorAll("section h1, section h2, section .sub, .day, .prem, #lu .lr, details.sec")];
+  const vh=innerHeight;els.splice(0,els.length,...els.filter(el=>el.getBoundingClientRect().top>vh*0.9));
   els.forEach(el=>{const sib=[...el.parentElement.children].indexOf(el);el.style.transitionDelay=Math.min(sib,6)*55+"ms";el.classList.add("rv")});
   const revealObs=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("in");revealObs.unobserve(en.target)}}),{rootMargin:"0px 0px -6% 0px",threshold:.08});
   els.forEach(el=>revealObs.observe(el));
