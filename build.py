@@ -3,7 +3,10 @@ if subprocess.run(['node','check.js']).returncode: sys.exit('build stopped: fix 
 t=open("template.html").read(); d=open("data.js").read()
 # Build into a candidate file; index.html is only replaced once the prerender succeeds (see the end).
 CAND=".index.build.html"
-open(CAND,"w").write(t.replace("/*DATA*/",d))
+import hashlib
+# build id: changes whenever the page or its data changes; open tabs and Home Screen apps compare it to /version.txt and reload
+BUILD=hashlib.sha1((t+d).encode()).hexdigest()[:12]
+open(CAND,"w").write(t.replace("/*DATA*/",d).replace("__BUILD__",BUILD))
 m=re.search(r'UPDATED\s*=\s*"(\d{4}-\d{2}-\d{2})"',d)
 lm=m.group(1) if m else ""
 
@@ -28,9 +31,9 @@ import prerender, shutil
 if prerender.chrome() is None:
   # No Chrome here: publish the plain page (it still renders with JavaScript) rather than block the daily update.
   print("WARNING: Chrome not found, index.html published without the pre-rendered schedule")
-  os.replace(CAND,"index.html")
+  os.replace(CAND,"index.html"); open("version.txt","w").write(BUILD)
 elif prerender.run(CAND):
-  os.replace(CAND,"index.html")
+  os.replace(CAND,"index.html"); open("version.txt","w").write(BUILD)
 else:
   os.remove(CAND)
   sys.exit("build stopped: Chrome is installed but the pre-render came back incomplete, so index.html was left unchanged. Fix the page script (it is probably throwing an error) and rebuild.")

@@ -631,7 +631,14 @@ bar.addEventListener("focusin",()=>bar.classList.remove("hide"));}
    reload when the date changes or the 6:00 AM Peacock drops pass; otherwise refresh "On now" every few minutes */
 const stamp=n=>n.d+(n.h>=6?"b":"a");const loadStamp=stamp(now);
 const freshen=()=>{const n=nyNow();if(stamp(n)!==loadStamp)return location.reload();now=n;if(VIEW==="bravo"&&!PAST)renderDays(true)};
-setInterval(freshen,3*60000);document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")freshen()});
+/* a new build went live (schedule fix or design update): reload. Matters most for people who saved the site to their Home Screen,
+   where the page can stay open for days and there's no pull-to-refresh */
+const BUILD="__BUILD__";let lastCheck=0;
+const checkBuild=()=>{if(Date.now()-lastCheck<60000||location.protocol==="file:")return;lastCheck=Date.now();
+  fetch("/version.txt",{cache:"no-store"}).then(r=>r.ok?r.text():"").then(v=>{v=v.trim();if(!v||v.length>40||v===BUILD)return;let tried="";try{tried=sessionStorage.getItem("ctReloadFor")||"";sessionStorage.setItem("ctReloadFor",v)}catch(e){}if(tried!==v)location.reload()}).catch(()=>{})};
+setInterval(()=>{freshen();checkBuild()},3*60000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){freshen();checkBuild()}});
+addEventListener("pageshow",e=>{if(e.persisted){freshen();checkBuild()}});
 }
 </script>
 <script>
