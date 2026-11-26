@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bravo.bunkrich.com/sitemap.xml
+Sitemap: https://clubhousetonight.com/sitemap.xml

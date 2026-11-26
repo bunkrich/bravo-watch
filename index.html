@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="dark">
 <title>Bravo Watch Calendar · What's on Bravo tonight, this week & on Peacock</title>
 <meta name="description" content="Every Bravo show airing the next 7 nights, upcoming premieres, WWHL guests, After Shows and Peacock drop times. Updated every morning.">
-<link rel="canonical" href="https://bravo.bunkrich.com/">
+<link rel="canonical" href="https://clubhousetonight.com/">
 <meta name="theme-color" content="#0b0718">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -15,13 +15,13 @@
 <meta property="og:site_name" content="Bravo Watch Calendar">
 <meta property="og:title" content="Bravo Watch Calendar">
 <meta property="og:description" content="What's on Bravo the next 7 nights, upcoming premieres, WWHL guests and Peacock drops. Updated daily.">
-<meta property="og:url" content="https://bravo.bunkrich.com/">
-<meta property="og:image" content="https://bravo.bunkrich.com/og.jpg">
+<meta property="og:url" content="https://clubhousetonight.com/">
+<meta property="og:image" content="https://clubhousetonight.com/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Bravo Watch Calendar: next 7 nights, premieres, WWHL guests, Peacock drops">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Bravo Watch Calendar","url":"https://bravo.bunkrich.com/","description":"Unofficial fan calendar of Bravo TV airings, premieres, WWHL guests and Peacock drops."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Bravo Watch Calendar","url":"https://clubhousetonight.com/","description":"Unofficial fan calendar of Bravo TV airings, premieres, WWHL guests and Peacock drops."}</script>
 <style>
 /* VOICE everyday guide: calm, fast, glanceable
    IDEA frosted-glass TV guide floating over a Miami-night colour wash
@@ -556,9 +556,10 @@ if("IntersectionObserver" in window&&!matchMedia("(prefers-reduced-motion: reduc
 /* Tap tracking: cookie-free, no personal data. Sends events to Umami when UMAMI_ID is set. */
 (()=>{
 const UMAMI_ID="cfb9dce1-a6ac-41b5-8f97-0c982d277fe9";
+const LIVE=["clubhousetonight.com","www.clubhousetonight.com","bravo.bunkrich.com"].includes(location.hostname);
 let me=false;try{if(new URLSearchParams(location.search).has("me")){localStorage.setItem("umami.disabled","1");location.replace("/me");return}me=!!localStorage.getItem("umami.disabled")}catch(e){}
-if(!me&&location.hostname==="bravo.bunkrich.com"){const c=document.createElement("script");c.defer=true;c.src="https://static.cloudflareinsights.com/beacon.min.js";c.dataset.cfBeacon=JSON.stringify({token:"e327c2f1f9b24f13bec12fed2dfbdeb0"});document.head.appendChild(c)}
-if(UMAMI_ID&&!me&&location.hostname==="bravo.bunkrich.com"){const s=document.createElement("script");s.defer=true;s.src="https://cloud.umami.is/script.js";s.dataset.websiteId=UMAMI_ID;s.dataset.domains="bravo.bunkrich.com";document.head.appendChild(s)}
+if(!me&&LIVE){const c=document.createElement("script");c.defer=true;c.src="https://static.cloudflareinsights.com/beacon.min.js";c.dataset.cfBeacon=JSON.stringify({token:"e327c2f1f9b24f13bec12fed2dfbdeb0"});document.head.appendChild(c)}
+if(UMAMI_ID&&!me&&LIVE){const s=document.createElement("script");s.defer=true;s.src="https://cloud.umami.is/script.js";s.dataset.websiteId=UMAMI_ID;s.dataset.domains="clubhousetonight.com,www.clubhousetonight.com,bravo.bunkrich.com";document.head.appendChild(s)}
 const q=[];const track=(n,d)=>{try{if(window.umami&&umami.track){while(q.length){const x=q.shift();umami.track(x[0],x[1])}umami.track(n,d)}else if(q.length<50)q.push([n,d])}catch(e){}};
 window.bwTrack=track;
 const txt=el=>el?el.textContent.trim().replace(/\s+/g," ").slice(0,60):"";
