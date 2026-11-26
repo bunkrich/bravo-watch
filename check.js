@@ -14,8 +14,17 @@ ctx.RADAR.forEach(r=>{
   aired.forEach(s=>{if(norm(r[0]+" "+r[1]).includes(norm(s)))errs.push(`RADAR "${r[0]}" mentions "${s}", which already aired; move it to HISTORY`)});
 });
 ctx.PREMIERES.forEach(p=>{if(p.date<today)errs.push(`PREMIERES "${p.title}" (${p.date}) is past; move it to HISTORY`)});
-if(days(ctx.UPDATED,today)>1)errs.push(`UPDATED is ${ctx.UPDATED}; bump it`);
-if(ctx.LISTED_THROUGH<today)errs.push(`LISTED_THROUGH ${ctx.LISTED_THROUGH} is past; add episodes`);
+function validDate(value) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+if (!validDate(ctx.UPDATED) || ctx.UPDATED > today || days(ctx.UPDATED, today) > 1) {
+  errs.push(`UPDATED must be today or yesterday in New York; got ${ctx.UPDATED}`);
+}
+if (!validDate(ctx.LISTED_THROUGH) || days(today, ctx.LISTED_THROUGH) < 6) {
+  errs.push(`LISTED_THROUGH must cover all seven nights starting ${today}; got ${ctx.LISTED_THROUGH}`);
+}
 const used=new Set([...ctx.EPISODES.map(e=>e[2]),...ctx.HISTORY.map(h=>h[1]),...ctx.PREMIERES.map(p=>p.show).filter(Boolean),...ctx.GRID.flatMap(g=>g[1].map(s=>s[1]))]);
 used.forEach(s=>{if(!ctx.FULL||!ctx.FULL[s])errs.push(`FULL is missing the official full name for "${s}"`)});
 if(errs.length){console.error("FRESHNESS CHECK FAILED:\n- "+errs.join("\n- "));process.exit(1)}
