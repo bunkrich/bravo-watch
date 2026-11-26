@@ -367,7 +367,7 @@ $("upd").innerHTML=`${ic("check")}Updated ${esc(short(UPDATED))}`;
 if(diff(UPDATED,today)>8)$("stale").style.display="inline-flex";
 
 /* links */
-const pk=(d,show,early)=>{const u=show==="WWHL"?WWHL.peacock:sh(show)[4];const drop=early||addDays(d,1);
+const pk=(d,show,early,ep)=>{const u=ep||(show==="WWHL"?WWHL.peacock:sh(show)[4]);const drop=early||addDays(d,1);
   const live=drop<today||(drop===today&&now.h*60+now.m>=360);
   const lbl=live?"Streaming now":`${early?"Early · ":""}${fd(drop,{weekday:"short"})} 6 AM`;
   const inner=`${ic("play")}Peacock ${esc(lbl)}`;
@@ -376,7 +376,7 @@ const srcA=u=>u?`<a class="srcl" href="${esc(u)}">${ic("link")}Source</a>`:"";
 const trl=show=>TRAILERS[show]?`<a class="pk trl" href="${esc(TRAILERS[show])}">${ic("film")}Trailer</a>`:"";
 
 /* rows */
-const epRow=e=>`<div class="row xr" tabindex="0" role="button" aria-expanded="false">${badge(e[2])}<div><div class="top"><span class="nm" title="${esc(fn(e[2]))}">${esc(e[2])}</span><span class="tm">${tH(e[1])}</span></div><div class="ds dsx"><span>${esc(e[3])}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more">${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln">${pill(e[4])}${pk(e[0],e[2],e[6])}</div></div></div></div>`;
+const epRow=e=>`<div class="row xr" tabindex="0" role="button" aria-expanded="false">${badge(e[2])}<div><div class="top"><span class="nm" title="${esc(fn(e[2]))}">${esc(e[2])}</span><span class="tm">${tH(e[1])}</span></div><div class="ds dsx"><span>${esc(e[3])}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more">${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln">${pill(e[4])}${pk(e[0],e[2],e[6],e[7])}</div></div></div></div>`;
 const wwFor=d=>{const w=D(d).getUTCDay();if(w===5||w===6)return null;
   const off=WWHL.off.find(o=>d>=o[0]&&d<=o[1]);if(off)return{off:1,ds:off[2].split(" · ")[0],st:off[3]};
   const g=WWHL.guests[d];if(g)return{nm:g[0],ds:"Watch What Happens Live",st:g[1]};
@@ -392,7 +392,7 @@ const FIRST_EP=EPISODES.map(e=>e[0]).sort()[0]||today;
 const dropOf=e=>e[6]||addDays(e[0],1);
 const isLive=d=>d<today||(d===today&&now.h*60+now.m>=360);
 const chev=ic("down").replace('class="i"','class="i chv"');
-const pkRow=e=>{const u=sh(e[2])[4],live=isLive(dropOf(e));
+const pkRow=e=>{const u=e[7]||sh(e[2])[4],live=isLive(dropOf(e));
   return `<div class="row xr" tabindex="0" role="button" aria-expanded="false">${badge(e[2])}<div><div class="top"><span class="nm" title="${esc(fn(e[2]))}">${esc(e[2])}</span><span class="tm">${live?'<span class="lv">Streaming</span>':tH("06:00")}</span></div><div class="ds dsx"><span>${esc(e[3])}</span>${chev}</div><div class="more">${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln"><span class="aired">${ic("tv")}${e[6]?"Early drop · airs on Bravo":"Aired on Bravo"} ${esc(fd(e[0],{weekday:"short"}))} ${esc(tTxt(e[1]))}</span>${u?`<a class="pk live" href="${esc(u)}">${ic("play")}Watch on Peacock</a>`:""}</div></div></div></div>`};
 const wwPkRow=(w,d)=>{const live=isLive(d);return `<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge ww">WWHL</span><div><div class="top"><span class="nm">${esc(w.nm)}</span><span class="tm">${live?'<span class="lv">Streaming</span>':tH("06:00")}</span></div><div class="ds dsx"><span>Watch What Happens Live</span>${chev}</div><div class="more"><div class="metaln">${w.st?pill(w.st):""}<a class="pk live" href="${esc(WWHL.peacock)}">${ic("play")}Watch on Peacock</a></div></div></div></div>`};
 function renderDays(){

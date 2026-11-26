@@ -84,10 +84,10 @@ const HISTORY = [ /* past premieres, newest first: date, show, season, night/tim
   ["2026-02-02","Below Deck Down Under","S4","Mon 8:00 PM"],
   ["2026-01-08","The Valley: Persian Style","S1 series premiere","Thu 9:00 PM"]
 ];
-const EPISODES = [ /* date, time, show, "S E · title · note", status, synopsis (optional, fill when Bravo/Peacock posts it) */
-  ["2026-11-17","20:00","RHONY","S16 E11 \u00b7 Peeling Back the Layers \u00b7 90 minutes","li","Erika reveals she's met her surrogate, and the group starts questioning her parenting plans."],
-  ["2026-11-18","20:00","RHOSLC","S7 E10 \u00b7 Amends With Friends","ok","Angie and Whitney talk through trouble at home, while Lisa and Meredith butt heads with their husbands."],
-  ["2026-11-18","21:00","Small Town Trouble: Texas","S1 E1 \u00b7 Rodeo Rendezvous \u00b7 two-hour premiere","ok","The series opens at the Tejas Rodeo, where old feuds, bedroom secrets and a new love triangle all heat up."],
+const EPISODES = [ /* date, time, show, "S E · title · note", status, synopsis (optional), early Peacock date (or null), Peacock episode URL (optional) */
+  ["2026-11-17","20:00","RHONY","S16 E11 \u00b7 Peeling Back the Layers \u00b7 90 minutes","li","Erika reveals she's met her surrogate, and the group starts questioning her parenting plans.",null,"https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-new-york-city/8023583101930400112/seasons/16/episodes/peeling-back-the-layers-episode-11/8f3933c6-c270-35b2-9aa7-b801c9e65af0"],
+  ["2026-11-18","20:00","RHOSLC","S7 E10 \u00b7 Amends With Friends","ok","Angie and Whitney talk through trouble at home, while Lisa and Meredith butt heads with their husbands.",null,"https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-salt-lake-city/8062314053813296112/seasons/7/episodes/amends-with-friends-episode-10/8b4cab7c-0bb2-359a-a45a-d496a05963fd"],
+  ["2026-11-18","21:00","Small Town Trouble: Texas","S1 E1 \u00b7 Rodeo Rendezvous \u00b7 two-hour premiere","ok","The series opens at the Tejas Rodeo, where old feuds, bedroom secrets and a new love triangle all heat up.",null,"https://www.peacocktv.com/watch-online/tv/small-town-trouble-texas/4841643441022334112/seasons/1/episodes/rodeo-rendezvous-episode-1/37b49770-909e-3c60-bbcb-7e2677365a8b"],
   ["2026-11-19","21:00","Southern Charm","S12 E2 \u00b7 Battle of Whits","ok","Madison jumps to Salley's defense and throws a get-together where Venita lets a secret slip."],
   ["2026-11-22","20:00","RHOP","S11 E7 \u00b7 Cold Beach, Hot Gossip","ok","The Rehoboth trip wraps with a drag show and one last blowup."],
   ["2026-11-23","20:00","Below Deck","S13 E7 \u00b7 Who's the Boss?","ok","A shake-up on the deck team makes for an emotional night, while Chef Moe rides high."],
