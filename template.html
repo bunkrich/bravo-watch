@@ -409,7 +409,9 @@ if("IntersectionObserver" in window&&!matchMedia("(prefers-reduced-motion: reduc
 /* Tap tracking: cookie-free, no personal data. Sends events to Umami when UMAMI_ID is set. */
 (()=>{
 const UMAMI_ID="cfb9dce1-a6ac-41b5-8f97-0c982d277fe9";
-if(UMAMI_ID&&location.hostname==="bravo.bunkrich.com"){const s=document.createElement("script");s.defer=true;s.src="https://cloud.umami.is/script.js";s.dataset.websiteId=UMAMI_ID;s.dataset.domains="bravo.bunkrich.com";document.head.appendChild(s)}
+let me=false;try{if(new URLSearchParams(location.search).has("me")){localStorage.setItem("umami.disabled","1");location.replace("/me");return}me=!!localStorage.getItem("umami.disabled")}catch(e){}
+if(!me&&location.hostname==="bravo.bunkrich.com"){const c=document.createElement("script");c.defer=true;c.src="https://static.cloudflareinsights.com/beacon.min.js";c.dataset.cfBeacon=JSON.stringify({token:"e327c2f1f9b24f13bec12fed2dfbdeb0"});document.head.appendChild(c)}
+if(UMAMI_ID&&!me&&location.hostname==="bravo.bunkrich.com"){const s=document.createElement("script");s.defer=true;s.src="https://cloud.umami.is/script.js";s.dataset.websiteId=UMAMI_ID;s.dataset.domains="bravo.bunkrich.com";document.head.appendChild(s)}
 const q=[];const track=(n,d)=>{try{if(window.umami&&umami.track){while(q.length){const x=q.shift();umami.track(x[0],x[1])}umami.track(n,d)}else if(q.length<50)q.push([n,d])}catch(e){}};
 window.bwTrack=track;
 const txt=el=>el?el.textContent.trim().replace(/\s+/g," ").slice(0,60):"";
@@ -437,6 +439,5 @@ if("IntersectionObserver" in window){const seen=new Set();const io=new Intersect
 let dw=0;const t0=Date.now();document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&!dw){dw=1;const s=Math.round((Date.now()-t0)/1000);track("engaged",{secs:s,bucket:s<10?"<10s":s<30?"10-30s":s<120?"30s-2m":"2m+"})}});
 })();
 </script>
-<!-- Cloudflare Web Analytics (cookie-free) --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e327c2f1f9b24f13bec12fed2dfbdeb0"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
