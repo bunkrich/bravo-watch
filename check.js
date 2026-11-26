@@ -16,5 +16,7 @@ ctx.RADAR.forEach(r=>{
 ctx.PREMIERES.forEach(p=>{if(p.date<today)errs.push(`PREMIERES "${p.title}" (${p.date}) is past; move it to HISTORY`)});
 if(days(ctx.UPDATED,today)>1)errs.push(`UPDATED is ${ctx.UPDATED}; bump it`);
 if(ctx.LISTED_THROUGH<today)errs.push(`LISTED_THROUGH ${ctx.LISTED_THROUGH} is past; add episodes`);
+const used=new Set([...ctx.EPISODES.map(e=>e[2]),...ctx.HISTORY.map(h=>h[1]),...ctx.PREMIERES.map(p=>p.show).filter(Boolean),...ctx.GRID.flatMap(g=>g[1].map(s=>s[1]))]);
+used.forEach(s=>{if(!ctx.FULL||!ctx.FULL[s])errs.push(`FULL is missing the official full name for "${s}"`)});
 if(errs.length){console.error("FRESHNESS CHECK FAILED:\n- "+errs.join("\n- "));process.exit(1)}
 console.log("freshness check ok");

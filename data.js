@@ -24,6 +24,28 @@ const SHOWS = { /* code, colour pair, icon, Peacock page */
   "Small Town Trouble: Texas":["STT","#ff6b3d","#c2185b","star","https://www.peacocktv.com/watch-online/tv/small-town-trouble-texas/4841643441022334112"],
   "Wife Swap: RH Edition":["WS","#c86bff","#ff3fa4","house","https://www.peacocktv.com/watch-online/tv/wife-swap-the-real-housewives-edition/6519457940197890112"]
 };
+const FULL = { /* official full show names, used on the page for search. Every show used anywhere needs one (check.js enforces it). */
+  "RHOSLC":"The Real Housewives of Salt Lake City",
+  "RHONY":"The Real Housewives of New York City",
+  "RHOP":"The Real Housewives of Potomac",
+  "RHONJ":"The Real Housewives of New Jersey",
+  "RHOBH":"The Real Housewives of Beverly Hills",
+  "RHOA":"The Real Housewives of Atlanta",
+  "RHORI":"The Real Housewives of Rhode Island",
+  "RHUGT: Roaring 20th":"The Real Housewives Ultimate Girls Trip: Roaring 20th",
+  "Wife Swap: RH Edition":"Wife Swap: The Real Housewives Edition",
+  "WWHL":"Watch What Happens Live with Andy Cohen",
+  "Below Deck":"Below Deck",
+  "Below Deck Down Under":"Below Deck Down Under",
+  "Southern Charm":"Southern Charm",
+  "Southern Hospitality":"Southern Hospitality",
+  "Small Town Trouble: Texas":"Small Town Trouble: Texas",
+  "Still Flipping Out":"Still Flipping Out",
+  "Next Gen NYC":"Next Gen NYC",
+  "Ladies of London: The New Reign":"Ladies of London: The New Reign",
+  "The Valley: Persian Style":"The Valley: Persian Style",
+  "Vanderpump Rules: Lisa Las Vegas":"Vanderpump Rules: Lisa Las Vegas"
+};
 const TRAILERS = { /* show -> official trailer page */
   "RHONY":"https://www.bravotv.com/the-daily-dish/rhony-season-16-midseason-trailer-hailey-glassman-cries-lindsay-hubbard-cameo",
   "RHOSLC":"https://www.bravotv.com/the-daily-dish/rhoslc-season-7-trailer-teases-whitney-angie-bronwyn-splits",

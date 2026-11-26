@@ -4,7 +4,7 @@ on load, so visitors always get the live 'today'. If Chrome isn't available the
 build keeps the plain page and just prints a note."""
 import html, json, os, re, shutil, subprocess
 
-IDS = ["upd", "days", "lu", "prem", "stack"]
+IDS = ["upd", "days", "lu", "prem", "stack", "covered"]
 PROBE = """<script>
 setTimeout(function(){
   var ids=%s, out={};
