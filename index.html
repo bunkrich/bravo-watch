@@ -73,6 +73,8 @@ h1.h2 span{background:none;-webkit-background-clip:border-box;background-clip:bo
 .wkc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .pastb{display:inline-flex;align-items:center;gap:6px;font:700 13.5px/1 inherit;color:var(--mut);background:var(--glass);border:1px solid var(--line);border-radius:99px;padding:10px 14px;cursor:pointer;box-shadow:var(--hi)}
 .pastb:hover,.pastb[aria-pressed="true"]{color:var(--ink);background:var(--glass2)}
+.day.past{opacity:.78}
+.day.past .dh b{color:var(--mut)}
 .pastb:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .seg{display:inline-flex;padding:3px;border-radius:99px;background:var(--glass);border:1px solid var(--line);box-shadow:var(--hi)}
 .seg button{font:700 13.5px/1 inherit;color:var(--mut);background:none;border:0;border-radius:99px;padding:8px 14px;cursor:pointer}
@@ -572,7 +574,7 @@ const pkRow=e=>{const u=sh(e[2])[4],live=isLive(dropOf(e));
 const wwPkRow=(w,d)=>{const live=isLive(d);return `<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge ww">WWHL</span><div><div class="top"><span class="nm">${esc(w.nm)}</span><span class="tm">${live?'<span class="lv">Streaming</span>':tH("06:00")}</span></div><div class="ds dsx"><span>Watch What Happens Live</span>${chev}</div><div class="more"><div class="metaln">${w.st?pill(w.st):""}<a class="pk live" href="${esc(WWHL.peacock)}">${ic("play")}Watch on Peacock</a></div></div></div></div>`};
 function renderDays(){
   const pk7=VIEW==="peacock";let out="";
-  for(let k=0;k<7;k++){const i=PAST?-(k+1):k,d=addDays(today,i);
+  for(let i=PAST?-7:0;i<7;i++){const d=addDays(today,i);
     const lbl=i===0?(pk7?"Today":"Tonight"):i===1?"Tomorrow":i===-1?(pk7?"Yesterday":"Last night"):fd(d,{weekday:"long"});
     const untracked=(pk7?addDays(d,-1):d)<FIRST_EP;
     let body;
@@ -582,15 +584,15 @@ function renderDays(){
     }else{const eps=byDate(d),w=wwFor(d);
       body=(eps.length?[...eps.map(e=>({t:e[1],html:epRow(e)})),...asFor(d,eps)].sort((x,y)=>x.t.localeCompare(y.t)).map(x=>x.html).join(""):`<div class="quiet">${ic(d<=LISTED_THROUGH?"tv":"clock")}${untracked?"Not tracked yet":d<=LISTED_THROUGH?"Nothing new on Bravo":"Listings not published yet"}</div>`)+(w?wwRow(w,d):"");
     }
-    out+=`<article class="day glass${i===0?" now":""}${i===-1?" now":""}"><div class="dh"><b>${esc(lbl)}</b><span>${esc(short(d))}</span></div>${body}</article>`}
+    out+=`<article class="day glass${i===0?" now":""}${i<0?" past":""}"><div class="dh"><b>${esc(lbl)}</b><span>${esc(short(d))}</span></div>${body}</article>`}
   $("days").innerHTML=out;
-  $("wkT").textContent=PAST?(pk7?"Last 7 Days on Peacock":"Last 7 Nights on Bravo"):(pk7?"Next 7 Days on Peacock":"Next 7 Nights on Bravo");
-  const pb=$("pastB");if(pb){pb.setAttribute("aria-pressed",String(PAST));pb.lastChild.textContent=PAST?" Back to this week":" Past 7 days"}
+  $("wkT").textContent=pk7?"Next 7 Days on Peacock":"Next 7 Nights on Bravo";
+  const pb=$("pastB");if(pb){pb.setAttribute("aria-pressed",String(PAST));pb.lastChild.textContent=PAST?" Hide past 7 days":" Past 7 days"}
   document.documentElement.classList.toggle("pkv",pk7);
   document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===VIEW)));
 }
 renderDays();
-$("pastB").addEventListener("click",()=>{PAST=!PAST;renderDays();window.bwTrack&&window.bwTrack("past_toggle",{on:PAST,view:VIEW})});
+$("pastB").addEventListener("click",()=>{PAST=!PAST;renderDays();if(PAST){const f=document.querySelector("#days .day");f&&f.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"nearest"})}window.bwTrack&&window.bwTrack("past_toggle",{on:PAST,view:VIEW})});
 document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{if(VIEW===b.dataset.v)return;VIEW=b.dataset.v;try{localStorage.setItem("ctView",VIEW)}catch(e){}renderDays();renderLineup();window.bwTrack&&window.bwTrack("view_switch",{to:VIEW})}));
 
 /* premieres */
