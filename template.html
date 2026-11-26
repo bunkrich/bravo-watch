@@ -408,7 +408,7 @@ if("IntersectionObserver" in window&&!matchMedia("(prefers-reduced-motion: reduc
 <script>
 /* Tap tracking: cookie-free, no personal data. Sends events to Umami when UMAMI_ID is set. */
 (()=>{
-const UMAMI_ID="";
+const UMAMI_ID="cfb9dce1-a6ac-41b5-8f97-0c982d277fe9";
 if(UMAMI_ID&&location.hostname==="bravo.bunkrich.com"){const s=document.createElement("script");s.defer=true;s.src="https://cloud.umami.is/script.js";s.dataset.websiteId=UMAMI_ID;s.dataset.domains="bravo.bunkrich.com";document.head.appendChild(s)}
 const q=[];const track=(n,d)=>{try{if(window.umami&&umami.track){while(q.length){const x=q.shift();umami.track(x[0],x[1])}umami.track(n,d)}else if(q.length<50)q.push([n,d])}catch(e){}};
 window.bwTrack=track;
