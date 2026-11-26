@@ -314,12 +314,12 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 </div></section>
 
 <section id="lineup"><div class="wrap">
-  <h2><svg class="i"><use href="#i-tv"/></svg><span id="luT">Current weekly lineup</span></h2>
+  <h2><svg class="i"><use href="#i-tv"/></svg><span id="luT">Current Weekly Lineup</span></h2>
     <div id="lu"></div>
 </div></section>
 
 <section id="coming"><div class="wrap">
-  <h2><svg class="i"><use href="#i-spark"/></svg>Coming up</h2>
+  <h2><svg class="i"><use href="#i-spark"/></svg>Coming Up</h2>
   <div class="grid" id="prem" style="--min:340px;align-items:start"></div>
 </div></section>
 
@@ -436,7 +436,7 @@ const dow=D(today).getUTCDay();
 function renderLineup(){const pk7=VIEW==="peacock";const G=pk7?GRID.map((g,i)=>[g[0],GRID[(i+6)%7][1].filter(s=>!/After Show/.test(s[2])).map(s=>["06:00",s[1],s[2],""])]):GRID;
 const luHtml=`<div class="inner" style="padding:2px 16px;margin-top:14px">${G.map((g,i)=>`<div class="lr${i===dow?" now":""}"><span class="dn">${g[0]}</span>${g[1].length?`<div class="slots">${g[1].map(s=>`<span class="sl"><span class="tm">${tH(s[0])}</span>${sh(s[1])[4]&&!/After Show/.test(s[2])?`<a class="pl" href="${esc(sh(s[1])[4])}"><b>${esc(fn(s[1]))}</b>${ic("play")}</a>`:`<b>${esc(fn(s[1]))}</b>`}<span style="color:var(--mut)">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>`).join("")}</div>`:`<span class="none">No new originals</span>`}</div>`).join("")}</div><p class="note" style="margin-top:10px">${pk7?"New episodes hit Peacock at 6:00 AM the morning after they air. WWHL lands the next morning too.":"WWHL follows Sunday to Thursday, around 11:00 PM."}</p>`;
 $("lu").innerHTML=luHtml.replace('class="inner" style="padding:2px 16px;margin-top:14px"','class="glass" style="padding:4px 20px"');
-$("luT").textContent=pk7?"Weekly Peacock drops":"Current weekly lineup";}
+$("luT").textContent=pk7?"Weekly Peacock Drops":"Current Weekly Lineup";}
 renderLineup();
 const chHtml=feed(CHANGES,c=>`<div class="k">${esc(c[0])} · ${ST[c[2]][0]}</div><div class="v">${safeB(c[1])}</div>${srcA(c[3])}`);
 const raHtml=feed(RADAR,c=>`<div class="v"><b>${esc(c[0])}</b></div><div class="k">${esc(c[1])} · ${ST[c[2]][0]}</div>${srcA(c[3])}`);
@@ -445,11 +445,11 @@ const srcHtml=`<div class="legend" style="margin-top:14px">${Object.keys(ST).map
 const firstChange=CHANGES[0]?CHANGES[0][1].replace(/<\/?b>/g,""):"No recent changes";
 $("stack").innerHTML=[
   sec("s-after","chat","After Shows",on.length?on.map(a=>`${a.title.replace(" After Show","")} · ${a.when}`).join(" · "):"None running right now",asHtml),
-  sec("s-reunion","chair","Reunions & events",[REUNIONS[0]&&`${REUNIONS[0][0]} reunion: ${REUNIONS[0][2].split(";")[0]}`,evs[0]&&`${evs[0][1]}`].filter(Boolean).join(" · "),ruHtml),
-  sec("s-changes","swap","Schedule changes",firstChange,chHtml),
-  sec("s-radar","radar","On the radar",`${RADAR.length} shows and events waiting on dates`,raHtml),
-  sec("s-history","clock","Premiere history",`${HISTORY.length} premieres in 2026`,hiHtml),
-  sec("s-src","link","Sources & legend","Where every date comes from",srcHtml)
+  sec("s-reunion","chair","Reunions & Events",[REUNIONS[0]&&`${REUNIONS[0][0]} reunion: ${REUNIONS[0][2].split(";")[0]}`,evs[0]&&`${evs[0][1]}`].filter(Boolean).join(" · "),ruHtml),
+  sec("s-changes","swap","Schedule Changes",firstChange,chHtml),
+  sec("s-radar","radar","On the Radar",`${RADAR.length} shows and events waiting on dates`,raHtml),
+  sec("s-history","clock","Premiere History",`${HISTORY.length} premieres in 2026`,hiHtml),
+  sec("s-src","link","Sources & Legend","Where every date comes from",srcHtml)
 ].join("");
 /* remember open sections */
 let openS=[];try{openS=JSON.parse(localStorage.getItem("bravoOpen")||"[]")}catch(e){}
