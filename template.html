@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="color-scheme" content="dark">
 <title>Bravo Schedule Tonight & This Week · Clubhouse Tonight</title>
 <meta name="description" content="What's on Bravo tonight and all week: every new episode with air times, WWHL guests, After Shows and exact Peacock drop times. Updated every morning.">
@@ -33,7 +33,7 @@
    LAYOUT sticky glass bar; one 12-col-free CSS grid system: auto-fill card grids that line up at every width */
 :root{--bg:#0b0718;--ink:#f5f1ff;--mut:#aea3c8;--dim:#8579a1;--line:rgba(255,255,255,.12);--glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.1);--hi:inset 0 1px 0 rgba(255,255,255,.16);--pink:#ff4fae;--cyan:#3ee6ea;--sun:#ffd25a;--ok:#4be8a0;--rep:#ffb547;--chk:#ff7090;--r:20px;--gap:clamp(12px,2vw,18px);--time:5.4rem;--bd:44px}
 *{box-sizing:border-box;min-width:0}
-html{scroll-behavior:smooth;scroll-padding-top:76px;-webkit-text-size-adjust:100%}
+html{background:#0b0718;scroll-behavior:smooth;scroll-padding-top:calc(76px + env(safe-area-inset-top));-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;overflow-x:clip;min-height:100vh}
 body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(40vmax 40vmax at 8% 0%,rgba(255,79,174,.28),transparent 60%),radial-gradient(38vmax 38vmax at 100% 20%,rgba(62,230,234,.18),transparent 60%),radial-gradient(45vmax 45vmax at 60% 110%,rgba(255,138,61,.18),transparent 60%),var(--bg)}
 a{color:inherit}
@@ -42,6 +42,7 @@ svg.i{width:1.05em;height:1.05em;flex:none;fill:none;stroke:currentColor;stroke-
 .glass{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--hi),0 10px 30px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%)}
 /* bar */
 .bar{position:sticky;top:0;z-index:10;background:rgba(11,7,24,.55);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid var(--line)}
+.bar{padding-top:env(safe-area-inset-top)}body::after{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#0b0718;z-index:11;pointer-events:none}
 .bar .wrap{display:flex;align-items:center;gap:16px;min-height:60px}
 .bar{transition:transform .28s cubic-bezier(.2,.7,.2,1)}
 @media(max-width:900px){.bar.hide{transform:translateY(-100%)}}

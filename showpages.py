@@ -218,7 +218,7 @@ def run():
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0b0718">
 <title>{e(title)} · Clubhouse Tonight</title>
@@ -230,7 +230,7 @@ def run():
 <meta property="og:title" content="{e(name)} schedule · Clubhouse Tonight"><meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{SITE}/{sl}"><meta property="og:image" content="{SITE}/og.jpg?v=2"><meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{json.dumps(ld)}</script>
-<style>{CSS}</style>
+<style>html{{background:#0b0718;padding-top:env(safe-area-inset-top)}}{CSS}</style>
 </head>
 <body data-show="{e(s)}">
 <div class="bar"><div class="wrap"><a class="brand" href="/">Clubhouse <span>Tonight</span></a><a class="back" href="/">← Tonight's schedule</a></div></div>
