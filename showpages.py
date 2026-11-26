@@ -92,12 +92,12 @@ a{color:inherit}:focus-visible{outline:2px solid var(--c1);outline-offset:2px}
 .brand span{color:#ff4fae;background:linear-gradient(90deg,#ff4fae,#ffd25a);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .back{display:inline-flex;align-items:center;min-height:40px;font-size:14px;font-weight:650;color:var(--mut);text-decoration:none;padding:0 14px;border-radius:99px}.back:hover{background:rgba(255,255,255,.1);color:var(--ink)}
 .hero{display:flex;gap:18px;align-items:center;margin:34px 0 8px}
-.badge{flex:none;width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font:800 17px/1 var(--font);letter-spacing:-.01em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);background:linear-gradient(145deg,var(--c1),var(--c2));box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -10px 18px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.12),0 0 34px -4px var(--c1)}
+.badge{flex:none;width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font:800 17px/1 var(--font);letter-spacing:-.01em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);background:linear-gradient(145deg,var(--c1),var(--c2));box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -10px 18px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.12),0 4px 18px -8px var(--c1)}
 .badge.sm{font-size:13.5px}.badge.ink{color:#160c02;text-shadow:0 1px 0 rgba(255,255,255,.35)}
 h1{font-size:clamp(27px,4.6vw,40px);line-height:1.1;letter-spacing:-.03em;margin:0;text-wrap:balance}
 .lead{color:var(--mut);margin:8px 0 24px;font-size:16.5px;text-wrap:pretty}
 .card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:20px 22px;margin:0 0 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 12px 32px rgba(0,0,0,.28);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%)}
-.card.next{border-color:color-mix(in srgb,var(--c1) 55%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--c1) 16%,transparent),var(--glass) 60%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 42px -16px var(--c1),0 12px 32px rgba(0,0,0,.28)}
+.card.next{border-color:color-mix(in srgb,var(--c1) 55%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--c1) 16%,transparent),var(--glass) 60%);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 32px -18px var(--c1),0 12px 32px rgba(0,0,0,.28)}
 h2{font-size:19px;margin:0 0 10px;letter-spacing:-.015em}
 .k{font-size:12.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--c1)}
 .next .when{font:800 23px/1.25 var(--num);letter-spacing:-.02em;margin:4px 0}.next .ttl{font-weight:700}
@@ -110,7 +110,7 @@ ul.eps{list-style:none;margin:0;padding:0}ul.eps li{display:grid;grid-template-c
 .pk.live{color:#1a1200;background:linear-gradient(90deg,var(--pea1),var(--pea2));border:0;box-shadow:0 0 18px -4px var(--pea2)}
 .tag{display:inline-block;font-size:11.5px;font-weight:800;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.1);color:var(--mut);margin-left:6px;vertical-align:1px}
 .shows{display:flex;flex-wrap:wrap;gap:8px}.shows a{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;border-radius:99px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:14px;font-weight:700;text-decoration:none;transition:border-color .2s,box-shadow .2s}
-.shows a::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c1);box-shadow:0 0 8px var(--c1)}
+.shows a::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c1);box-shadow:0 0 5px -1px var(--c1)}
 .shows a:hover{border-color:var(--c1);box-shadow:0 0 16px -6px var(--c1)}
 .cta{display:inline-flex;align-items:center;min-height:44px;margin-top:6px;padding:0 20px;border-radius:99px;background:linear-gradient(90deg,#ff4fae,#ffd25a);color:#140b24;font-weight:800;text-decoration:none;box-shadow:0 0 22px -6px #ff4fae}
 footer{padding:22px 0 calc(48px + env(safe-area-inset-bottom));color:var(--dim);font-size:13px}footer a{color:var(--mut)}
@@ -296,6 +296,38 @@ def run():
               "productionCompany": {"@type": "Organization", "name": "Bravo"}}
         if season:
             ld["numberOfSeasons"] = int(season)
+        # The episodes shown on this page, so search engines can match "next episode of ..." to a dated airing
+        since8 = (today - dt.timedelta(days=8)).isoformat()
+        ld_eps = []
+        if s == "WWHL":
+            w = c["WWHL"]
+            for night, a in sorted((w.get("airings") or {}).items()):
+                if night < since8:
+                    continue
+                g = w.get("guests", {}).get(night)
+                item = {"@type": "TVEpisode", "episodeNumber": a[0], "name": f"Watch What Happens Live {D(night).strftime('%-m/%-d')}",
+                        "releasedEvent": {"@type": "PublicationEvent", "startDate": at_ny(a[1][:10], a[1][11:]), "publishedOn": {"@type": "BroadcastService", "name": "Bravo"}}}
+                if g:
+                    item["description"] = f"Guests: {g[0]}"
+                ld_eps.append(item)
+        else:
+            for x in sorted([x for x in c["EPISODES"] if x[2] == s and x[0] >= since8], key=lambda x: (x[0], x[1])):
+                m = re.match(r"S(\d+) E(\d+)(?: · ([^·]+))?", x[3])
+                if not m:
+                    continue
+                item = {"@type": "TVEpisode", "partOfSeason": {"@type": "TVSeason", "seasonNumber": int(m.group(1))}, "episodeNumber": int(m.group(2))}
+                t = (m.group(3) or "").strip()
+                if t and not t[0].islower():
+                    item["name"] = t
+                if len(x) > 5 and x[5]:
+                    item["description"] = x[5]
+                if x[1]:
+                    item["releasedEvent"] = {"@type": "PublicationEvent", "startDate": at_ny(x[0], x[1]), "publishedOn": {"@type": "BroadcastService", "name": "Bravo"}}
+                if len(x) > 7 and x[7]:
+                    item["url"] = x[7]
+                ld_eps.append(item)
+        if ld_eps:
+            ld["episode"] = ld_eps
         page = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -310,7 +342,7 @@ def run():
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Clubhouse Tonight">
 <meta property="og:title" content="{e(name)} schedule · Clubhouse Tonight"><meta property="og:description" content="{e(desc)}">
-<meta property="og:url" content="{SITE}/{sl}"><meta property="og:image" content="{SITE}/og.jpg?v=2"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:url" content="{SITE}/{sl}"><meta property="og:image" content="{SITE}/og.jpg?v=3"><meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{json.dumps(ld)}</script>
 <style>html{{background:#0b0718;padding-top:env(safe-area-inset-top)}}{CSS}</style>
 </head>

@@ -103,14 +103,12 @@ const EPISODES = [ /* date, time, show, "S E · title · note", status, synopsis
   ["2026-11-25","21:00","Small Town Trouble: Texas","S1 E2 \u00b7 Double Date and Double Standards","ok","A night at a lesbian bar stirs up jealousy for Aaryn and Annari, Hailey weighs a career change, and old feuds cool off at Honky Tonk Thursday."],
   ["2026-11-26","20:00","Southern Charm","S12 E3 \u00b7 No Bunny Business \u00b7 an hour early for Thanksgiving","ok","Allie calls off her date with Whitner, who suspects Salley had a hand in it, and Austen confronts Shep at Patricia's Easter brunch."],
   ["2026-11-29","20:00","RHOP","S11 E8 \u00b7 Surprise Surprise","ok",""],
-  ["2026-11-29","21:30","Married at First Sight","S20 E5 \u00b7 Swim Socks and Love on the Rocks \u00b7 Bravo airing","ok","","streaming"],
   ["2026-11-30","20:00","Below Deck","S13 E8 \u00b7 Shape Up or Ship Out","ok",""],
   ["2026-12-01","20:00","RHONY","S16 E12 \u00b7 Echoes of the Past \u00b7 back after a Thanksgiving-week break","ok",""],
   ["2026-12-02","20:00","RHOSLC","S7 E12 \u00b7 Lei Down the Law","ok",""],
   ["2026-12-02","21:00","Small Town Trouble: Texas","S1 E3 \u00b7 All Hail the Corn Queen","ok",""],
   ["2026-12-03","20:00","Southern Charm","S12 E4 \u00b7 A Historic Divide \u00b7 8:00 PM again","ok",""],
   ["2026-12-06","20:00","RHOP","S11 E9 \u00b7 Sorori-Tea! Fun","ok",""],
-  ["2026-12-06","21:30","Married at First Sight","S20 E6 \u00b7 New Home Keys and Jet Skis \u00b7 Bravo airing","ok","","streaming","https://www.peacocktv.com/watch-online/tv/married-at-first-sight/6006834051739908112/seasons/20/episodes/new-home-keys-and-jet-skis-episode-6/49b08545-5bbd-3958-aabd-04df97412441"],
   ["2026-12-07","20:00","Below Deck","S13 E9 \u00b7 Smoke and Mirrors","ok",""],
   ["2026-12-08","20:00","RHONY","S16 E13 \u00b7 Good Vibes Only","ok",""],
   ["2026-12-09","20:00","RHOSLC","S7 E13 \u00b7 Hostess With the Roastest","ok",""],
@@ -140,7 +138,7 @@ const AFTERSHOWS = [ /* on:true + time = shown in Next 7 nights on every night t
   {show:"RHOSLC",title:"RHOSLC After Show S7",on:false,when:"No Season 7 After Show announced",where:"Past seasons: BravoTV.com + YouTube",next:"—",note:"Bravo hasn't listed one for this season.",st:"chk"}
 ];
 const GRID = [
-  ["Sun",[["20:00","RHOP","S11",""],["21:30","Married at First Sight","S20","Already on Peacock"]]],
+  ["Sun",[["20:00","RHOP","S11",""]]],
   ["Mon",[["20:00","Below Deck","S13",""]]],
   ["Tue",[["20:00","RHONY","S16","RHONJ takes over Jan 19"],["21:00","RHONY","After Show","Online only"]]],
   ["Wed",[["20:00","RHOSLC","S7",""],["21:00","Small Town Trouble: Texas","S1","Wife Swap S2 from Dec 30"]]],
@@ -151,7 +149,6 @@ const GRID = [
 const CHANGES = [ /* logged, change (may use <b>), status, source URL */
   ["Nov 26","<b>WWHL</b> returns Sun Nov 29. Bravo's airtimes move night to night: Mon 9:00 PM, Wed 10:00 PM, other nights after midnight","ok","https://www.bravotv.com/schedule/watch-what-happens-live"],
   ["Nov 26","<b>Southern Charm</b> stays at 8:00 PM on Dec 3 (Bravo listing), not back to 9:00 PM","ok","https://www.bravotv.com/schedule"],
-  ["Nov 26","<b>Married at First Sight</b> S20 airs Sundays 9:30 PM on Bravo; the whole season is already on Peacock","ok","https://www.bravotv.com/the-daily-dish/married-at-first-sight-season-20s-episode-release-schedule-bravo"],
   ["Nov 25","<b>Southern Charm</b> Ep. 3 moves an hour early to 8:00 PM on Thanksgiving","ok","https://www.bravotv.com/schedule"],
   ["Nov 25","<b>RHONY</b> skipped Nov 24 for Thanksgiving week; returns Dec 1 with Ep. 12 and its After Show","li","https://whenitsout.com/tv/channel/bravo/"],
   ["Nov 25","<b>WWHL</b> off for Thanksgiving week (Nov 22\u201328); last new episode listed Nov 19","rep","https://www.peacocktv.com/watch-online/tv/watch-what-happens-live-with-andy-cohen/8809822949267363112"],

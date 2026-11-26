@@ -65,5 +65,5 @@ python3 -m http.server    # then open http://localhost:8000
 
 ## Credits
 
-Designed and built by **Brent ([@bunkrich](https://github.com/bunkrich))**, with Claude as a pair-programmer.
+Designed and built by **Brent Unkrich** ([@bunkrich](https://github.com/bunkrich)) · vibe coded with Claude.
 Not affiliated with Bravo, NBCUniversal or Peacock. Show names and trademarks belong to their owners; episode details are summarized in our own words with links to official sources.
