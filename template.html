@@ -421,7 +421,7 @@ const prem=PREMIERES.filter(p=>p.date>=today);
 $("prem").innerHTML=prem.map((p,i)=>`<article class="prem glass"><div class="ph">${badge(p.show)}<div><h3>${esc(p.title)}</h3><div class="ds">${esc(fd(p.date,{weekday:"short",month:"short",day:"numeric"}))} · ${esc(p.when)}</div></div></div>
 <div class="cd" id="cd${i}"></div><ul class="list">${p.eps.map(x=>`<li><b>${esc(x[0])}</b><span>${esc(x[1])}</span></li>`).join("")}</ul><div class="metaln" style="margin-top:0">${pill(p.st)}${p.early?`<span class="pk live">${ic("play")}Early on Peacock ${esc(short(p.early))}</span>`:""}${trl(p.show)}</div></article>`).join("")||`<p class="sub">No dated premieres right now.</p>`;
 const tick=()=>{const n=nyNow();prem.forEach((p,i)=>{const[hh,mm]=(p.time||"20:00").split(":").map(Number);let m=diff(n.d,p.date)*1440+hh*60+mm-(n.h*60+n.m);if(m<0)m=0;
-  const el=$("cd"+i);if(el)el.innerHTML=[[Math.floor(m/1440),"days"],[Math.floor(m%1440/60),"hrs"],[m%60,"min"]].map(([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`).join("")})};
+  const el=$("cd"+i);if(el){const dd=Math.floor(m/1440),wk=Math.floor(dd/7),hr=Math.floor(m%1440/60);const u=(v,s,p)=>[v,v===1?s:p];const parts=wk?[u(wk,"week","weeks"),u(dd%7,"day","days"),u(hr,"hr","hrs")]:[u(dd,"day","days"),u(hr,"hr","hrs")];el.innerHTML=parts.map(([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`).join("")}})};
 tick();const timer=setInterval(tick,60000);
 
 /* collapsible sections */
