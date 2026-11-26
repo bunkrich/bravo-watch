@@ -27,7 +27,8 @@ a{color:inherit}
 .bar .wrap{display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:12px}
 .brand{font-weight:800;letter-spacing:-.02em;font-size:20px;text-decoration:none;white-space:nowrap}
 .brand span{background:linear-gradient(90deg,var(--pink),var(--sun));-webkit-background-clip:text;background-clip:text;color:transparent}
-.back{font-size:14px;font-weight:600;color:var(--mut);text-decoration:none;padding:8px 12px;border-radius:99px}
+.back{display:inline-flex;align-items:center;min-height:40px;font-size:14px;font-weight:600;color:var(--mut);text-decoration:none;padding:0 12px;border-radius:99px}
+@media(max-width:360px){.brand{font-size:17px!important}.back{font-size:13px;padding:0 8px}}
 .back:hover{background:rgba(255,255,255,.1);color:var(--ink)}
 h1{font-size:clamp(30px,5vw,42px);line-height:1.1;letter-spacing:-.03em;margin:40px 0 10px}
 .lead{color:var(--mut);font-size:18px;margin:0 0 28px}

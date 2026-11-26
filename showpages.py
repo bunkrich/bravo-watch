@@ -90,6 +90,7 @@ a{color:inherit}:focus-visible{outline:2px solid var(--c1);outline-offset:2px}
 .bar .wrap{display:flex;align-items:center;justify-content:space-between;min-height:60px;gap:12px}
 .brand{font-weight:800;letter-spacing:-.025em;font-size:20px;text-decoration:none;white-space:nowrap}
 .brand span{color:#ff4fae;background:linear-gradient(90deg,#ff4fae,#ffd25a);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+@media(max-width:360px){.brand{font-size:17px}.back{padding:0 8px!important;font-size:13px!important}}
 .back{display:inline-flex;align-items:center;min-height:40px;font-size:14px;font-weight:650;color:var(--mut);text-decoration:none;padding:0 14px;border-radius:99px}.back:hover{background:rgba(255,255,255,.1);color:var(--ink)}
 .hero{display:flex;gap:18px;align-items:center;margin:34px 0 8px}
 .badge{flex:none;width:64px;height:64px;border-radius:18px;display:grid;place-items:center;font:800 17px/1 var(--font);letter-spacing:-.01em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);background:linear-gradient(145deg,var(--c1),var(--c2));box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -10px 18px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.12),0 4px 18px -8px var(--c1)}
@@ -132,7 +133,7 @@ if(a.classList.contains("pk"))t("peacock",{show:sh,area:"show_page"});else if(a.
 # Show pages are rebuilt once a day: once the featured airing has ended, roll the card on to the next one.
 ROLL = """<script>(()=>{const c=[...document.querySelectorAll(".card.next[data-end]")];if(!c.length)return;const roll=()=>{const n=Date.now();
 const a=c[0];if(!a||a.hidden||n<Date.parse(a.dataset.end))return;const b=c[1];
-if(b){a.hidden=true;b.hidden=false}else{const k=a.querySelector(".k");if(k)k.textContent="Latest episode \u00b7 aired"}};
+if(b){a.hidden=true;b.hidden=false;const li=document.querySelector("li[data-roll]");if(li){const ul=li.parentElement;li.remove();if(!ul.children.length)ul.closest(".card").hidden=true}}else{const k=a.querySelector(".k");if(k)k.textContent="Latest episode \u00b7 aired"}};
 roll();document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")roll()});setInterval(roll,300000)})();</script>"""
 
 
@@ -274,8 +275,10 @@ def run():
             for p in prem:
                 eplist = "".join(f'<li><div class="dt">{e(x[0])}</div><div class="ep"><b>{e(x[1])}</b></div></li>' for x in p.get("eps", []))
                 sections.append(f'<section class="card"><h2>Premiere: {e(p["title"])}</h2><p><b>{e(nice(p["date"], True))}</b> · {e(p.get("when", ""))}</p>' + (f'<ul class="eps">{eplist}</ul>' if eplist else "") + '</section>')
-            if up[2:]:
-                sections.append(f'<section class="card"><h2>Coming Up</h2><ul class="eps">{"".join(ep_li(x, False) for x in up[2:])}</ul></section>')
+            if up[1:]:
+                # the first item is the episode the card above rolls on to once tonight's airing ends; the roll script hides it then
+                items = "".join(ep_li(x, False) for x in up[1:]).replace("<li>", '<li data-roll>', 1)
+                sections.append(f'<section class="card"><h2>Coming Up</h2><ul class="eps">{items}</ul></section>')
             if past:
                 sections.append(f'<section class="card"><h2>Recent Episodes</h2><ul class="eps">{"".join(ep_li(x, True) for x in past)}</ul></section>')
             extras = []

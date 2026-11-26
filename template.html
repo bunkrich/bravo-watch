@@ -225,7 +225,9 @@ a.pk:hover{border-color:var(--pea1);color:#fff}
 .sl .ss{color:var(--mut)}
 .sl em{display:block;font-style:normal;font-size:12.5px;color:var(--cyan)}
 .lr .none{color:var(--dim);font-size:14px}
-.pl{text-decoration:none;font-weight:700;background-image:linear-gradient(var(--c1,currentColor),var(--c1,currentColor));background-size:0 2px;background-position:0 100%;background-repeat:no-repeat;transition:background-size .25s var(--ease)}
+/* tiny phones (320-360px): day label above its shows so names get the full width */
+@media(max-width:360px){.lr{grid-template-columns:minmax(0,1fr);gap:6px}#lu>.glass{padding:4px 14px}.sl{grid-template-columns:auto minmax(0,1fr) auto;gap:0 8px}}
+.pl{display:inline-block;padding:3px 0;text-decoration:none;font-weight:700;background-image:linear-gradient(var(--c1,currentColor),var(--c1,currentColor));background-size:0 2px;background-position:0 100%;background-repeat:no-repeat;transition:background-size .25s var(--ease)}
 .pl:hover{background-size:100% 2px}
 .pli{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;color:#1a1200;background:linear-gradient(135deg,var(--pea1),var(--pea2));text-decoration:none;align-self:center}
 .pli svg{width:10px;height:10px;fill:currentColor;stroke:none;margin-left:1px}
@@ -407,7 +409,7 @@ h1,h2,h3{text-wrap:balance}
   <nav class="nav" aria-label="Sections"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav>
 </div></div>
 
-<noscript><div class="wrap" style="padding:24px 0">All times Eastern. Turn on JavaScript for the live view, the Peacock view and countdowns.</div></noscript>
+<noscript><style>.more{display:block!important;visibility:visible!important}.chv{display:none}</style><div class="wrap" style="padding:24px 0">All times Eastern. Turn on JavaScript for the live view, the Peacock view and countdowns.</div></noscript>
 <main>
 <section id="week" aria-labelledby="wkH"><div class="wrap">
   <div class="wkh">
@@ -455,6 +457,9 @@ const sh=n=>SHOWS[n]||[n.replace(/[^A-Z]/g,"").slice(0,3)||n.slice(0,2).toUpperC
 const fn=n=>(typeof FULL!=="undefined"&&FULL[n])||n;
 const fnLine=n=>fn(n)!==n?`<div class="fn">${esc(fn(n))}</div>`:"";
 const slugOf=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+/* only shows that have their own page get linked (build.py fills this in from showpages.py) */
+const PAGES=new Set(__PAGES__);
+const hasPage=s=>PAGES.has(s==="WWHL"?"wwhl":slugOf(s));
 /* show colours: --c1 (bright) and --c2 (deep); dark text on badges whose colours are too light for white */
 const lum=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(c=>c<=.03928?c/12.92:((c+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]};
 const mix=(a,b)=>"#"+[1,3,5].map(i=>Math.round((parseInt(a.slice(i,i+2),16)+parseInt(b.slice(i,i+2),16))/2).toString(16).padStart(2,"0")).join("");
@@ -481,7 +486,7 @@ const vt=f=>{if(!document.startViewTransition||reduce)return f();let done=false;
 
 /* ---------- header bits ---------- */
 const covered=[...new Set([...EPISODES.map(e=>e[2]),...GRID.flatMap(g=>g[1].map(s=>s[1])),...PREMIERES.map(p=>p.show).filter(Boolean),"WWHL"])].sort((a,b)=>fn(a).localeCompare(fn(b)));
-$("covered").innerHTML="Show schedules: "+covered.map(s=>`<a href="/${slugOf(s)}">${esc(fn(s))}</a>`).join(", ")+".";
+$("covered").innerHTML="Show schedules: "+covered.filter(hasPage).map(s=>`<a href="/${slugOf(s)}">${esc(fn(s))}</a>`).join(", ")+".";
 $("upd").innerHTML=`${ic("check")}Updated ${esc(short(UPDATED))}`;
 if(diff(UPDATED,today)>2)$("stale").style.display="inline-flex";
 
@@ -495,7 +500,7 @@ const pk=(d,show,early,ep)=>{const u=peacockUrl(show,ep);let lbl,live;
   const inner=`${ic("play")}Peacock · ${esc(lbl)}`;
   return u?`<a class="pk${live?" live":""}" href="${esc(u)}">${inner}</a>`:`<span class="pk">${inner}</span>`};
 const srcA=u=>u?`<a class="srcl" href="${esc(u)}">${ic("link")}Source</a>`:"";
-const showLink=show=>`<a class="intl" href="/${slugOf(show)}">${ic("list")}All episodes</a>`;
+const showLink=show=>hasPage(show)?`<a class="intl" href="/${slugOf(show)}">${ic("list")}All episodes</a>`:"";
 const trl=show=>TRAILERS[show]?`<a class="pk trl" href="${esc(TRAILERS[show])}">${ic("film")}Trailer</a>`:"";
 
 /* ---------- one row builder for every kind of row ---------- */
@@ -580,7 +585,7 @@ const onPeacockAlready=show=>{const r=EPISODES.filter(e=>e[2]===show);return r.l
 function renderLineup(){const pk7=VIEW==="peacock";
   const G=pk7?GRID.map((g,i)=>[g[0],GRID[(i+6)%7][1].filter(s=>!/After Show/.test(s[2])&&!onPeacockAlready(s[1])).map(s=>["06:00",s[1],s[2],""])]):GRID;
   const slot=s=>{const after=/After Show/.test(s[2]),u=sh(s[1])[4];
-    return `<span class="sl" style="${vars(s[1])}"><span class="tm"><span class="dot" aria-hidden="true"></span>${tH(s[0])}</span><span class="who"><a class="pl" href="/${slugOf(s[1])}">${esc(fn(s[1]))}</a> <span class="ss">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>${u&&!after?`<a class="pli" href="${esc(u)}" aria-label="${esc(fn(s[1]))} on Peacock">${ic("play")}</a>`:"<span></span>"}</span>`};
+    return `<span class="sl" style="${vars(s[1])}"><span class="tm"><span class="dot" aria-hidden="true"></span>${tH(s[0])}</span><span class="who">${hasPage(s[1])?`<a class="pl" href="/${slugOf(s[1])}">${esc(fn(s[1]))}</a>`:`<b>${esc(fn(s[1]))}</b>`} <span class="ss">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>${u&&!after?`<a class="pli" href="${esc(u)}" aria-label="${esc(fn(s[1]))} on Peacock">${ic("play")}</a>`:"<span></span>"}</span>`};
   $("lu").innerHTML=`<div class="glass">${G.map((g,i)=>`<div class="lr${i===dow?" now":""}"><span class="dn">${g[0]}</span>${g[1].length?`<div class="slots">${g[1].map(slot).join("")}</div>`:`<span class="none">No new originals</span>`}</div>`).join("")}</div><p class="note" style="margin-top:10px">${pk7?"New episodes hit Peacock at 6:00 AM the morning after they air. WWHL lands the next morning too.":"WWHL airs Sunday to Thursday nights, but Bravo moves its time night to night (some nights after midnight), so check each night above."}</p>`;
   $("luT").textContent=pk7?"Weekly Peacock Drops":"Current Weekly Lineup"}
 renderLineup();
@@ -606,7 +611,7 @@ const evs=EVENTS.filter(e=>e[0]>=today||!/^\d/.test(e[0]));
 const ruHtml=`<div class="inner" style="padding:4px 16px;margin-top:14px">${REUNIONS.map(r=>`<div class="ru">${badge(r[0])}<div><div class="nm">${esc(r[1])}</div><div class="ds">${esc(r[2])}</div><div class="metaln">${pill(r[3])}${srcA(r[4])}</div></div></div>`).join("")}${evs.map(e=>`<div class="ru"><span class="badge" style="--c1:#3ee6ea;--c2:#2a6df4" aria-hidden="true">${ic("ticket")}</span><div><div class="nm">${esc(e[1])}</div><div class="ds">${/^\d/.test(e[0])?`<b style="color:var(--cyan)">${esc(fd(e[0],{weekday:"short",month:"short",day:"numeric"}))}</b> · `:""}${esc(e[2])}</div><div class="metaln">${pill(e[3])}${srcA(e[4])}</div></div></div>`).join("")}</div>`;
 const chHtml=feed(CHANGES,c=>`<div class="k">${esc(c[0])} · ${ST[c[2]][0]}</div><div class="v">${safeB(c[1])}</div>${srcA(c[3])}`);
 const raHtml=feed(RADAR,c=>`<div class="v"><b>${esc(c[0])}</b></div><div class="k">${esc(c[1])} · ${ST[c[2]][0]}</div>${srcA(c[3])}`);
-const hiHtml=`<ol class="grid hist">${HISTORY.map(x=>`<li class="inner">${badge(x[1])}<div><div class="hd">${esc(fd(x[0],{month:"short",day:"numeric",year:"numeric"}))}</div><div class="hn"><a class="pl" style="${vars(x[1])}" href="/${slugOf(x[1])}">${esc(fn(x[1]))}</a></div><div class="hs">${esc(x[2])} · ${esc(x[3])}</div></div></li>`).join("")}</ol>`;
+const hiHtml=`<ol class="grid hist">${HISTORY.map(x=>`<li class="inner">${badge(x[1])}<div><div class="hd">${esc(fd(x[0],{month:"short",day:"numeric",year:"numeric"}))}</div><div class="hn">${hasPage(x[1])?`<a class="pl" style="${vars(x[1])}" href="/${slugOf(x[1])}">${esc(fn(x[1]))}</a>`:esc(fn(x[1]))}</div><div class="hs">${esc(x[2])} · ${esc(x[3])}</div></div></li>`).join("")}</ol>`;
 const srcHtml=`<div class="legend">${Object.keys(ST).map(k=>`<span>${pill(k)} ${{ok:"announced by Bravo",li:"TV listing",rep:"press or fan report",chk:"sources disagree"}[k]}</span>`).join("")}</div><div class="src">${SOURCES.map(s=>`<a href="${esc(s[1])}">${ic("link")}${esc(s[0])}</a>`).join("")}</div>`;
 const firstChange=CHANGES[0]?CHANGES[0][1].replace(/<\/?b>/g,""):"No recent changes";
 $("stack").innerHTML=[

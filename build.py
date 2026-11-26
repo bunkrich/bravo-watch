@@ -6,7 +6,6 @@ CAND=".index.build.html"
 import hashlib
 # build id: changes whenever the page or its data changes; open tabs and Home Screen apps compare it to /version.txt and reload
 BUILD=hashlib.sha1((t+d).encode()).hexdigest()[:12]
-open(CAND,"w").write(t.replace("/*DATA*/",d).replace("__BUILD__",BUILD))
 m=re.search(r'UPDATED\s*=\s*"(\d{4}-\d{2}-\d{2})"',d)
 lm=m.group(1) if m else ""
 
@@ -18,6 +17,7 @@ import showpages
 pages=showpages.run()
 for p in old:
   if p not in pages and os.path.exists(p+".html"): os.remove(p+".html")
+open(CAND,"w").write(t.replace("/*DATA*/",d).replace("__BUILD__",BUILD).replace("__PAGES__",json.dumps(pages)))
 
 # widget setup page (code embedded from widget.js so it never drifts)
 import html as _h
