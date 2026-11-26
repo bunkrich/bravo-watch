@@ -4,7 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>Bravo Watch Calendar</title>
+<title>Bravo Watch Calendar · What's on Bravo tonight, this week & on Peacock</title>
+<meta name="description" content="Every Bravo show airing the next 7 nights, upcoming premieres, WWHL guests, After Shows and Peacock drop times. Updated every morning.">
+<link rel="canonical" href="https://bravo.bunkrich.com/">
+<meta name="theme-color" content="#0b0718">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Bravo Watch Calendar">
+<meta property="og:title" content="Bravo Watch Calendar">
+<meta property="og:description" content="What's on Bravo the next 7 nights, upcoming premieres, WWHL guests and Peacock drops. Updated daily.">
+<meta property="og:url" content="https://bravo.bunkrich.com/">
+<meta property="og:image" content="https://bravo.bunkrich.com/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bravo Watch Calendar: next 7 nights, premieres, WWHL guests, Peacock drops">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Bravo Watch Calendar","url":"https://bravo.bunkrich.com/","description":"Unofficial fan calendar of Bravo TV airings, premieres, WWHL guests and Peacock drops."}</script>
 <style>
 /* VOICE everyday guide: calm, fast, glanceable
    IDEA frosted-glass TV guide floating over a Miami-night colour wash
@@ -12,7 +29,7 @@
    COLOUR night #0b0718, neon pink #ff4fae, cyan #3ee6ea, sun #ffd25a over soft colour blobs
    TYPE system UI stack only (no web fonts, instant load), tabular numbers for times
    LAYOUT sticky glass bar; one 12-col-free CSS grid system: auto-fill card grids that line up at every width */
-:root{--bg:#0b0718;--ink:#f5f1ff;--mut:#aea3c8;--dim:#7d7299;--line:rgba(255,255,255,.12);--glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.1);--hi:inset 0 1px 0 rgba(255,255,255,.16);--pink:#ff4fae;--cyan:#3ee6ea;--sun:#ffd25a;--ok:#4be8a0;--rep:#ffb547;--chk:#ff7090;--r:20px;--gap:clamp(12px,2vw,18px);--time:5.4rem;--bd:44px}
+:root{--bg:#0b0718;--ink:#f5f1ff;--mut:#aea3c8;--dim:#8579a1;--line:rgba(255,255,255,.12);--glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.1);--hi:inset 0 1px 0 rgba(255,255,255,.16);--pink:#ff4fae;--cyan:#3ee6ea;--sun:#ffd25a;--ok:#4be8a0;--rep:#ffb547;--chk:#ff7090;--r:20px;--gap:clamp(12px,2vw,18px);--time:5.4rem;--bd:44px}
 *{box-sizing:border-box;min-width:0}
 html{scroll-behavior:smooth;scroll-padding-top:76px;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;overflow-x:clip;min-height:100vh}
@@ -260,6 +277,7 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
   <nav class="nav"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav>
 </div></div>
 
+<noscript><div class="wrap" style="padding:24px 0">This calendar needs JavaScript to show the schedule. Turn it on and reload.</div></noscript>
 <section id="week"><div class="wrap">
   <h2><svg class="i"><use href="#i-cal"/></svg>Next 7 Nights on Bravo</h2>
   <div class="grid days" id="days"></div>
@@ -386,6 +404,38 @@ if("IntersectionObserver" in window&&!matchMedia("(prefers-reduced-motion: reduc
   els.forEach(el=>revealObs.observe(el));
 }
 }
+</script>
+<script>
+/* Tap tracking: cookie-free, no personal data. Sends events to Umami when UMAMI_ID is set. */
+(()=>{
+const UMAMI_ID="";
+if(UMAMI_ID&&location.hostname==="bravo.bunkrich.com"){const s=document.createElement("script");s.defer=true;s.src="https://cloud.umami.is/script.js";s.dataset.websiteId=UMAMI_ID;s.dataset.domains="bravo.bunkrich.com";document.head.appendChild(s)}
+const q=[];const track=(n,d)=>{try{if(window.umami&&umami.track){while(q.length){const x=q.shift();umami.track(x[0],x[1])}umami.track(n,d)}else if(q.length<50)q.push([n,d])}catch(e){}};
+window.bwTrack=track;
+const txt=el=>el?el.textContent.trim().replace(/\s+/g," ").slice(0,60):"";
+const area=el=>{const s=el.closest("section,details.sec");return s?s.id:"page"};
+const showOf=el=>txt(el.closest(".row")?.querySelector(".nm"))||txt(el.closest(".prem")?.querySelector("h3"))||txt(el.closest(".ru")?.querySelector(".nm"))||txt(el.closest(".as")?.querySelector("h3"))||txt(el);
+const night=el=>{const d=el.closest(".day");return d?[...d.parentElement.children].indexOf(d):-1};
+document.addEventListener("click",e=>{
+  const a=e.target.closest("a");
+  if(a){
+    const h=a.getAttribute("href")||"";let host="";try{host=new URL(a.href).hostname.replace(/^www\./,"")}catch(_){}
+    if(a.closest(".nav")||a.classList.contains("brand"))return track("nav",{to:h.replace("#","")||"top"});
+    if(a.classList.contains("trl"))return track("trailer",{show:showOf(a)});
+    if(a.classList.contains("srcl"))return track("source",{host,area:area(a)});
+    if(a.classList.contains("pk"))return track("peacock",{show:showOf(a),area:area(a),night:night(a)});
+    if(a.classList.contains("pl"))return track("show_link",{show:txt(a),area:area(a)});
+    if(h.startsWith("#"))return;
+    return track("outbound",{host,area:area(a)});
+  }
+  const r=e.target.closest(".xr");
+  if(r&&r.getAttribute("aria-expanded")==="true")track("row_open",{show:txt(r.querySelector(".nm")),night:night(r),tonight:night(r)===0});
+});
+document.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const r=e.target.closest&&e.target.closest(".xr");if(r&&e.target===r)setTimeout(()=>{if(r.getAttribute("aria-expanded")==="true")track("row_open",{show:txt(r.querySelector(".nm")),night:night(r),tonight:night(r)===0,kb:true})},0)});
+document.querySelectorAll("details.sec").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)track("section_open",{id:d.id})}));
+if("IntersectionObserver" in window){const seen=new Set();const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting&&!seen.has(en.target.id)){seen.add(en.target.id);track("seen",{section:en.target.id});io.unobserve(en.target)}}),{threshold:.25});document.querySelectorAll("section[id]").forEach(s=>io.observe(s))}
+let dw=0;const t0=Date.now();document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&!dw){dw=1;const s=Math.round((Date.now()-t0)/1000);track("engaged",{secs:s,bucket:s<10?"<10s":s<30?"10-30s":s<120?"30s-2m":"2m+"})}});
+})();
 </script>
 <!-- Cloudflare Web Analytics (cookie-free) --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e327c2f1f9b24f13bec12fed2dfbdeb0"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
