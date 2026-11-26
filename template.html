@@ -43,6 +43,9 @@ svg.i{width:1.05em;height:1.05em;flex:none;fill:none;stroke:currentColor;stroke-
 /* bar */
 .bar{position:sticky;top:0;z-index:10;background:rgba(11,7,24,.55);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);border-bottom:1px solid var(--line)}
 .bar .wrap{display:flex;align-items:center;gap:16px;min-height:60px}
+.bar{transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+@media(max-width:900px){.bar.hide{transform:translateY(-100%)}}
+@media(prefers-reduced-motion:reduce){.bar{transition:none}}
 .brand{font-weight:800;letter-spacing:-.02em;font-size:18px;text-decoration:none;white-space:nowrap;flex:none}
 .brand span{color:var(--pink)}
 .nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-left:auto}
@@ -427,6 +430,12 @@ $("prem").innerHTML=prem.map((p,i)=>`<article class="prem glass"><div class="ph"
 const tick=()=>{const n=nyNow();prem.forEach((p,i)=>{const[hh,mm]=(p.time||"20:00").split(":").map(Number);let m=diff(n.d,p.date)*1440+hh*60+mm-(n.h*60+n.m);if(m<0)m=0;
   const el=$("cd"+i);if(el){const dd=Math.floor(m/1440),wk=Math.floor(dd/7),hr=Math.floor(m%1440/60);const u=(v,s,p)=>[v,v===1?s:p];const parts=wk?[u(wk,"week","weeks"),u(dd%7,"day","days"),u(hr,"hr","hrs")]:[u(dd,"day","days"),u(hr,"hr","hrs")];el.innerHTML=parts.map(([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`).join("")}})};
 tick();const timer=setInterval(tick,60000);
+/* phones: hide the top bar when scrolling down, bring it back when scrolling up */
+{const bar=$("top");let lastY=scrollY,ticking=false;const mq=matchMedia("(max-width: 900px)");
+addEventListener("scroll",()=>{if(ticking)return;ticking=true;requestAnimationFrame(()=>{const y=scrollY;
+  if(!mq.matches||y<80||y<lastY-6)bar.classList.remove("hide");else if(y>lastY+6)bar.classList.add("hide");
+  if(Math.abs(y-lastY)>6)lastY=y;ticking=false})},{passive:true});
+bar.addEventListener("focusin",()=>bar.classList.remove("hide"));}
 /* keep an open tab current: reload when the day changes or 6:00 AM Peacock drops pass */
 const stamp=n=>n.d+(n.h>=6?"b":"a");const loadStamp=stamp(now);
 const freshen=()=>{if(stamp(nyNow())!==loadStamp)location.reload()};
