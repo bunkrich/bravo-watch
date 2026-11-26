@@ -26,6 +26,23 @@
   [headers.values]
     Cache-Control = "public, max-age=604800"
 
+# Old addresses -> new home (keeps paths and ?me)
+[[redirects]]
+  from = "https://bravo.bunkrich.com/*"
+  to = "https://clubhousetonight.com/:splat"
+  status = 301
+  force = true
+[[redirects]]
+  from = "http://bravo.bunkrich.com/*"
+  to = "https://clubhousetonight.com/:splat"
+  status = 301
+  force = true
+[[redirects]]
+  from = "https://bravo-watch.netlify.app/*"
+  to = "https://clubhousetonight.com/:splat"
+  status = 301
+  force = true
+
 # Keep source/build files private
 [[redirects]]
   from = "/template.html"
