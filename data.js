@@ -85,6 +85,12 @@ const HISTORY = [ /* past premieres, newest first: date, show, season, night/tim
   ["2026-01-08","The Valley: Persian Style","S1 series premiere","Thu 9:00 PM"]
 ];
 const EPISODES = [ /* date, time, show, "S E · title · note", status, synopsis (optional, fill when Bravo/Peacock posts it) */
+  ["2026-11-17","20:00","RHONY","S16 E11 \u00b7 Peeling Back the Layers \u00b7 90 minutes","li","Erika reveals she's met her surrogate, and the group starts questioning her parenting plans."],
+  ["2026-11-18","20:00","RHOSLC","S7 E10 \u00b7 Amends With Friends","ok","Angie and Whitney talk through trouble at home, while Lisa and Meredith butt heads with their husbands."],
+  ["2026-11-18","21:00","Small Town Trouble: Texas","S1 E1 \u00b7 Rodeo Rendezvous \u00b7 two-hour premiere","ok","The series opens at the Tejas Rodeo, where old feuds, bedroom secrets and a new love triangle all heat up."],
+  ["2026-11-19","21:00","Southern Charm","S12 E2 \u00b7 Battle of Whits","ok","Madison jumps to Salley's defense and throws a get-together where Venita lets a secret slip."],
+  ["2026-11-22","20:00","RHOP","S11 E7 \u00b7 Cold Beach, Hot Gossip","ok","The Rehoboth trip wraps with a drag show and one last blowup."],
+  ["2026-11-23","20:00","Below Deck","S13 E7 \u00b7 Who's the Boss?","ok","A shake-up on the deck team makes for an emotional night, while Chef Moe rides high."],
   ["2026-11-25","20:00","RHOSLC","S7 E11 \u00b7 Maui Mystery, Solved","ok","The group hunts for whoever has been leaking info to Mary, Meredith lands a big DJ gig, and the Maui trip exposes the culprit."],
   ["2026-11-25","21:00","Small Town Trouble: Texas","S1 E2 \u00b7 Double Date and Double Standards","ok","A night at a lesbian bar stirs up jealousy for Aaryn and Annari, Hailey weighs a career change, and old feuds cool off at Honky Tonk Thursday."],
   ["2026-11-26","20:00","Southern Charm","S12 E3 \u00b7 No Bunny Business \u00b7 an hour early for Thanksgiving","li",""],

@@ -70,6 +70,10 @@ h1.h2 svg{color:var(--cyan)}
 .wkh{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;margin-bottom:6px}
 .wkh h1{margin:0}
 h1.h2 span{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:inherit}
+.wkc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pastb{display:inline-flex;align-items:center;gap:6px;font:700 13.5px/1 inherit;color:var(--mut);background:var(--glass);border:1px solid var(--line);border-radius:99px;padding:10px 14px;cursor:pointer;box-shadow:var(--hi)}
+.pastb:hover,.pastb[aria-pressed="true"]{color:var(--ink);background:var(--glass2)}
+.pastb:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
 .seg{display:inline-flex;padding:3px;border-radius:99px;background:var(--glass);border:1px solid var(--line);box-shadow:var(--hi)}
 .seg button{font:700 13.5px/1 inherit;color:var(--mut);background:none;border:0;border-radius:99px;padding:8px 14px;cursor:pointer}
 .seg button[aria-pressed="true"]{color:#0b0718;background:linear-gradient(90deg,var(--pink),var(--sun))}
@@ -304,7 +308,7 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 <noscript><div class="wrap" style="padding:24px 0">Showing this morning's schedule. Turn on JavaScript for live times and countdowns.</div></noscript>
 <section id="week"><div class="wrap">
   <div class="wkh"><h1 class="h2"><svg class="i"><use href="#i-cal"/></svg><span id="wkT">Next 7 Nights on Bravo</span></h1>
-  <div class="seg" role="group" aria-label="Show the schedule for"><button type="button" data-v="bravo" aria-pressed="true">On Bravo</button><button type="button" data-v="peacock" aria-pressed="false">On Peacock</button></div></div>
+  <div class="wkc"><button type="button" class="pastb" id="pastB" aria-pressed="false"><svg class="i"><use href="#i-clock"/></svg> Past 7 days</button><div class="seg" role="group" aria-label="Show the schedule for"><button type="button" data-v="bravo" aria-pressed="true">On Bravo</button><button type="button" data-v="peacock" aria-pressed="false">On Peacock</button></div></div></div>
   <div class="grid days" id="days"></div>
 </div></section>
 
@@ -381,6 +385,8 @@ const wwRow=(w,d)=>w.off?`<div class="wwq">${ic("mic")}<div><div><b>WWHL</b> \u0
 const asFor=(d,eps)=>AFTERSHOWS.filter(a=>a.on&&a.time&&eps.some(e=>e[2]===a.show)).map(a=>({t:a.time,html:`<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge as-b" style="background:linear-gradient(145deg,${sh(a.show)[1]},${sh(a.show)[2]})">${ic("chat")}</span><div><div class="top"><span class="nm">${esc(a.show)} After Show</span><span class="tm">${tH(a.time)}</span></div><div class="ds dsx"><span>Online only \u00b7 BravoTV.com + YouTube</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more"><div class="metaln">${pill(a.st)}<a class="pk" href="${esc(a.url)}">${ic("play")}Watch online</a>${pk(d,a.show)}</div></div></div></div>`}));
 /* 7 nights: Bravo view (air dates) or Peacock view (streaming drop dates) */
 let VIEW="bravo";try{const q=new URLSearchParams(location.search).get("view");VIEW=(q==="peacock"||q==="bravo")?q:(localStorage.getItem("ctView")==="peacock"?"peacock":"bravo")}catch(e){}
+let PAST=false;
+const FIRST_EP=EPISODES.map(e=>e[0]).sort()[0]||today;
 const dropOf=e=>e[6]||addDays(e[0],1);
 const isLive=d=>d<today||(d===today&&now.h*60+now.m>=360);
 const chev=ic("down").replace('class="i"','class="i chv"');
@@ -389,22 +395,25 @@ const pkRow=e=>{const u=sh(e[2])[4],live=isLive(dropOf(e));
 const wwPkRow=(w,d)=>{const live=isLive(d);return `<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge ww">WWHL</span><div><div class="top"><span class="nm">${esc(w.nm)}</span><span class="tm">${live?'<span class="lv">Streaming</span>':tH("06:00")}</span></div><div class="ds dsx"><span>Watch What Happens Live</span>${chev}</div><div class="more"><div class="metaln">${w.st?pill(w.st):""}<a class="pk live" href="${esc(WWHL.peacock)}">${ic("play")}Watch on Peacock</a></div></div></div></div>`};
 function renderDays(){
   const pk7=VIEW==="peacock";let out="";
-  for(let i=0;i<7;i++){const d=addDays(today,i);
-    const lbl=i===0?(pk7?"Today":"Tonight"):i===1?"Tomorrow":fd(d,{weekday:"long"});
+  for(let k=0;k<7;k++){const i=PAST?-(k+1):k,d=addDays(today,i);
+    const lbl=i===0?(pk7?"Today":"Tonight"):i===1?"Tomorrow":i===-1?(pk7?"Yesterday":"Last night"):fd(d,{weekday:"long"});
+    const untracked=(pk7?addDays(d,-1):d)<FIRST_EP;
     let body;
     if(pk7){const eps=EPISODES.filter(e=>dropOf(e)===d).sort((a,b)=>a[1].localeCompare(b[1]));const w=wwFor(addDays(d,-1));
       const rows=eps.map(pkRow);if(w&&!w.off&&w.nm!=="Guests TBA")rows.push(wwPkRow(w,d));
-      body=rows.length?rows.join(""):`<div class="quiet">${ic(addDays(d,-1)<=LISTED_THROUGH?"tv":"clock")}${addDays(d,-1)<=LISTED_THROUGH?"Nothing new on Peacock":"Listings not published yet"}</div>`;
+      body=rows.length?rows.join(""):`<div class="quiet">${ic(addDays(d,-1)<=LISTED_THROUGH?"tv":"clock")}${untracked?"Not tracked yet":addDays(d,-1)<=LISTED_THROUGH?"Nothing new on Peacock":"Listings not published yet"}</div>`;
     }else{const eps=byDate(d),w=wwFor(d);
-      body=(eps.length?[...eps.map(e=>({t:e[1],html:epRow(e)})),...asFor(d,eps)].sort((x,y)=>x.t.localeCompare(y.t)).map(x=>x.html).join(""):`<div class="quiet">${ic(d<=LISTED_THROUGH?"tv":"clock")}${d<=LISTED_THROUGH?"Nothing new on Bravo":"Listings not published yet"}</div>`)+(w?wwRow(w,d):"");
+      body=(eps.length?[...eps.map(e=>({t:e[1],html:epRow(e)})),...asFor(d,eps)].sort((x,y)=>x.t.localeCompare(y.t)).map(x=>x.html).join(""):`<div class="quiet">${ic(d<=LISTED_THROUGH?"tv":"clock")}${untracked?"Not tracked yet":d<=LISTED_THROUGH?"Nothing new on Bravo":"Listings not published yet"}</div>`)+(w?wwRow(w,d):"");
     }
-    out+=`<article class="day glass${i===0?" now":""}"><div class="dh"><b>${esc(lbl)}</b><span>${esc(short(d))}</span></div>${body}</article>`}
+    out+=`<article class="day glass${i===0?" now":""}${i===-1?" now":""}"><div class="dh"><b>${esc(lbl)}</b><span>${esc(short(d))}</span></div>${body}</article>`}
   $("days").innerHTML=out;
-  $("wkT").textContent=pk7?"Next 7 Days on Peacock":"Next 7 Nights on Bravo";
+  $("wkT").textContent=PAST?(pk7?"Last 7 Days on Peacock":"Last 7 Nights on Bravo"):(pk7?"Next 7 Days on Peacock":"Next 7 Nights on Bravo");
+  const pb=$("pastB");if(pb){pb.setAttribute("aria-pressed",String(PAST));pb.lastChild.textContent=PAST?" Back to this week":" Past 7 days"}
   document.documentElement.classList.toggle("pkv",pk7);
   document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===VIEW)));
 }
 renderDays();
+$("pastB").addEventListener("click",()=>{PAST=!PAST;renderDays();window.bwTrack&&window.bwTrack("past_toggle",{on:PAST,view:VIEW})});
 document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{if(VIEW===b.dataset.v)return;VIEW=b.dataset.v;try{localStorage.setItem("ctView",VIEW)}catch(e){}renderDays();renderLineup();window.bwTrack&&window.bwTrack("view_switch",{to:VIEW})}));
 
 /* premieres */
