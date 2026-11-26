@@ -28,7 +28,8 @@ async function load() {
 }
 
 function todayNY() {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+  // a TV day: rolls over at 6 AM New York time, like the site, so a 3 AM WWHL airing still counts as last night
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(Date.now() - 6 * 3600e3));
 }
 function label(iso, today) {
   const diff = Math.round((new Date(iso + "T12:00:00Z") - new Date(today + "T12:00:00Z")) / 864e5);

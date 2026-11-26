@@ -7,6 +7,8 @@
 <meta name="theme-color" content="#0b0718">
 <title>Bravo Schedule iPhone Widget · Clubhouse Tonight</title>
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://clubhousetonight.com/widget">
+<meta property="og:description" content="A free iPhone home-screen widget that shows the next new Bravo episodes or Peacock drops at a glance.">
 <meta property="og:title" content="Clubhouse Tonight iPhone widget">
 <meta property="og:image" content="https://clubhousetonight.com/og.jpg?v=3">
 <meta property="og:image:width" content="1200">
@@ -90,7 +92,8 @@ async function load() {
 }
 
 function todayNY() {
-  return new Intl.DateTimeFormat(&quot;en-CA&quot;, { timeZone: &quot;America/New_York&quot;, year: &quot;numeric&quot;, month: &quot;2-digit&quot;, day: &quot;2-digit&quot; }).format(new Date());
+  // a TV day: rolls over at 6 AM New York time, like the site, so a 3 AM WWHL airing still counts as last night
+  return new Intl.DateTimeFormat(&quot;en-CA&quot;, { timeZone: &quot;America/New_York&quot;, year: &quot;numeric&quot;, month: &quot;2-digit&quot;, day: &quot;2-digit&quot; }).format(new Date(Date.now() - 6 * 3600e3));
 }
 function label(iso, today) {
   const diff = Math.round((new Date(iso + &quot;T12:00:00Z&quot;) - new Date(today + &quot;T12:00:00Z&quot;)) / 864e5);

@@ -42,6 +42,13 @@ Object.entries(W.airings||{}).forEach(([n,a])=>{const id=`WWHL.airings["${n}"]`;
   if(!ST.has(a[2]))errs.push(`${id}: status "${a[2]}" must be ok, li, rep or chk`);
   if((W.off||[]).some(o=>n>=o[0]&&n<=o[1]))errs.push(`${id}: falls inside an off week; remove one or the other`)});
 Object.keys(W.guests||{}).forEach(n=>{if(!isDate(n))errs.push(`WWHL.guests["${n}"]: bad date`)});
+Object.entries(W.airings||{}).forEach(([n,a])=>{if(Array.isArray(a)&&!(Number.isInteger(a[0])&&a[0]>0))errs.push(`WWHL.airings["${n}"]: episode number must be a positive whole number`);if(Array.isArray(a)&&a[3]!=null&&!(Number.isInteger(a[3])&&a[3]>=10&&a[3]<=180))errs.push(`WWHL.airings["${n}"]: runtime must be 10-180 minutes`)});
+ctx.EPISODES.forEach((e,i)=>{if(e[8]!=null&&e[8]!==""&&!(Number.isInteger(e[8])&&e[8]>=15&&e[8]<=240))errs.push(`EPISODES[${i}] ${e[2]} ${e[0]}: runtime "${e[8]}" must be 15-240 minutes`)});
+/* an emptied or truncated EPISODES list must never pass as "nothing new this week" */
+{const wk=ctx.EPISODES.filter(e=>e[0]>=today&&e[0]<=plus(today,6)).length;
+ if(!wk&&!(isDate(ctx.QUIET_THROUGH||"")&&ctx.QUIET_THROUGH>=plus(today,6)))errs.push(`no new episodes in the next 7 nights. If Bravo really has none, set QUIET_THROUGH = "YYYY-MM-DD" in data.js; otherwise episodes are missing`);}
+(ctx.PREMIERES||[]).forEach(p=>{if(!isDate(p.date))errs.push(`PREMIERES "${p.title}": bad date "${p.date}"`)});
+(ctx.RADAR||[]).forEach(r=>{if(r[4]&&isDate(r[4])&&r[4]>today)errs.push(`RADAR "${r[0]}": last-verified date ${r[4]} is in the future`)});
 (ctx.PREMIERES||[]).forEach(p=>{if(p.time&&!isTime(p.time))errs.push(`PREMIERES "${p.title}": time must be HH:MM or "" when not announced`)});
 const used=new Set([...ctx.EPISODES.map(e=>e[2]),...ctx.HISTORY.map(h=>h[1]),...ctx.PREMIERES.map(p=>p.show).filter(Boolean),...ctx.GRID.flatMap(g=>g[1].map(s=>s[1])),...(ctx.AFTERSHOWS||[]).map(a=>a.show),...(ctx.REUNIONS||[]).map(r=>r[0]),"WWHL"]);
 used.forEach(s=>{if(!ctx.FULL||!ctx.FULL[s])errs.push(`FULL is missing the official full name for "${s}"`)});

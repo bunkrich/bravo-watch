@@ -71,6 +71,8 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 a{color:inherit}
 button{font:inherit;color:inherit}
 svg.i{width:1.05em;height:1.05em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.skip{position:fixed;left:12px;top:calc(8px + env(safe-area-inset-top));z-index:20;transform:translateY(-200%);background:var(--ink);color:#140b24;font-weight:800;padding:10px 16px;border-radius:99px;text-decoration:none;transition:transform .2s}
+.skip:focus{transform:none}
 .vh{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 .wrap{width:min(1200px,100% - 2*var(--edge));margin-inline:auto}
 @supports (padding:max(1px,env(safe-area-inset-left))){.wrap{width:min(1200px,100% - 2*max(var(--edge),env(safe-area-inset-left),env(safe-area-inset-right)))}}
@@ -95,6 +97,7 @@ body::after{content:"";position:fixed;top:0;left:0;right:0;height:env(safe-area-
 .chip svg{color:var(--ok)}
 .stale{display:none;background:rgba(255,79,174,.18);border-color:rgba(255,79,174,.5);color:#ffd0e8}
 @media(max-width:900px){.bar.hide{transform:translateY(-100%)}}
+@media(max-width:360px){.nav a{padding:0 8px;font-size:13px}}
 @media(max-width:700px){.tl2{display:none}.bar .nav{order:3;width:100%;margin:0 -8px}.bar .wrap{gap:4px 10px;padding-bottom:4px}.nav a{padding:0 10px;font-size:13.5px}}
 
 /* ========== sections ========== */
@@ -115,9 +118,9 @@ section h2+*{margin-top:16px}
 .wkh h1{margin:0}
 .wkc{margin-left:auto}
 .seg{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:99px;background:rgba(255,255,255,.07);border:1px solid var(--line2);box-shadow:var(--hi),0 6px 20px rgba(0,0,0,.25)}
-.seg button{position:relative;z-index:1;font-weight:800;font-size:clamp(17px,2.1vw,21px);letter-spacing:-.02em;line-height:1;color:var(--mut);background:none;border:0;border-radius:99px;padding:9px 16px;min-height:40px;cursor:pointer;transition:color .25s}
+.seg button{position:relative;z-index:1;font-weight:800;font-size:clamp(17px,2.1vw,21px);letter-spacing:-.02em;line-height:1;color:var(--mut);background:none;border:0;border-radius:99px;padding:9px 16px;min-height:44px;cursor:pointer;transition:color .25s}
 .seg button[aria-pressed="true"]{color:#140b24;background:linear-gradient(90deg,var(--ac1),var(--ac2));box-shadow:0 0 18px -2px var(--ac2)}
-.pastb{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;line-height:1;color:var(--mut);background:var(--glass);border:1px solid var(--line);border-radius:99px;padding:0 14px;min-height:40px;cursor:pointer;box-shadow:var(--hi)}
+.pastb{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;line-height:1;color:var(--mut);background:var(--glass);border:1px solid var(--line);border-radius:99px;padding:0 14px;min-height:44px;cursor:pointer;box-shadow:var(--hi)}
 .pastb:hover,.pastb[aria-pressed="true"]{color:var(--ink);background:var(--glass2)}
 @media(max-width:480px){.wkh h1{font-size:22px;gap:8px}.wkh h1 svg{width:21px;height:21px}.seg button{font-size:16px;padding:8px 12px}.wkc{margin-left:0}}
 
@@ -174,6 +177,7 @@ section h2+*{margin-top:16px}
 .pill{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:99px;white-space:nowrap}
 .pill svg{width:11px;height:11px;stroke-width:2.8}
 .p-ok{color:var(--ok);background:rgba(75,232,160,.12)}.p-li{color:#d6ccef;background:rgba(255,255,255,.08)}.p-rep{color:var(--rep);background:rgba(255,181,71,.13)}.p-chk{color:var(--chk);background:rgba(255,112,144,.14)}
+@media(pointer:coarse){.pk,.srcl,.intl{min-height:40px}}
 .pk{display:inline-flex;align-items:center;gap:6px;min-height:34px;font-size:12.5px;font-weight:650;color:#ddd3f5;text-decoration:none;padding:0 12px 0 10px;border-radius:99px;background:var(--glass);border:1px solid var(--line);max-width:100%;transition:border-color .2s,color .2s,box-shadow .2s}
 .pk svg{width:12px;height:12px}
 a.pk:hover{border-color:var(--pea1);color:#fff}
@@ -330,6 +334,7 @@ h1,h2,h3{text-wrap:balance}
 
 /* "Tonight" gets a slowly turning neon ring in the current view's colours */
 @property --spin{syntax:"<angle>";inherits:false;initial-value:0deg}
+.day.now{--spin:0deg} /* browsers without @property still get a valid ring */
 @supports ((mask-composite:exclude) or (-webkit-mask-composite:xor)){
   .day.now::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;pointer-events:none;
     background:conic-gradient(from var(--spin),var(--ac1),var(--ac2),var(--pink),var(--ac1));
@@ -398,7 +403,7 @@ h1,h2,h3{text-wrap:balance}
 <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 </svg>
 
-<a class="vh" href="#week">Skip to this week's schedule</a>
+<a class="skip" href="#week">Skip to this week's schedule</a>
 <div class="bar" id="top"><div class="wrap">
   <div class="bar-l">
     <div class="bar-l1"><a class="brand" href="#top">Clubhouse <span>Tonight</span></a>
@@ -409,7 +414,7 @@ h1,h2,h3{text-wrap:balance}
   <nav class="nav" aria-label="Sections"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav>
 </div></div>
 
-<noscript><style>.more{display:block!important;visibility:visible!important}.chv{display:none}</style><div class="wrap" style="padding:24px 0">All times Eastern. Turn on JavaScript for the live view, the Peacock view and countdowns.</div></noscript>
+<noscript><style>.more{display:block!important;visibility:visible!important}.chv,.seg,.pastb{display:none!important}</style><div class="wrap" style="padding:24px 0">All times Eastern. Turn on JavaScript for the live view, the Peacock view and countdowns.</div></noscript>
 <main>
 <section id="week" aria-labelledby="wkH"><div class="wrap">
   <div class="wkh">
@@ -463,13 +468,14 @@ const hasPage=s=>PAGES.has(s==="WWHL"?"wwhl":slugOf(s));
 /* show colours: --c1 (bright) and --c2 (deep); dark text on badges whose colours are too light for white */
 const lum=h=>{const v=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255).map(c=>c<=.03928?c/12.92:((c+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]};
 const mix=(a,b)=>"#"+[1,3,5].map(i=>Math.round((parseInt(a.slice(i,i+2),16)+parseInt(b.slice(i,i+2),16))/2).toString(16).padStart(2,"0")).join("");
-const inkOn=(a,b)=>1.05/(lum(mix(a,b))+.05)<3;
+/* dark text when it has more contrast than white where the letters sit (the middle of the gradient) */
+const inkOn=(a,b)=>{const m=lum(mix(a,b));return (m+.05)/(lum("#160c02")+.05)>1.05/(m+.05)};
 const vars=n=>{const s=sh(n);return `--c1:${s[1]};--c2:${s[2]}`};
 const badge=(n,inner)=>{const s=sh(n);return `<span class="badge${inkOn(s[1],s[2])?" ink":""}${!inner&&s[0].length>3?" sm":""}" style="${vars(n)}" aria-hidden="true">${inner||esc(s[0])}</span>`};
 /* dates and times (all America/New_York) */
 const parts=t=>{let[h,m]=t.split(":").map(Number);const p=h>=12?"PM":"AM";h=h%12||12;return[h+":"+String(m).padStart(2,"0"),p]};
 const tH=t=>{if(!t)return"TBA";const[a,p]=parts(t);return`${a}<span class="ap">${p}</span>`};
-const tTxt=t=>parts(t).join(" ");
+const tTxt=t=>t?parts(t).join(" "):"time TBA";
 const nyNow=()=>{const f=new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date());const g=t=>f.find(x=>x.type===t).value;return{d:`${g("year")}-${g("month")}-${g("day")}`,h:+g("hour"),m:+g("minute")}};
 const D=s=>new Date(s+"T12:00:00Z");
 const addDays=(s,n)=>{const d=D(s);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
@@ -477,7 +483,13 @@ const fd=(s,o)=>D(s).toLocaleDateString("en-US",Object.assign({timeZone:"UTC"},o
 const diff=(a,b)=>Math.round((D(b)-D(a))/864e5);
 const short=o=>fd(o,{month:"short",day:"numeric"});
 const safeB=s=>esc(s).replace(/&lt;(\/?)b&gt;/g,"<$1b>");
-let now=nyNow(),today=now.d;
+/* epoch ms for a New York wall-clock date + time (handles daylight saving) */
+const etMs=(d,t)=>{const[y,mo,da]=d.split("-").map(Number),[h,mi]=(t||"00:00").split(":").map(Number);let g=Date.UTC(y,mo-1,da,h,mi)+5*36e5;
+  for(let k=0;k<2;k++){const f=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hourCycle:"h23",year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric"}).formatToParts(new Date(g)),q=x=>+f.find(p=>p.type===x).value;
+    g+=Date.UTC(y,mo-1,da,h,mi)-Date.UTC(q("year"),q("month")-1,q("day"),q("hour"),q("minute"))}return g};
+/* "today" is a TV day: it rolls over at 6 AM, so a 3 AM WWHL airing still sits under last night, and the Peacock day starts with the 6 AM drops */
+const tvDay=n=>n.h<6?addDays(n.d,-1):n.d;
+let now=nyNow(),today=tvDay(now);
 window.ctToday=today;
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* view transitions where supported; the update always runs, even if a transition stalls */
@@ -493,7 +505,7 @@ if(diff(UPDATED,today)>2)$("stale").style.display="inline-flex";
 /* ---------- Peacock and source links ---------- */
 const peacockUrl=(show,ep)=>ep||(sh(show)[4])||"";
 const dropOf=e=>e[6]&&e[6]!=="streaming"?e[6]:addDays(e[0],1);
-const isLive=d=>d<today||(d===today&&now.h*60+now.m>=360);
+const isLive=d=>Date.now()>=etMs(d,"06:00");
 const pk=(d,show,early,ep)=>{const u=peacockUrl(show,ep);let lbl,live;
   if(early==="streaming"){lbl="already streaming";live=true}
   else{const drop=early||addDays(d,1);live=isLive(drop);lbl=live?"streaming now":`${early?"early · ":""}${fd(drop,{weekday:"short"})} 6 AM`}
@@ -510,8 +522,9 @@ const row=({show,name,time,desc,more,badgeHtml,cls=""})=>{const id="r"+(++RID);
   return `<div class="row xr${cls}" style="${vars(show)}">${badgeHtml||badge(show)}<div class="rb"><button type="button" class="rt" aria-expanded="false" aria-controls="${id}"><span class="top"><span class="nm">${name}</span><span class="tm">${time}</span></span><span class="ds dsx"><span>${desc}</span>${chev}</span></button><div class="more" id="${id}"><div>${more}</div></div></div></div>`};
 
 /* is an episode on the air right now? (runtime from the note: 90 minutes / two hours, else an hour) */
-const runtime=e=>/90 min/i.test(e[3])?90:/two.hour|2 hours/i.test(e[3])?120:60;
-const onNow=e=>{if(e[0]!==today||!e[1])return false;const[h,m]=e[1].split(":").map(Number),s=h*60+m,n=now.h*60+now.m;return n>=s&&n<s+runtime(e)};
+const runtime=e=>+e[8]||(/90 min/i.test(e[3])?90:/two.hour|2 hours/i.test(e[3])?120:60);
+const airing=(d,t,mins)=>{if(!t)return false;const st=etMs(d,t),n=Date.now();return n>=st&&n<st+mins*6e4};
+const onNow=e=>airing(e[0],e[1],runtime(e));
 
 const epRow=e=>{const live=onNow(e);return row({show:e[2],cls:live?" onnow":"",
   name:esc(e[2])+(live?`<span class="vh">, on now</span>`:""),
@@ -525,11 +538,12 @@ const wwFor=d=>{const a=(WWHL.airings||{})[d],g=WWHL.guests[d],off=WWHL.off.find
   if(!a&&!g)return null;
   const at=a?a[1]:"",ad=at.slice(0,10),late=!!at&&ad>d;
   const when=at?(late?`Late ${fd(d,{weekday:"short"})} · airs ${fd(ad,{weekday:"short"})} ${tTxt(at.slice(11))} ET`:`Airs ${tTxt(at.slice(11))} ET`):"";
-  return{nm:g?g[0]:"Guests TBA",ds:g?"Watch What Happens Live":"Watch What Happens Live · guests not announced yet",st:g?g[1]:a?a[2]:null,when,
+  const live=!!at&&airing(ad,at.slice(11),+(a&&a[3])||30);
+  return{nm:g?g[0]:"Guests TBA",live,ds:g?"Watch What Happens Live":"Watch What Happens Live · guests not announced yet",st:g?g[1]:a?a[2]:null,when,
     tm:at?(late?`<span class="ovn">${esc(fd(ad,{weekday:"short"}))}</span> `:"")+tH(at.slice(11)):""}};
 const wwRow=(w,d)=>w.off
   ?`<div class="wwq">${ic("mic")}<div><div><b>WWHL</b> · ${esc(w.ds)}</div><div class="metaln" style="margin-top:6px">${pill(w.st)}</div></div></div>`
-  :row({show:"WWHL",name:esc(w.nm),time:w.tm,desc:esc(w.when||w.ds),
+  :row({show:"WWHL",cls:w.live?" onnow":"",name:`<span class="vh">WWHL: </span>${esc(w.nm)}${w.live?'<span class="vh">, on now</span>':""}`,time:w.tm+(w.live?'<span class="onair" aria-hidden="true">On now</span>':""),desc:esc(w.when||w.ds),
     more:`${w.when?`<div class="syn">${esc(w.ds)}</div>`:""}<div class="metaln">${w.st?pill(w.st):""}${pk(d,"WWHL")}<a class="intl" href="/wwhl">${ic("list")}All guests</a></div>`});
 
 /* After Show rows: same night as a new episode of that show */
@@ -542,8 +556,12 @@ const pkStatus=(live,u,drop)=>u?(live?`<a class="pk live" href="${esc(u)}">${ic(
 const pkRow=e=>{const drop=dropOf(e),live=isLive(drop);return row({show:e[2],name:esc(e[2]),
   time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:esc(e[3]),
   more:`${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln"><span class="aired">${ic("tv")}${e[6]?"Early drop · airs on Bravo":"Aired on Bravo"} ${esc(fd(e[0],{weekday:"short"}))} ${esc(tTxt(e[1]))}</span>${pkStatus(live,peacockUrl(e[2],e[7]),drop)}${showLink(e[2])}</div>`})};
-const wwPkRow=(w,d)=>{const live=isLive(d);return row({show:"WWHL",name:esc(w.nm),time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:"Watch What Happens Live",
+const wwPkRow=(w,d)=>{const live=isLive(d);return row({show:"WWHL",name:`<span class="vh">WWHL: </span>${esc(w.nm)}`,time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:"Watch What Happens Live",
   more:`<div class="metaln">${w.st?pill(w.st):""}${pkStatus(live,WWHL.peacock,d)}<a class="intl" href="/wwhl">${ic("list")}All guests</a></div>`})};
+
+const asPkRows=d=>AFTERSHOWS.filter(a=>a.on&&a.pk&&EPISODES.some(e=>e[2]===a.show&&e[0]===addDays(d,-1))).map(a=>{const live=isLive(d);return row({show:a.show,badgeHtml:badge(a.show,ic("chat")),
+  name:`${esc(a.show)} After Show`,time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:`On Peacock the morning after ${esc(a.show)}`,
+  more:`<div class="metaln">${pill(a.st)}<span class="aired">${ic("chat")}Online ${esc(fd(addDays(d,-1),{weekday:"short"}))} ${esc(tTxt(a.time))}</span><a class="pk" href="${esc(a.url)}">${ic("link")}Where to watch</a></div>`})});
 
 /* ---------- Next 7 nights: Bravo view (air dates) or Peacock view (streaming drop dates) ---------- */
 let VIEW="bravo";try{const q=new URLSearchParams(location.search).get("view");VIEW=(q==="peacock"||q==="bravo")?q:(localStorage.getItem("ctView")==="peacock"?"peacock":"bravo")}catch(e){}
@@ -558,7 +576,7 @@ function renderDays(keepOpen){
     const untracked=(pk7?addDays(d,-1):d)<FIRST_EP;
     let body,q="";
     if(pk7){const eps=EPISODES.filter(e=>e[6]!=="streaming"&&dropOf(e)===d).sort((a,b)=>a[1].localeCompare(b[1]));const w=wwFor(addDays(d,-1));
-      const rows=eps.map(pkRow);if(w&&!w.off)rows.push(wwPkRow(w,d));
+      const rows=[...eps.map(pkRow),...asPkRows(d)];if(w&&!w.off)rows.push(wwPkRow(w,d));
       body=rows.join("");if(!rows.length)q=untracked?"Not tracked yet":addDays(d,-1)<=LISTED_THROUGH?"Nothing new":"Not listed yet";
     }else{const eps=byDate(d),w=wwFor(d);
       body=(eps.length?[...eps.map(e=>({t:e[1],html:epRow(e)})),...asFor(d,eps)].sort((x,y)=>x.t.localeCompare(y.t)).map(x=>x.html).join(""):"")+(w?wwRow(w,d):"");
@@ -597,7 +615,7 @@ $("prem").innerHTML=prem.map((p,i)=>`<article class="prem glass" style="${vars(p
 const tile=([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`,unit=(v,s,p)=>[v,v===1?s:p];
 const tick=()=>{const n=nyNow();prem.forEach((p,i)=>{const el=$("cd"+i);if(!el)return;
   if(!p.time){const dd=Math.max(0,diff(n.d,p.date)),wk=Math.floor(dd/7);el.innerHTML=(wk?[unit(wk,"week","weeks"),unit(dd%7,"day","days")]:[unit(dd,"day","days")]).map(tile).join("")+tile(["TBA","time"]);return}
-  const[hh,mm]=p.time.split(":").map(Number);let m=Math.max(0,diff(n.d,p.date)*1440+hh*60+mm-(n.h*60+n.m));
+  let m=Math.max(0,Math.round((etMs(p.date,p.time)-Date.now())/6e4));
   const dd=Math.floor(m/1440),wk=Math.floor(dd/7),hr=Math.floor(m%1440/60),mi=m%60;
   el.innerHTML=(wk?[unit(wk,"week","weeks"),unit(dd%7,"day","days"),unit(hr,"hr","hrs")]:dd?[unit(dd,"day","days"),unit(hr,"hr","hrs"),unit(mi,"min","min")]:[unit(hr,"hr","hrs"),unit(mi,"min","min"),["ET",tTxt(p.time)]]).map(tile).join("")})};
 tick();setInterval(tick,60000);
@@ -635,12 +653,23 @@ bar.addEventListener("focusin",()=>bar.classList.remove("hide"));}
 /* ---------- keep an open tab current ----------
    reload when the date changes or the 6:00 AM Peacock drops pass; otherwise refresh "On now" every few minutes */
 const stamp=n=>n.d+(n.h>=6?"b":"a");const loadStamp=stamp(now);
-const freshen=()=>{const n=nyNow();if(stamp(n)!==loadStamp)return location.reload();now=n;if(VIEW==="bravo"&&!PAST)renderDays(true)};
-/* a new build went live (schedule fix or design update): reload. Matters most for people who saved the site to their Home Screen,
-   where the page can stay open for days and there's no pull-to-refresh */
+const sig=()=>EPISODES.filter(onNow).map(e=>e[0]+e[2]).join()+"|"+Object.keys(WWHL.airings||{}).filter(k=>{const w=wwFor(k);return w&&w.live}).join();
+let lastSig=sig();
+const freshen=()=>{const n=nyNow();if(stamp(n)!==loadStamp)return location.reload();now=n;
+  const s2=sig();if(s2===lastSig||VIEW!=="bravo"||PAST)return;lastSig=s2;
+  const f=document.activeElement,key=f&&f.closest&&f.closest("#days")?(f.getAttribute("aria-controls")||f.getAttribute("href")):null;
+  renderDays(true);
+  if(key){const el=[...document.querySelectorAll("#days [aria-controls],#days a[href]")].find(x=>(x.getAttribute("aria-controls")||x.getAttribute("href"))===key);el&&el.focus({preventScroll:true})}};
+/* reload right at the next 6:00 AM or midnight, not up to a few minutes late */
+{const nx=now.h<6?etMs(now.d,"06:00"):etMs(addDays(now.d,1),"00:00");setTimeout(freshen,Math.max(1000,nx-Date.now()+1500))}
+/* a new build went live (schedule fix or design update): reload once. Matters most for people who saved the site to their Home Screen,
+   where the page can stay open for days and there's no pull-to-refresh. The ?v= on the reload skips any cached copy of the old page. */
 const BUILD="__BUILD__";let lastCheck=0;
+try{const u=new URL(location.href);if(u.searchParams.has("v")){u.searchParams.delete("v");history.replaceState(null,"",u.pathname+u.search+u.hash)}}catch(e){}
 const checkBuild=()=>{if(Date.now()-lastCheck<60000||location.protocol==="file:")return;lastCheck=Date.now();
-  fetch("/version.txt",{cache:"no-store"}).then(r=>r.ok?r.text():"").then(v=>{v=v.trim();if(!v||v.length>40||v===BUILD)return;let tried="";try{tried=sessionStorage.getItem("ctReloadFor")||"";sessionStorage.setItem("ctReloadFor",v)}catch(e){}if(tried!==v)location.reload()}).catch(()=>{})};
+  fetch("/version.txt",{cache:"no-store"}).then(r=>r.ok?r.text():"").then(v=>{v=v.trim();if(!/^[0-9a-f]{12}$/.test(v)||v===BUILD)return;
+    try{if(sessionStorage.getItem("ctReloadFor")===v)return;sessionStorage.setItem("ctReloadFor",v)}catch(e){return} /* no storage: never auto-reload */
+    const u=new URL(location.href);u.searchParams.set("v",v);location.replace(u.pathname+u.search+u.hash)}).catch(()=>{})};
 setInterval(()=>{freshen();checkBuild()},3*60000);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){freshen();checkBuild()}});
 addEventListener("pageshow",e=>{if(e.persisted){freshen();checkBuild()}});

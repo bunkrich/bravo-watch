@@ -5,7 +5,7 @@ t=open("template.html").read(); d=open("data.js").read()
 CAND=".index.build.html"
 import hashlib
 # build id: changes whenever the page or its data changes; open tabs and Home Screen apps compare it to /version.txt and reload
-BUILD=hashlib.sha1((t+d).encode()).hexdigest()[:12]
+BUILD=hashlib.sha1((t+d+open("build.py").read()+open("prerender.py").read()).encode()).hexdigest()[:12]
 m=re.search(r'UPDATED\s*=\s*"(\d{4}-\d{2}-\d{2})"',d)
 lm=m.group(1) if m else ""
 
@@ -30,7 +30,9 @@ print("built index.html + sitemap.xml", lm)
 import prerender, shutil
 if prerender.chrome() is None:
   # No Chrome here: publish the plain page (it still renders with JavaScript) rather than block the daily update.
-  print("WARNING: Chrome not found, index.html published without the pre-rendered schedule")
+  # No Chrome here: reuse the last good pre-render (a day old at most) so search engines and no-JS readers never get an empty
+  # schedule. The page still re-renders fresh data with JavaScript as usual.
+  print("WARNING: Chrome not found; reusing the last pre-rendered schedule:", "ok" if prerender.reuse_last(CAND) else "none saved yet")
   os.replace(CAND,"index.html"); open("version.txt","w").write(BUILD)
 elif prerender.run(CAND):
   os.replace(CAND,"index.html"); open("version.txt","w").write(BUILD)

@@ -14,6 +14,8 @@ setTimeout(function(){
     c.querySelectorAll('details[open]').forEach(function(d){d.removeAttribute('open')});
     c.querySelectorAll('[aria-expanded="true"]').forEach(function(n){n.setAttribute('aria-expanded','false')});
     c.querySelectorAll('.xr.open').forEach(function(n){n.classList.remove('open')});
+    /* without JavaScript the row toggles do nothing, so bake them as plain blocks (the live script re-renders real buttons) */
+    c.querySelectorAll('button.rt').forEach(function(b){var d=document.createElement('div');d.className='rt';d.innerHTML=b.innerHTML;b.replaceWith(d)});
     out[id]=c.innerHTML;
   });
   var pre=document.createElement('pre'); pre.id='__pr'; pre.textContent=JSON.stringify(out);
@@ -56,6 +58,11 @@ def run(index="index.html"):
         print("prerender skipped: no output from Chrome")
         return False
     data = json.loads(html.unescape(m.group(1)))
+    return inject(index, src, data, save=True)
+
+
+def inject(index, src, data, save=False):
+    """Fill the empty section placeholders in src with pre-rendered HTML and write index."""
     filled = 0
     for i in IDS:
         inner = data.get(i)
@@ -66,7 +73,19 @@ def run(index="index.html"):
         filled += n
     open(index, "w").write(src)
     print("prerendered %d/%d sections" % (filled, len(IDS)))
+    if save and filled == len(IDS):
+        # kept in the repo so a build on a machine without Chrome can reuse the last good render
+        json.dump(data, open("prerendered.json", "w"))
     return filled == len(IDS)
+
+
+def reuse_last(index):
+    """No Chrome: reuse the last good render (one build old) rather than ship empty sections."""
+    try:
+        data = json.load(open("prerendered.json"))
+    except (OSError, ValueError):
+        return False
+    return inject(index, open(index).read(), data)
 
 
 if __name__ == "__main__":
