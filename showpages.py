@@ -38,12 +38,31 @@ def t12(t):
     return f"{h % 12 or 12}:{m:02d} {'PM' if h >= 12 else 'AM'}"
 
 
+from zoneinfo import ZoneInfo  # required: never fall back to the server's own date
+
+NY = ZoneInfo("America/New_York")
+
+
 def today_ny():
-    try:
-        from zoneinfo import ZoneInfo
-        return dt.datetime.now(ZoneInfo("America/New_York")).date()
-    except Exception:
-        return dt.date.today()
+    return dt.datetime.now(NY).date()
+
+
+def at_ny(date, hhmm, minutes=0):
+    """ISO timestamp (with ET offset) for a date + HH:MM, plus optional minutes."""
+    h, m = map(int, (hhmm or "20:00").split(":"))
+    return (dt.datetime.combine(D(date), dt.time(h, m), NY) + dt.timedelta(minutes=minutes)).isoformat()
+
+
+def wwhl_airing(w, night):
+    """[ep, "YYYY-MM-DD HH:MM", st] or None for a WWHL viewing night."""
+    return (w.get("airings") or {}).get(night)
+
+
+def wwhl_when(night, at):
+    ad, t = at[:10], at[11:]
+    if ad > night:
+        return f"Late {D(night).strftime('%a')} · airs {D(ad).strftime('%a')} {t12(t)} ET"
+    return f"{t12(t)} ET"
 
 
 CSS = """:root{--ink:#f5f1ff;--mut:#aea3c8;--dim:#8579a1;--line:rgba(255,255,255,.12);--glass:rgba(255,255,255,.06);--pink:#ff4fae;--sun:#ffd25a;--cyan:#3ee6ea}
@@ -85,6 +104,13 @@ document.addEventListener("click",ev=>{const a=ev.target.closest("a");if(!a)retu
 if(a.classList.contains("pk"))t("peacock",{show:sh,area:"show_page"});else if(a.closest(".shows"))t("show_page_nav",{from:sh,to:a.textContent.trim()});});})();</script>"""
 
 
+# Show pages are rebuilt once a day: once the featured airing has ended, roll the card on to the next one.
+ROLL = """<script>(()=>{const c=[...document.querySelectorAll(".card.next[data-end]")];if(!c.length)return;const roll=()=>{const n=Date.now();
+const a=c[0];if(!a||a.hidden||n<Date.parse(a.dataset.end))return;const b=c[1];
+if(b){a.hidden=true;b.hidden=false}else{const k=a.querySelector(".k");if(k)k.textContent="Latest episode \u00b7 aired"}};
+roll();document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")roll()});setInterval(roll,300000)})();</script>"""
+
+
 def run():
     c = load()
     today = today_ny()
@@ -112,16 +138,16 @@ def run():
         m = shows_meta.get(s)
         return m[4] if m and len(m) > 4 else ""
 
+    def streaming(ep):
+        return len(ep) > 6 and ep[6] == "streaming"
+
     def drop_of(ep):
+        if streaming(ep):
+            return ep[0]
         return ep[6] if len(ep) > 6 and ep[6] else (D(ep[0]) + dt.timedelta(days=1)).isoformat()
 
     def is_live(drop):
-        now = dt.datetime.now()
-        try:
-            from zoneinfo import ZoneInfo
-            now = dt.datetime.now(ZoneInfo("America/New_York"))
-        except Exception:
-            pass
+        now = dt.datetime.now(NY)
         return drop < tstr or (drop == tstr and now.hour >= 6)
 
     def ep_li(ep, past):
@@ -129,7 +155,9 @@ def run():
         url = (ep[7] if len(ep) > 7 and ep[7] else "") or peacock_url(ep[2])
         live = is_live(drop)
         btn = ""
-        if url:
+        if url and streaming(ep):
+            btn = f'<a class="pk live" href="{e(url)}">▶ Already on Peacock</a>'
+        elif url:
             btn = (f'<a class="pk live" href="{e(url)}">▶ Watch on Peacock</a>' if live
                    else f'<a class="pk" href="{e(url)}">Peacock · {e(D(drop).strftime("%a"))} 6 AM</a>')
         syn = f'<div class="syn">{e(ep[5])}</div>' if len(ep) > 5 and ep[5] else ""
@@ -156,22 +184,37 @@ def run():
 
         if s == "WWHL":
             w = c["WWHL"]
-            guests = sorted([(d, g) for d, g in w.get("guests", {}).items() if d >= (today - dt.timedelta(days=8)).isoformat()])
-            lead = f'Airs Sunday to Thursday around {t12(w.get("time", "23:00"))} on Bravo, and streams the next morning on Peacock.'
-            upg = [(d, g) for d, g in guests if d >= tstr]
+            since = (today - dt.timedelta(days=8)).isoformat()
+            nights = sorted(set([d for d in w.get("guests", {}) if d >= since] + [d for d in (w.get("airings") or {}) if d >= since]))
+            lead = ("Bravo moves Watch What Happens Live around night to night, sometimes to after midnight, so every airtime below is copied from "
+                    "Bravo's own schedule. Each episode streams on Peacock the next morning.")
             offs = [o for o in w.get("off", []) if o[1] >= tstr]
-            nxt = ""
-            if upg:
-                d, g = upg[0]
-                nxt = f'<section class="card next"><div class="k">Next episode</div><div class="when">{e(nice(d))} · ~{e(t12(w.get("time")))}</div><div class="ttl">Guests: {e(g[0])}</div></section>'
+            upn = [d for d in nights if d >= tstr and wwhl_airing(w, d)]
+
+            def card(d, label, hidden=False):
+                a = wwhl_airing(w, d)
+                g = w.get("guests", {}).get(d)
+                end = at_ny(a[1][:10], a[1][11:], 60)
+                who = f"Guests: {e(g[0])}" if g else "Guests not announced yet"
+                return (f'<section class="card next" data-end="{e(end)}"{" hidden" if hidden else ""}><div class="k">{e(label)}</div>'
+                        f'<div class="when">{e(nice(d))} · {e(wwhl_when(d, a[1]))}</div><div class="ttl">{who}</div>'
+                        f'<p class="mut">Episode {e(a[0])} · on Peacock {e(nice((D(d) + dt.timedelta(days=1)).isoformat()))} at 6:00 AM.</p></section>')
+            if upn:
+                sections.append(card(upn[0], "Tonight's episode" if upn[0] == tstr else "Next episode"))
+                if len(upn) > 1:
+                    sections.append(card(upn[1], "Next episode", hidden=True))
             elif offs:
-                nxt = f'<section class="card next"><div class="k">Next episode</div><div class="ttl">{e(offs[0][2])}</div><p class="mut">Through {e(nice(offs[0][1]))}.</p></section>'
-            sections.append(nxt)
-            if guests:
-                items = "".join(f'<li><div class="dt">{e(nice(d))}<span>~{e(t12(w.get("time")))}</span></div><div class="ep"><b>{e(g[0])}</b>' +
-                                (f'<a class="pk live" href="{e(w.get("peacock"))}">▶ Watch on Peacock</a>' if is_live((D(d) + dt.timedelta(days=1)).isoformat()) and w.get("peacock") else "") +
-                                '</div></li>' for d, g in reversed(guests))
-                sections.append(f'<section class="card"><h2>WWHL Guests</h2><ul class="eps">{items}</ul></section>')
+                sections.append(f'<section class="card next"><div class="k">Next episode</div><div class="ttl">{e(offs[0][2])}</div><p class="mut">Through {e(nice(offs[0][1]))}.</p></section>')
+            if nights:
+                def li(d):
+                    a = wwhl_airing(w, d)
+                    g = w.get("guests", {}).get(d)
+                    tm = e(wwhl_when(d, a[1])) if a else "Time not tracked"
+                    live = is_live((D(d) + dt.timedelta(days=1)).isoformat())
+                    btn = f'<a class="pk live" href="{e(w.get("peacock"))}">▶ Watch on Peacock</a>' if live and w.get("peacock") else ""
+                    return (f'<li><div class="dt">{e(nice(d))}<span>{tm}</span></div><div class="ep"><b>{e(g[0]) if g else "Guests not announced yet"}</b>'
+                            + (f'<div class="syn">Episode {e(a[0])}</div>' if a else "") + btn + '</div></li>')
+                sections.append(f'<section class="card"><h2>WWHL Nights &amp; Guests</h2><ul class="eps">{"".join(li(d) for d in reversed(nights))}</ul></section>')
             if offs:
                 sections.append('<section class="card"><h2>Weeks Off</h2>' + "".join(f'<p>{e(nice(o[0]))} – {e(nice(o[1]))}: {e(o[2])}</p>' for o in offs) + '</section>')
             title = "WWHL Guests This Week: Watch What Happens Live Schedule"
@@ -181,19 +224,27 @@ def run():
             if slots:
                 when_bits.append(" and ".join(f"{days_full[d]} at {t12(t)}" for d, t in slots) + " on Bravo")
             lead = (f"Season {season} · " if season else "") + (when_bits[0] if when_bits else "On Bravo") + ". New episodes stream on Peacock the next morning at 6:00 AM."
-            if up:
-                n = up[0]
+            def next_card(n, label, hidden=False):
                 drop = drop_of(n)
                 url = (n[7] if len(n) > 7 and n[7] else "") or peacock_url(s)
                 syn = f'<p class="mut">{e(n[5])}</p>' if len(n) > 5 and n[5] else ""
-                sections.append(f'<section class="card next"><div class="k">Next new episode</div><div class="when">{e(nice(n[0]))} · {e(t12(n[1]))}</div><div class="ttl">{e(n[3])}</div>{syn}'
-                                f'<p class="mut">On Peacock {e(nice(drop))} at 6:00 AM.</p>' + (f'<a class="pk" href="{e(url)}">Peacock · {e(D(drop).strftime("%a"))} 6 AM</a>' if url else "") + '</section>')
+                if streaming(n):
+                    pk = '<p class="mut">Already streaming on Peacock.</p>' + (f'<a class="pk live" href="{e(url)}">▶ Watch on Peacock</a>' if url else "")
+                else:
+                    pk = f'<p class="mut">On Peacock {e(nice(drop))} at 6:00 AM.</p>' + (f'<a class="pk" href="{e(url)}">Peacock · {e(D(drop).strftime("%a"))} 6 AM</a>' if url else "")
+                attrs = (f' data-end="{e(at_ny(n[0], n[1], 60))}"' if n[1] else "") + (" hidden" if hidden else "")
+                return (f'<section class="card next"{attrs}><div class="k">{e(label)}</div>'
+                        f'<div class="when">{e(nice(n[0]))} · {e(t12(n[1]))}</div><div class="ttl">{e(n[3])}</div>{syn}{pk}</section>')
+            if up:
+                sections.append(next_card(up[0], "Tonight's new episode" if up[0][0] == tstr else "Next new episode"))
+                if len(up) > 1:
+                    sections.append(next_card(up[1], "Next new episode", hidden=True))
             prem = [p for p in c["PREMIERES"] if p.get("show") == s and p["date"] >= tstr]
             for p in prem:
                 eplist = "".join(f'<li><div class="dt">{e(x[0])}</div><div class="ep"><b>{e(x[1])}</b></div></li>' for x in p.get("eps", []))
                 sections.append(f'<section class="card"><h2>Premiere: {e(p["title"])}</h2><p><b>{e(nice(p["date"], True))}</b> · {e(p.get("when", ""))}</p>' + (f'<ul class="eps">{eplist}</ul>' if eplist else "") + '</section>')
-            if up[1:] or (up and len(up) == 1 and False):
-                sections.append(f'<section class="card"><h2>Coming Up</h2><ul class="eps">{"".join(ep_li(x, False) for x in up[1:])}</ul></section>')
+            if up[2:]:
+                sections.append(f'<section class="card"><h2>Coming Up</h2><ul class="eps">{"".join(ep_li(x, False) for x in up[2:])}</ul></section>')
             if past:
                 sections.append(f'<section class="card"><h2>Recent Episodes</h2><ul class="eps">{"".join(ep_li(x, True) for x in past)}</ul></section>')
             extras = []
@@ -242,6 +293,7 @@ def run():
   <section class="card"><h2>More Show Schedules</h2><div class="shows">{nav}</div></section>
 </main>
 <footer><div class="wrap">Updated {e(nice(c["UPDATED"], True))}. All times Eastern. Not affiliated with Bravo, NBCUniversal or Peacock. · <a href="/about">About &amp; contact</a></div></footer>
+{ROLL}
 {TRACK}
 </body>
 </html>
@@ -256,14 +308,21 @@ def run():
         for x in sorted([x for x in c["EPISODES"] if x[0] == dd], key=lambda x: x[1]):
             m = shows_meta.get(x[2]) or [x[2][:3], "#7b6be0", "#3f2f9c"]
             bravo.append({"show": x[2], "code": m[0], "color": m[1], "time": t12(x[1]), "title": x[3], "url": f"{SITE}/{slug(x[2])}"})
-        wd = D(dd).weekday()  # Mon=0 .. Sun=6
-        if wd not in (4, 5) and not any(o[0] <= dd <= o[1] for o in c["WWHL"].get("off", [])):
-            g = c["WWHL"].get("guests", {}).get(dd)
-            bravo.append({"show": "WWHL", "code": "WWHL", "color": "#ffd25a", "time": "~" + t12(c["WWHL"].get("time", "23:00")), "title": g[0] if g else "Guests TBA", "url": f"{SITE}/wwhl"})
+        ww = c["WWHL"]
+        a = wwhl_airing(ww, dd)
+        if a:
+            g = ww.get("guests", {}).get(dd)
+            late = a[1][:10] > dd
+            bravo.append({"show": "WWHL", "code": "WWHL", "color": "#ffd25a", "time": (D(a[1][:10]).strftime("%a ") if late else "") + t12(a[1][11:]),
+                          "title": g[0] if g else "Guests TBA", "url": f"{SITE}/wwhl"})
         peacock = []
-        for x in sorted([x for x in c["EPISODES"] if drop_of(x) == dd], key=lambda x: x[1]):
+        for x in sorted([x for x in c["EPISODES"] if not streaming(x) and drop_of(x) == dd], key=lambda x: x[1]):
             m = shows_meta.get(x[2]) or [x[2][:3], "#7b6be0", "#3f2f9c"]
             peacock.append({"show": x[2], "code": m[0], "color": m[1], "time": "6:00 AM", "title": x[3], "url": (x[7] if len(x) > 7 and x[7] else "") or peacock_url(x[2])})
+        prev = (D(dd) - dt.timedelta(days=1)).isoformat()
+        if wwhl_airing(ww, prev):
+            g = ww.get("guests", {}).get(prev)
+            peacock.append({"show": "WWHL", "code": "WWHL", "color": "#ffd25a", "time": "6:00 AM", "title": g[0] if g else "Guests TBA", "url": ww.get("peacock", "")})
         days.append({"date": dd, "bravo": bravo, "peacock": peacock})
     json.dump({"updated": c["UPDATED"], "site": SITE, "days": days}, open("schedule.json", "w"), separators=(",", ":"))
     json.dump(pages, open("showpages.json", "w"))

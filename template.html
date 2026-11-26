@@ -286,6 +286,7 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
 .xr[aria-expanded=true] .chv{transform:rotate(180deg);color:var(--mut)}
 .days .more{display:none}
 .days .xr[aria-expanded=true] .more{display:block}
+.ovn{font-size:.72em;font-weight:800;opacity:.75;margin-right:2px}
 </style>
 </head>
 <body>
@@ -320,7 +321,7 @@ section h2+.grid,section h2+div,section h2+.stack{margin-top:16px}
   <nav class="nav"><a href="#week">This week</a><a href="#lineup">Lineup</a><a href="#coming">Coming up</a><a href="#more">More</a></nav>
 </div></div>
 
-<noscript><div class="wrap" style="padding:24px 0">Showing this morning's schedule. Turn on JavaScript for live times and countdowns.</div></noscript>
+<noscript><div class="wrap" style="padding:24px 0">All times Eastern. Turn on JavaScript for the live view, the Peacock view and countdowns.</div></noscript>
 <section id="week"><div class="wrap">
   <div class="wkh"><h1 class="h2"><svg class="i"><use href="#i-cal"/></svg><span id="wkT">Next 7 Nights</span><span>on</span><span class="seg seg-h" role="group" aria-label="Show the schedule for"><button type="button" data-v="bravo" aria-pressed="true">Bravo</button><button type="button" data-v="peacock" aria-pressed="false">Peacock</button></span></h1>
   <div class="wkc"><button type="button" class="pastb" id="pastB" aria-pressed="false"><svg class="i"><use href="#i-clock"/></svg> Past 7 days</button></div></div>
@@ -378,10 +379,12 @@ const slugOf=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,""
 const covered=[...new Set([...EPISODES.map(e=>e[2]),...GRID.flatMap(g=>g[1].map(s=>s[1])),...PREMIERES.map(p=>p.show).filter(Boolean),"WWHL"])].sort((a,b)=>fn(a).localeCompare(fn(b)));
 $("covered").innerHTML="Show schedules: "+covered.map(s=>`<a href="/${slugOf(s)}">${esc(fn(s))}</a>`).join(", ")+".";
 $("upd").innerHTML=`${ic("check")}Updated ${esc(short(UPDATED))}`;
-if(diff(UPDATED,today)>8)$("stale").style.display="inline-flex";
+if(diff(UPDATED,today)>2)$("stale").style.display="inline-flex";
 
 /* links */
-const pk=(d,show,early,ep)=>{const u=ep||(show==="WWHL"?WWHL.peacock:sh(show)[4]);const drop=early||addDays(d,1);
+const pk=(d,show,early,ep)=>{const u=ep||(show==="WWHL"?WWHL.peacock:sh(show)[4]);
+  if(early==="streaming"){const inner=`${ic("play")}Peacock \u00b7 already streaming`;return u?`<a class="pk live" href="${esc(u)}">${inner}</a>`:`<span class="pk">${inner}</span>`}
+  const drop=early||addDays(d,1);
   const live=drop<today||(drop===today&&now.h*60+now.m>=360);
   const lbl=live?"Streaming now":`${early?"Early · ":""}${fd(drop,{weekday:"short"})} 6 AM`;
   const inner=`${ic("play")}Peacock ${esc(lbl)}`;
@@ -391,11 +394,15 @@ const trl=show=>TRAILERS[show]?`<a class="pk trl" href="${esc(TRAILERS[show])}">
 
 /* rows */
 const epRow=e=>`<div class="row xr" tabindex="0" role="button" aria-expanded="false">${badge(e[2])}<div><div class="top"><span class="nm" title="${esc(fn(e[2]))}">${esc(e[2])}</span><span class="tm">${tH(e[1])}</span></div><div class="ds dsx"><span>${esc(e[3])}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more">${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln">${pill(e[4])}${pk(e[0],e[2],e[6],e[7])}<a class="srcl" href="/${slugOf(e[2])}">${ic("list")}All episodes</a></div></div></div></div>`;
-const wwFor=d=>{const w=D(d).getUTCDay();if(w===5||w===6)return null;
-  const off=WWHL.off.find(o=>d>=o[0]&&d<=o[1]);if(off)return{off:1,ds:off[2].split(" · ")[0],st:off[3]};
-  const g=WWHL.guests[d];if(g)return{nm:g[0],ds:"Watch What Happens Live",st:g[1]};
-  return{nm:"Guests TBA",ds:"Watch What Happens Live · lineup posts the weekend before",st:null}};
-const wwRow=(w,d)=>w.off?`<div class="wwq">${ic("mic")}<div><div><b>WWHL</b> \u00b7 ${esc(w.ds)}</div><div class="metaln" style="margin-top:6px">${pill(w.st)}</div></div></div>`:`<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge ww">WWHL</span><div><div class="top"><span class="nm">${esc(w.nm)}</span><span class="tm dim">~${tH(WWHL.time)}</span></div><div class="ds dsx"><span>${esc(w.ds)}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more"><div class="metaln">${w.st?pill(w.st):""}${pk(d,"WWHL")}<a class="srcl" href="/wwhl">${ic("list")}All guests</a></div></div></div></div>`;
+/* WWHL: only nights Bravo actually lists (WWHL.airings), at Bravo's real airtime. Overnight airings stay under the night before. */
+const wwFor=d=>{const a=(WWHL.airings||{})[d],g=WWHL.guests[d],off=WWHL.off.find(o=>d>=o[0]&&d<=o[1]);
+  if(!a&&off){const wd=D(d).getUTCDay();return wd===5||wd===6?null:{off:1,ds:off[2].split(" \u00b7 ")[0],st:off[3]}}
+  if(!a&&!g)return null;
+  const at=a?a[1]:"",ad=at.slice(0,10),late=!!at&&ad>d;
+  const when=at?(late?`Late ${fd(d,{weekday:"short"})} \u00b7 airs ${fd(ad,{weekday:"short"})} ${tTxt(at.slice(11))} ET`:`Airs ${tTxt(at.slice(11))} ET`):"";
+  return{nm:g?g[0]:"Guests TBA",ds:g?"Watch What Happens Live":"Watch What Happens Live \u00b7 guests not announced yet",st:g?g[1]:a?a[2]:null,at,late,when,
+    tm:at?(late?`<span class="ovn">${esc(fd(ad,{weekday:"short"}))}</span> `:"")+tH(at.slice(11)):""}};
+const wwRow=(w,d)=>w.off?`<div class="wwq">${ic("mic")}<div><div><b>WWHL</b> \u00b7 ${esc(w.ds)}</div><div class="metaln" style="margin-top:6px">${pill(w.st)}</div></div></div>`:`<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge ww">WWHL</span><div><div class="top"><span class="nm">${esc(w.nm)}</span><span class="tm">${w.tm}</span></div><div class="ds dsx"><span>${esc(w.when||w.ds)}</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more">${w.when?`<div class="syn">${esc(w.ds)}</div>`:""}<div class="metaln">${w.st?pill(w.st):""}${pk(d,"WWHL")}<a class="srcl" href="/wwhl">${ic("list")}All guests</a></div></div></div></div>`;
 
 /* After Show rows: same night as a new episode of that show */
 const asFor=(d,eps)=>AFTERSHOWS.filter(a=>a.on&&a.time&&eps.some(e=>e[2]===a.show)).map(a=>({t:a.time,html:`<div class="row xr" tabindex="0" role="button" aria-expanded="false"><span class="badge as-b" style="background:linear-gradient(145deg,${sh(a.show)[1]},${sh(a.show)[2]})">${ic("chat")}</span><div><div class="top"><span class="nm">${esc(a.show)} After Show</span><span class="tm">${tH(a.time)}</span></div><div class="ds dsx"><span>Online only \u00b7 BravoTV.com + YouTube</span>${ic("down").replace('class="i"','class="i chv"')}</div><div class="more"><div class="metaln">${pill(a.st)}<a class="pk" href="${esc(a.url)}">${ic("play")}Watch online</a>${pk(d,a.show)}</div></div></div></div>`}));
@@ -415,8 +422,8 @@ function renderDays(){
     const lbl=i===0?(pk7?"Today":"Tonight"):i===1?"Tomorrow":i===-1?(pk7?"Yesterday":"Last night"):fd(d,{weekday:"long"});
     const untracked=(pk7?addDays(d,-1):d)<FIRST_EP;
     let body,q="";
-    if(pk7){const eps=EPISODES.filter(e=>dropOf(e)===d).sort((a,b)=>a[1].localeCompare(b[1]));const w=wwFor(addDays(d,-1));
-      const rows=eps.map(pkRow);if(w&&!w.off&&w.nm!=="Guests TBA")rows.push(wwPkRow(w,d));
+    if(pk7){const eps=EPISODES.filter(e=>e[6]!=="streaming"&&dropOf(e)===d).sort((a,b)=>a[1].localeCompare(b[1]));const w=wwFor(addDays(d,-1));
+      const rows=eps.map(pkRow);if(w&&!w.off)rows.push(wwPkRow(w,d));
       body=rows.join("");if(!rows.length)q=untracked?"Not tracked yet":addDays(d,-1)<=LISTED_THROUGH?"Nothing new":"Not listed yet";
     }else{const eps=byDate(d),w=wwFor(d);
       body=(eps.length?[...eps.map(e=>({t:e[1],html:epRow(e)})),...asFor(d,eps)].sort((x,y)=>x.t.localeCompare(y.t)).map(x=>x.html).join(""):"")+(w?wwRow(w,d):"");if(!eps.length)q=untracked?"Not tracked yet":d<=LISTED_THROUGH?"Nothing new":"Not listed yet";
@@ -436,7 +443,8 @@ document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",(
 const prem=PREMIERES.filter(p=>p.date>=today);
 $("prem").innerHTML=prem.map((p,i)=>`<article class="prem glass"><div class="ph">${badge(p.show)}<div><h3>${esc(p.title)}</h3><div class="ds">${esc(fd(p.date,{weekday:"short",month:"short",day:"numeric"}))} · ${esc(p.when)}</div></div></div>
 <div class="cd" id="cd${i}"></div><ul class="list">${p.eps.map(x=>`<li><b>${esc(x[0])}</b><span>${esc(x[1])}</span></li>`).join("")}</ul><div class="metaln" style="margin-top:0">${pill(p.st)}${p.early?`<span class="pk live">${ic("play")}Early on Peacock ${esc(short(p.early))}</span>`:""}${trl(p.show)}</div></article>`).join("")||`<p class="sub">No dated premieres right now.</p>`;
-const tick=()=>{const n=nyNow();prem.forEach((p,i)=>{const[hh,mm]=(p.time||"20:00").split(":").map(Number);let m=diff(n.d,p.date)*1440+hh*60+mm-(n.h*60+n.m);if(m<0)m=0;
+const tick=()=>{const n=nyNow();prem.forEach((p,i)=>{if(!p.time){const el=$("cd"+i);if(el){const dd=Math.max(0,diff(n.d,p.date)),wk=Math.floor(dd/7);const u=(v,s,q)=>[v,v===1?s:q];el.innerHTML=(wk?[u(wk,"week","weeks"),u(dd%7,"day","days")]:[u(dd,"day","days")]).map(([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`).join("")+`<div><b>TBA</b><span>time</span></div>`}return}
+  const[hh,mm]=p.time.split(":").map(Number);let m=diff(n.d,p.date)*1440+hh*60+mm-(n.h*60+n.m);if(m<0)m=0;
   const el=$("cd"+i);if(el){const dd=Math.floor(m/1440),wk=Math.floor(dd/7),hr=Math.floor(m%1440/60);const u=(v,s,p)=>[v,v===1?s:p];const parts=wk?[u(wk,"week","weeks"),u(dd%7,"day","days"),u(hr,"hr","hrs")]:[u(dd,"day","days"),u(hr,"hr","hrs")];el.innerHTML=parts.map(([v,l])=>`<div><b>${v}</b><span>${l}</span></div>`).join("")}})};
 tick();const timer=setInterval(tick,60000);
 /* phones: hide the top bar when scrolling down, bring it back when scrolling up */
@@ -458,8 +466,10 @@ const asHtml=`<div class="grid" style="--min:280px">${AFTERSHOWS.map(a=>`<articl
 const evs=EVENTS.filter(e=>e[0]>=today||!/^\d/.test(e[0]));
 const ruHtml=`<div class="inner" style="padding:4px 16px;margin-top:14px">${REUNIONS.map(r=>`<div class="ru">${badge(r[0])}<div><div class="nm">${esc(r[1])}</div><div class="ds">${esc(r[2])}</div><div class="metaln">${pill(r[3])}${srcA(r[4])}</div></div></div>`).join("")}${evs.map(e=>`<div class="ru"><span class="badge" style="background:linear-gradient(145deg,var(--cyan),#2a9df4)">${ic("ticket")}</span><div><div class="nm">${esc(e[1])}</div><div class="ds">${/^\d/.test(e[0])?`<b style="color:var(--cyan)">${esc(fd(e[0],{weekday:"short",month:"short",day:"numeric"}))}</b> · `:""}${esc(e[2])}</div><div class="metaln">${pill(e[3])}${srcA(e[4])}</div></div></div>`).join("")}</div>`;
 const dow=D(today).getUTCDay();
-function renderLineup(){const pk7=VIEW==="peacock";const G=pk7?GRID.map((g,i)=>[g[0],GRID[(i+6)%7][1].filter(s=>!/After Show/.test(s[2])).map(s=>["06:00",s[1],s[2],""])]):GRID;
-const luHtml=`<div class="inner" style="padding:2px 16px;margin-top:14px">${G.map((g,i)=>`<div class="lr${i===dow?" now":""}"><span class="dn">${g[0]}</span>${g[1].length?`<div class="slots">${g[1].map(s=>`<span class="sl"><span class="tm">${tH(s[0])}</span>${sh(s[1])[4]&&!/After Show/.test(s[2])?`<a class="pl" href="${esc(sh(s[1])[4])}"><b>${esc(fn(s[1]))}</b>${ic("play")}</a>`:`<b>${esc(fn(s[1]))}</b>`}<span style="color:var(--mut)">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>`).join("")}</div>`:`<span class="none">No new originals</span>`}</div>`).join("")}</div><p class="note" style="margin-top:10px">${pk7?"New episodes hit Peacock at 6:00 AM the morning after they air. WWHL lands the next morning too.":"WWHL follows Sunday to Thursday, around 11:00 PM."}</p>`;
+/* shows whose Bravo airings are reruns of a season already on Peacock (no weekly drop) */
+const onPeacockAlready=show=>{const r=EPISODES.filter(e=>e[2]===show);return r.length>0&&r.every(e=>e[6]==="streaming")};
+function renderLineup(){const pk7=VIEW==="peacock";const G=pk7?GRID.map((g,i)=>[g[0],GRID[(i+6)%7][1].filter(s=>!/After Show/.test(s[2])&&!onPeacockAlready(s[1])).map(s=>["06:00",s[1],s[2],""])]):GRID;
+const luHtml=`<div class="inner" style="padding:2px 16px;margin-top:14px">${G.map((g,i)=>`<div class="lr${i===dow?" now":""}"><span class="dn">${g[0]}</span>${g[1].length?`<div class="slots">${g[1].map(s=>`<span class="sl"><span class="tm">${tH(s[0])}</span>${sh(s[1])[4]&&!/After Show/.test(s[2])?`<a class="pl" href="${esc(sh(s[1])[4])}"><b>${esc(fn(s[1]))}</b>${ic("play")}</a>`:`<b>${esc(fn(s[1]))}</b>`}<span style="color:var(--mut)">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>`).join("")}</div>`:`<span class="none">No new originals</span>`}</div>`).join("")}</div><p class="note" style="margin-top:10px">${pk7?"New episodes hit Peacock at 6:00 AM the morning after they air. WWHL lands the next morning too.":"WWHL airs Sunday to Thursday nights, but Bravo moves its time night to night (some nights after midnight), so check each night above."}</p>`;
 $("lu").innerHTML=luHtml.replace('class="inner" style="padding:2px 16px;margin-top:14px"','class="glass" style="padding:4px 20px"');
 $("luT").textContent=pk7?"Weekly Peacock Drops":"Current Weekly Lineup";}
 renderLineup();

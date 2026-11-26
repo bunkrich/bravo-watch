@@ -18,10 +18,12 @@ async function load() {
     const r = new Request(FEED);
     r.timeoutInterval = 10;
     const data = await r.loadJSON();
+    if (!data || !data.updated || !Array.isArray(data.days)) throw new Error("bad feed"); // never cache a broken feed
     fm.writeString(cache, JSON.stringify(data));
     return data;
   } catch (e) {
-    return fm.fileExists(cache) ? JSON.parse(fm.readString(cache)) : null; // offline: last good copy
+    try { return fm.fileExists(cache) ? JSON.parse(fm.readString(cache)) : null; } // offline: last good copy
+    catch (e2) { return null; }
   }
 }
 
