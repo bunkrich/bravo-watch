@@ -20,6 +20,7 @@ const SHOWS = { /* code, colour pair, icon, Peacock page */
   "RHONJ":["NJ","#ffd23f","#ff8a3d","crown","https://www.peacocktv.com/watch-online/tv/the-real-housewives-of-new-jersey/6825525389042832112"],
   "Below Deck":["BD","#1fb6ff","#0a5cd6","anchor","https://www.peacocktv.com/stream-tv/below-deck"],
   "Southern Charm":["SC","#47f0a0","#0f9d8a","glass","https://www.peacocktv.com/watch-online/tv/southern-charm/8058982241606202112/seasons/12"],
+  "Vanderpump Rules: Lisa Las Vegas":["LV","#fbbf24","#b45309","star",""],
   "Small Town Trouble: Texas":["STT","#ff6b3d","#c2185b","star","https://www.peacocktv.com/watch-online/tv/small-town-trouble-texas/4841643441022334112"],
   "Wife Swap: RH Edition":["WS","#c86bff","#ff3fa4","house","https://www.peacocktv.com/watch-online/tv/wife-swap-the-real-housewives-edition/6519457940197890112"]
 };
@@ -48,6 +49,7 @@ const WWHL = { /* Watch What Happens Live, Sun-Thu after the last original */
 const HISTORY = [ /* past premieres, newest first: date, show, season, night/time, source */
   ["2026-11-18","Small Town Trouble: Texas","S1 series premiere","Wed 9:00 PM \u00b7 two hours"],
   ["2026-11-12","Southern Charm","S12","Thu 9:00 PM"],
+  ["2026-10-20","Vanderpump Rules: Lisa Las Vegas","Limited series (3 episodes)","Tue 9:00 PM \u00b7 finale Wed"],
   ["2026-10-11","RHOP","S11","Sun 8:00 PM"],
   ["2026-09-28","Still Flipping Out","S1 series premiere","Mon 9:00 PM"],
   ["2026-09-16","RHOSLC","S7","Wed 8:00 PM"],
@@ -116,13 +118,13 @@ const CHANGES = [ /* logged, change (may use <b>), status, source URL */
   ["Nov 16","<b>RHONJ S15</b> pushed from December to Tue Jan 19","ok","https://www.bravotv.com/the-daily-dish/when-does-rhonj-season-15-premiere-air-date-revealed"],
   ["Nov","<b>Still Flipping Out</b> S1 ended; Mon 9:00 PM is open","li","https://whenitsout.com/tv/channel/bravo/"]
 ];
-const RADAR = [ /* item, detail, status, source URL */
-  ["RHOBH S16","Expected February, after RHOSLC; Leah Remini and Tracy Tutor reported joining","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/"],
-  ["RHOA S18","Expected March, after RHOP","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/"],
-  ["RHORI S2","Renewed in May; expected April","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/"],
-  ["Summer House S11 \u00b7 Married to Medicine S13","Renewed at May upfronts; no dates","ok","https://www.nbcuniversal.com/article/bravo-unveils-new-series-vanderpump-rules-lisa-las-vegas-and-secrets-lies-texas-wives-alongside"],
-  ["New series","Secrets, Lies, Texas Wives and Vanderpump Rules: Lisa Las Vegas, announced at upfronts","ok","https://www.nbcuniversal.com/article/bravo-unveils-new-series-vanderpump-rules-lisa-las-vegas-and-secrets-lies-texas-wives-alongside"],
-  ["Holiday weeks","Skips around Christmas and New Year's not announced yet","chk","https://www.bravotv.com/the-daily-dish/bravo-winter-2026-schedule-full-lineup"]
+const RADAR = [ /* item, detail, status, source URL, last verified (YYYY-MM-DD). Remove an item the day it premieres and add it to HISTORY. check.js fails the build if any item is unverified for 7+ days. */
+  ["RHOBH S16","Expected February, after RHOSLC; Leah Remini and Tracy Tutor reported joining","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/","2026-11-25"],
+  ["RHOA S18","Expected March, after RHOP","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/","2026-11-25"],
+  ["RHORI S2","Renewed in May; expected April","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/","2026-11-25"],
+  ["Summer House S11","Filmed this summer, with a Below Deck Med crossover; 2027, no date yet","ok","https://www.bravotv.com/the-daily-dish/below-deck-mediterranean-summer-house-crossover-preview-video-details","2026-11-25"],
+  ["Married to Medicine S13","Renewed at May upfronts; no date yet","ok","https://www.nbcuniversal.com/article/bravo-unveils-new-series-vanderpump-rules-lisa-las-vegas-and-secrets-lies-texas-wives-alongside","2026-11-25"],
+  ["Holiday weeks","Skips around Christmas and New Year's not announced yet","chk","https://www.bravotv.com/the-daily-dish/bravo-winter-2026-schedule-full-lineup","2026-11-25"]
 ];
 const SOURCES = [
   ["Bravo: Winter 2026 schedule","https://www.bravotv.com/the-daily-dish/bravo-winter-2026-schedule-full-lineup"],
