@@ -68,12 +68,16 @@ footer{padding:22px 0 48px;color:var(--dim);font-size:13px}
 
 const FEED = &quot;https://clubhousetonight.com/schedule.json&quot;;
 const MODE = String(args.widgetParameter || &quot;&quot;).toLowerCase().includes(&quot;peacock&quot;) ? &quot;peacock&quot; : &quot;bravo&quot;;
+const PK = MODE === &quot;peacock&quot;;
 const FAMILY = config.widgetFamily || &quot;large&quot;;
-const LIMITS = { small: { days: 1, rows: 3 }, medium: { days: 2, rows: 4 }, large: { days: 4, rows: 9 }, extraLarge: { days: 7, rows: 14 } };
-const LIM = LIMITS[FAMILY] || LIMITS.large;
+const SMALL = FAMILY === &quot;small&quot;;
+// vertical room for the list, in points (header + footer already taken out)
+const ROOM = { small: 108, medium: 104, large: 292, extraLarge: 292 }[FAMILY] || 292;
+const ROW_H = 21, DAY_H = 22; // a row incl. its gap · a day label incl. gaps
 
-const PINK = new Color(&quot;#ff4fae&quot;), SUN = new Color(&quot;#ffd25a&quot;), CYAN = new Color(&quot;#3ee6ea&quot;);
-const INK = new Color(&quot;#f5f1ff&quot;), MUT = new Color(&quot;#aea3c8&quot;), DIM = new Color(&quot;#8579a1&quot;);
+const INK = new Color(&quot;#f5f1ff&quot;), MUT = new Color(&quot;#aea3c8&quot;), DIM = new Color(&quot;#7d7299&quot;);
+const PINK = new Color(&quot;#ff4fae&quot;);
+const ACCENT = PK ? new Color(&quot;#ffe000&quot;) : new Color(&quot;#4dc9ff&quot;); // Peacock gold · Bravo cyan, like the site
 
 async function load() {
   const fm = FileManager.local();
@@ -95,76 +99,118 @@ function todayNY() {
   // a TV day: rolls over at 6 AM New York time, like the site, so a 3 AM WWHL airing still counts as last night
   return new Intl.DateTimeFormat(&quot;en-CA&quot;, { timeZone: &quot;America/New_York&quot;, year: &quot;numeric&quot;, month: &quot;2-digit&quot;, day: &quot;2-digit&quot; }).format(new Date(Date.now() - 6 * 3600e3));
 }
+const noon = iso =&gt; new Date(iso + &quot;T12:00:00Z&quot;);
 function label(iso, today) {
-  const diff = Math.round((new Date(iso + &quot;T12:00:00Z&quot;) - new Date(today + &quot;T12:00:00Z&quot;)) / 864e5);
-  if (diff === 0) return MODE === &quot;peacock&quot; ? &quot;Today&quot; : &quot;Tonight&quot;;
+  const diff = Math.round((noon(iso) - noon(today)) / 864e5);
+  if (diff === 0) return PK ? &quot;Today&quot; : &quot;Tonight&quot;;
   if (diff === 1) return &quot;Tomorrow&quot;;
-  return new Date(iso + &quot;T12:00:00Z&quot;).toLocaleDateString(&quot;en-US&quot;, { weekday: &quot;long&quot;, timeZone: &quot;UTC&quot; });
+  return noon(iso).toLocaleDateString(&quot;en-US&quot;, { weekday: &quot;long&quot;, timeZone: &quot;UTC&quot; });
 }
+const shortDate = iso =&gt; noon(iso).toLocaleDateString(&quot;en-US&quot;, { month: &quot;short&quot;, day: &quot;numeric&quot;, timeZone: &quot;UTC&quot; });
+// &quot;S16 E12 · Echoes of the Past · back after a break&quot; → &quot;Echoes of the Past&quot; (the notes live on the site)
+function cleanTitle(it) {
+  const parts = it.title.split(&quot; · &quot;);
+  if (it.show === &quot;WWHL&quot;) return parts[0];
+  return (/^S\d+ E\d+$/.test(parts[0]) ? parts[1] : parts[0]) || it.title;
+}
+// &quot;8:00 PM&quot; → &quot;8 PM&quot;, &quot;Mon 3:00 AM&quot; → &quot;3 AM&quot;, &quot;~9:30 PM&quot; → &quot;9:30 PM&quot;
+const shortTime = t =&gt; t.replace(&quot;~&quot;, &quot;&quot;).replace(/^[A-Z][a-z]{2} /, &quot;&quot;).replace(&quot;:00 &quot;, &quot; &quot;);
 
 const data = await load();
 const w = new ListWidget();
 const g = new LinearGradient();
-g.colors = [new Color(&quot;#1a0b2e&quot;), new Color(&quot;#0b0718&quot;)];
+g.colors = [new Color(&quot;#1d0d33&quot;), new Color(&quot;#0b0718&quot;)];
 g.locations = [0, 1];
 w.backgroundGradient = g;
-w.setPadding(14, 14, 12, 14);
-w.url = &quot;https://clubhousetonight.com/&quot; + (MODE === &quot;peacock&quot; ? &quot;?view=peacock&quot; : &quot;&quot;);
+w.setPadding(SMALL ? 14 : 16, 16, 14, 16);
+w.url = &quot;https://clubhousetonight.com/&quot; + (PK ? &quot;?view=peacock&quot; : &quot;&quot;);
 w.refreshAfterDate = new Date(Date.now() + 60 * 60 * 1000);
 
+// header: Clubhouse Tonight ............ On Peacock · 6 AM
 const head = w.addStack();
 head.centerAlignContent();
 const t1 = head.addText(&quot;Clubhouse &quot;);
-t1.font = Font.heavySystemFont(FAMILY === &quot;small&quot; ? 13 : 15); t1.textColor = INK;
+t1.font = Font.heavySystemFont(SMALL ? 13 : 16); t1.textColor = INK;
 const t2 = head.addText(&quot;Tonight&quot;);
-t2.font = Font.heavySystemFont(FAMILY === &quot;small&quot; ? 13 : 15); t2.textColor = PINK;
-if (FAMILY !== &quot;small&quot;) {
+t2.font = Font.heavySystemFont(SMALL ? 13 : 16); t2.textColor = PINK;
+if (!SMALL) {
   head.addSpacer();
-  const m = head.addText(MODE === &quot;peacock&quot; ? &quot;On Peacock&quot; : &quot;On Bravo&quot;);
-  m.font = Font.semiboldSystemFont(11); m.textColor = MODE === &quot;peacock&quot; ? CYAN : SUN;
+  const m = head.addText(PK ? &quot;Peacock · 6 AM&quot; : &quot;On Bravo&quot;);
+  m.font = Font.semiboldSystemFont(11); m.textColor = ACCENT;
 }
-w.addSpacer(8);
+w.addSpacer(SMALL ? 8 : 12);
+
+function pill(parent, it) {
+  const c = it.color || &quot;#ff4fae&quot;;
+  const p = parent.addStack();
+  p.size = new Size(SMALL ? 38 : 42, 17);
+  p.cornerRadius = 5;
+  p.backgroundColor = new Color(c, 0.18);
+  p.centerAlignContent();
+  const t = p.addText(it.code);
+  t.font = Font.heavySystemFont(10); t.textColor = new Color(c); t.lineLimit = 1; t.minimumScaleFactor = 0.7;
+}
 
 if (!data) {
   const t = w.addText(&quot;Can&#x27;t load the schedule right now.&quot;);
   t.font = Font.systemFont(13); t.textColor = MUT;
 } else {
   const today = todayNY();
-  let rowsLeft = LIM.rows, daysShown = 0;
+  let room = ROOM, daysShown = 0;
   for (const d of data.days) {
-    if (d.date &lt; today || daysShown &gt;= LIM.days || rowsLeft &lt;= 0) continue;
+    if (d.date &lt; today) continue;
     const items = d[MODE] || [];
-    if (!items.length &amp;&amp; daysShown &gt; 0) continue;
+    if (!items.length &amp;&amp; daysShown &gt; 0) continue;   // skip empty days after the first
+    if (room &lt; DAY_H + ROW_H) break;                // don&#x27;t start a day we can&#x27;t show a row of
+    if (daysShown &gt; 0) w.addSpacer(8);
     daysShown++;
-    const dl = w.addText(label(d.date, today).toUpperCase());
-    dl.font = Font.heavySystemFont(10); dl.textColor = daysShown === 1 ? PINK : DIM;
-    w.addSpacer(3);
-    if (!items.length) {
-      const q = w.addText(MODE === &quot;peacock&quot; ? &quot;Nothing new on Peacock&quot; : &quot;Nothing new on Bravo&quot;);
-      q.font = Font.systemFont(12); q.textColor = MUT;
-      rowsLeft--;
-    }
-    for (const it of items) {
-      if (rowsLeft &lt;= 0) break;
-      const r = w.addStack();
-      r.centerAlignContent();
-      r.spacing = 6;
-      const tm = r.addText(it.time.replace(&quot;:00 &quot;, &quot; &quot;).replace(&quot;~&quot;, &quot;&quot;));
-      tm.font = Font.boldMonospacedSystemFont(11); tm.textColor = SUN; tm.lineLimit = 1;
-      tm.minimumScaleFactor = 0.8;
-      const sh = r.addText(it.code);
-      sh.font = Font.heavySystemFont(12); sh.textColor = new Color(it.color || &quot;#ff4fae&quot;); sh.lineLimit = 1;
-      if (FAMILY !== &quot;small&quot;) {
-        const ti = r.addText(it.show === &quot;WWHL&quot; ? it.title : it.title.replace(/^S\d+ E\d+ · /, &quot;&quot;));
-        ti.font = Font.systemFont(12); ti.textColor = INK; ti.lineLimit = 1;
-      }
-      rowsLeft--;
-      w.addSpacer(3);
+    room -= DAY_H;
+
+    const dh = w.addStack();
+    dh.centerAlignContent();
+    const dl = dh.addText(label(d.date, today).toUpperCase());
+    dl.font = Font.heavySystemFont(10); dl.textColor = daysShown === 1 ? ACCENT : MUT;
+    if (!SMALL) {
+      const dd = dh.addText(&quot;  &quot; + shortDate(d.date));
+      dd.font = Font.semiboldSystemFont(10); dd.textColor = DIM;
     }
     w.addSpacer(5);
+
+    if (!items.length) {
+      const q = w.addText(PK ? &quot;Nothing new on Peacock&quot; : &quot;Nothing new on Bravo&quot;);
+      q.font = Font.systemFont(12); q.textColor = MUT;
+      room -= ROW_H;
+      continue;
+    }
+    items.forEach((it, i) =&gt; {
+      if (room &lt; ROW_H) return;
+      if (i &gt; 0) w.addSpacer(4);
+      room -= ROW_H;
+      const r = w.addStack();
+      r.centerAlignContent();
+      if (!PK) {                                     // Peacock drops are all 6 AM, so no time column there
+        const tc = r.addStack();
+        tc.size = new Size(SMALL ? 36 : 40, 17);
+        tc.centerAlignContent();
+        const tm = tc.addText(shortTime(it.time));
+        tm.font = Font.semiboldMonospacedSystemFont(11); tm.textColor = INK; tm.lineLimit = 1; tm.minimumScaleFactor = 0.75;
+        tc.addSpacer();
+        r.addSpacer(4);
+      }
+      pill(r, it);
+      if (!SMALL) {
+        r.addSpacer(10);
+        const tba = /TBA/i.test(it.title);
+        const ti = r.addText(cleanTitle(it));
+        ti.font = tba ? Font.systemFont(13) : Font.mediumSystemFont(13);
+        ti.textColor = tba ? DIM : INK; ti.lineLimit = 1;
+      }
+      r.addSpacer();
+    });
+    if (SMALL) break;                                // small: just the first day
   }
   w.addSpacer();
-  const f = w.addText(&quot;Updated &quot; + new Date(data.updated + &quot;T12:00:00Z&quot;).toLocaleDateString(&quot;en-US&quot;, { month: &quot;short&quot;, day: &quot;numeric&quot;, timeZone: &quot;UTC&quot; }) + &quot; · times ET&quot;);
+  const f = w.addText(&quot;Updated &quot; + shortDate(data.updated) + &quot; · times ET&quot;);
   f.font = Font.systemFont(9); f.textColor = DIM;
 }
 

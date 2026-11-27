@@ -224,6 +224,8 @@ a.pk:hover{border-color:var(--pea1);color:#fff}
 .pkv .lr.now .dn{color:var(--pea1)}
 .slots{display:flex;flex-direction:column;gap:8px}
 .sl{font-size:15.5px;display:grid;grid-template-columns:4.9rem minmax(0,1fr) auto;gap:0 10px;align-items:center}
+.sl.nt{grid-template-columns:.9rem minmax(0,1fr) auto}
+.sl.nt .dot{margin-right:0}
 .sl .who{line-height:1.3}
 .sl .tm{font-size:14px}
 .sl .ss{color:var(--mut)}
@@ -233,8 +235,10 @@ a.pk:hover{border-color:var(--pea1);color:#fff}
 @media(max-width:360px){.lr{grid-template-columns:minmax(0,1fr);gap:6px}#lu>.glass{padding:4px 14px}.sl{grid-template-columns:auto minmax(0,1fr) auto;gap:0 8px}}
 .pl{display:inline-block;padding:3px 0;text-decoration:none;font-weight:700;background-image:linear-gradient(var(--c1,currentColor),var(--c1,currentColor));background-size:0 2px;background-position:0 100%;background-repeat:no-repeat;transition:background-size .25s var(--ease)}
 .pl:hover{background-size:100% 2px}
-.pli{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;color:#1a1200;background:linear-gradient(135deg,var(--pea1),var(--pea2));text-decoration:none;align-self:center}
-.pli svg{width:10px;height:10px;fill:currentColor;stroke:none;margin-left:1px}
+.pli{position:relative;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;color:var(--pea1);background:rgba(255,224,0,.12);box-shadow:inset 0 0 0 1px rgba(255,224,0,.32);text-decoration:none;align-self:center;transition:background .2s,color .2s}
+.pli::after{content:"";position:absolute;inset:-9px}/* keeps a 44px tap target */
+.pli:hover,.pli:focus-visible{background:linear-gradient(135deg,var(--pea1),var(--pea2));color:#1a1200}
+.pli svg{width:9px;height:9px;fill:currentColor;stroke:none;margin-left:1px}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c1);box-shadow:0 0 5px -1px var(--c1);margin-right:6px;vertical-align:2px}
 
 /* ========== premieres ========== */
@@ -433,7 +437,7 @@ h1,h2,h3{text-wrap:balance}
 <section id="coming" aria-labelledby="cmT"><div class="wrap">
   <h2 id="cmT"><svg class="i" aria-hidden="true"><use href="#i-spark"/></svg>Coming Up</h2>
   <div class="grid" id="prem" style="--min:340px;align-items:start"><article class="prem glass" style="--c1:#ffe14a;--c2:#ff8a00"><div class="ph"><span class="badge ink" style="--c1:#ffe14a;--c2:#ff8a00" aria-hidden="true">WS</span><div><h3>Wife Swap: The Real Housewives Edition S2</h3><div class="ds">Wed, Dec 30 · Wed 9:00 PM · two-episode premiere, then Wednesdays</div></div></div>
-<div class="cd" id="cd0" role="timer" aria-label="Countdown to Wife Swap: The Real Housewives Edition S2"><div><b>4</b><span>weeks</span></div><div><b>5</b><span>days</span></div><div><b>14</b><span>hrs</span></div></div><ul class="list"><li><b>Dec 30</b><span>Lisa Barlow and Angela Oakley</span></li><li><b>Jan 6</b><span>Gina Kirschenheiter</span></li><li><b>Jan 13</b><span>Stephanie Hollman</span></li><li><b>Jan 20</b><span>Phaedra Parks</span></li><li><b>Jan 27</b><span>Crystal Kung-Minkoff · finale</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i" aria-hidden="true"><use href="#i-check"></use></svg>Bravo</span><a class="pk trl" href="https://www.bravotv.com/the-daily-dish/wife-swap-real-housewives-edition-season-2-everything-to-know"><svg class="i" aria-hidden="true"><use href="#i-film"></use></svg>Trailer</a></div></article><article class="prem glass" style="--c1:#ffa451;--c2:#6d2fb0"><div class="ph"><span class="badge ink" style="--c1:#ffa451;--c2:#6d2fb0" aria-hidden="true">NJ</span><div><h3>The Real Housewives of New Jersey S15</h3><div class="ds">Tue, Jan 19 · Tuesday · time not announced yet</div></div></div>
+<div class="cd" id="cd0" role="timer" aria-label="Countdown to Wife Swap: The Real Housewives Edition S2"><div><b>4</b><span>weeks</span></div><div><b>5</b><span>days</span></div><div><b>11</b><span>hrs</span></div></div><ul class="list"><li><b>Dec 30</b><span>Lisa Barlow and Angela Oakley</span></li><li><b>Jan 6</b><span>Gina Kirschenheiter</span></li><li><b>Jan 13</b><span>Stephanie Hollman</span></li><li><b>Jan 20</b><span>Phaedra Parks</span></li><li><b>Jan 27</b><span>Crystal Kung-Minkoff · finale</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i" aria-hidden="true"><use href="#i-check"></use></svg>Bravo</span><a class="pk trl" href="https://www.bravotv.com/the-daily-dish/wife-swap-real-housewives-edition-season-2-everything-to-know"><svg class="i" aria-hidden="true"><use href="#i-film"></use></svg>Trailer</a></div></article><article class="prem glass" style="--c1:#ffa451;--c2:#6d2fb0"><div class="ph"><span class="badge ink" style="--c1:#ffa451;--c2:#6d2fb0" aria-hidden="true">NJ</span><div><h3>The Real Housewives of New Jersey S15</h3><div class="ds">Tue, Jan 19 · Tuesday · time not announced yet</div></div></div>
 <div class="cd" id="cd1" role="timer" aria-label="Countdown to The Real Housewives of New Jersey S15"><div><b>7</b><span>weeks</span></div><div><b>4</b><span>days</span></div><div><b>TBA</b><span>time</span></div></div><ul class="list"><li><b>Cast</b><span>Teresa, Melissa and Dolores, plus five new Housewives</span></li></ul><div class="metaln" style="margin-top:0"><span class="pill p-ok"><svg class="i" aria-hidden="true"><use href="#i-check"></use></svg>Bravo</span></div></article></div>
 </div></section>
 
@@ -738,13 +742,13 @@ const asFor=(d,eps)=>AFTERSHOWS.filter(a=>a.on&&a.time&&eps.some(e=>e[2]===a.sho
 /* Peacock view rows */
 const pkStatus=(live,u,drop)=>u?(live?`<a class="pk live" href="${esc(u)}">${ic("play")}Watch on Peacock</a>`:`<a class="pk" href="${esc(u)}">${ic("clock")}Drops ${esc(fd(drop,{weekday:"short"}))} 6 AM</a>`):"";
 const pkRow=e=>{const drop=dropOf(e),live=isLive(drop);return row({show:e[2],name:esc(e[2]),
-  time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:esc(e[3]),
+  time:live?'<span class="lv">Streaming</span>':"",desc:esc(e[3]),
   more:`${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln"><span class="aired">${ic("tv")}${e[6]?"Early drop · airs on Bravo":"Aired on Bravo"} ${esc(fd(e[0],{weekday:"short"}))} ${esc(tTxt(e[1]))}</span>${pkStatus(live,peacockUrl(e[2],e[7]),drop)}${showLink(e[2])}</div>`})};
-const wwPkRow=(w,d)=>{const live=isLive(d);return row({show:"WWHL",name:`<span class="vh">WWHL: </span>${esc(w.nm)}`,time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:"Watch What Happens Live",
+const wwPkRow=(w,d)=>{const live=isLive(d);return row({show:"WWHL",name:`<span class="vh">WWHL: </span>${esc(w.nm)}`,time:live?'<span class="lv">Streaming</span>':"",desc:"Watch What Happens Live",
   more:`<div class="metaln">${w.st?pill(w.st):""}${pkStatus(live,WWHL.peacock,d)}<a class="intl" href="/wwhl">${ic("list")}All guests</a></div>`})};
 
 const asPkRows=d=>AFTERSHOWS.filter(a=>a.on&&a.pk&&EPISODES.some(e=>e[2]===a.show&&e[0]===addDays(d,-1))).map(a=>{const live=isLive(d);return row({show:a.show,badgeHtml:badge(a.show,ic("chat")),
-  name:`${esc(a.show)} After Show`,time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:`On Peacock the morning after ${esc(a.show)}`,
+  name:`${esc(a.show)} After Show`,time:live?'<span class="lv">Streaming</span>':"",desc:`On Peacock the morning after ${esc(a.show)}`,
   more:`<div class="metaln">${pill(a.st)}<span class="aired">${ic("chat")}Online ${esc(fd(addDays(d,-1),{weekday:"short"}))} ${esc(tTxt(a.time))}</span><a class="pk" href="${esc(a.url)}">${ic("link")}Where to watch</a></div>`})});
 
 /* ---------- Next 7 nights: Bravo view (air dates) or Peacock view (streaming drop dates) ---------- */
@@ -766,7 +770,7 @@ function renderDays(keepOpen){
       body=(eps.length?[...eps.map(e=>({t:e[1],html:epRow(e)})),...asFor(d,eps)].sort((x,y)=>x.t.localeCompare(y.t)).map(x=>x.html).join(""):"")+(w?wwRow(w,d):"");
       if(!eps.length)q=untracked?"Not tracked yet":d<=LISTED_THROUGH?"Nothing new":"Not listed yet";
     }
-    out+=`<article class="day glass${i===0?" now":""}${i<0?" past":""}${body?"":" empty"}" data-date="${d}" aria-label="${esc(lbl)}, ${esc(short(d))}"><div class="dh"><b>${esc(lbl)}</b>${q?`<i class="nn">${esc(q)}</i>`:""}<span class="dd">${esc(short(d))}</span></div>${body}</article>`}
+    out+=`<article class="day glass${i===0?" now":""}${i<0?" past":""}${body?"":" empty"}" data-date="${d}" aria-label="${esc(lbl)}, ${esc(short(d))}"><div class="dh"><b>${esc(lbl)}</b>${q?`<i class="nn">${esc(q)}</i>`:""}<span class="dd">${pk7&&body?"6:00 AM · ":""}${esc(short(d))}</span></div>${body}</article>`}
   $("days").innerHTML=out;
   open.forEach(id=>{const b=document.querySelector(`#days [aria-controls="${id}"]`);if(b){b.setAttribute("aria-expanded","true");b.closest(".xr").classList.add("open")}});
   $("wkT").textContent=pk7?"Next 7 Days":"Next 7 Nights";
@@ -787,7 +791,7 @@ const onPeacockAlready=show=>{const r=EPISODES.filter(e=>e[2]===show);return r.l
 function renderLineup(){const pk7=VIEW==="peacock";
   const G=pk7?GRID.map((g,i)=>[g[0],GRID[(i+6)%7][1].filter(s=>!/After Show/.test(s[2])&&!onPeacockAlready(s[1])).map(s=>["06:00",s[1],s[2],""])]):GRID;
   const slot=s=>{const after=/After Show/.test(s[2]),u=sh(s[1])[4];
-    return `<span class="sl" style="${vars(s[1])}"><span class="tm"><span class="dot" aria-hidden="true"></span>${tH(s[0])}</span><span class="who">${hasPage(s[1])?`<a class="pl" href="/${slugOf(s[1])}">${esc(fn(s[1]))}</a>`:`<b>${esc(fn(s[1]))}</b>`} <span class="ss">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>${u&&!after?`<a class="pli" href="${esc(u)}" aria-label="${esc(fn(s[1]))} on Peacock">${ic("play")}</a>`:"<span></span>"}</span>`};
+    return `<span class="sl${pk7?" nt":""}" style="${vars(s[1])}"><span class="tm"><span class="dot" aria-hidden="true"></span>${pk7?"":tH(s[0])}</span><span class="who">${hasPage(s[1])?`<a class="pl" href="/${slugOf(s[1])}">${esc(fn(s[1]))}</a>`:`<b>${esc(fn(s[1]))}</b>`} <span class="ss">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>${u&&!after?`<a class="pli" href="${esc(u)}" aria-label="${esc(fn(s[1]))} on Peacock">${ic("play")}</a>`:"<span></span>"}</span>`};
   $("lu").innerHTML=`<div class="glass">${G.map((g,i)=>`<div class="lr${i===dow?" now":""}"><span class="dn">${g[0]}</span>${g[1].length?`<div class="slots">${g[1].map(slot).join("")}</div>`:`<span class="none">No new originals</span>`}</div>`).join("")}</div><p class="note" style="margin-top:10px">${pk7?"New episodes hit Peacock at 6:00 AM the morning after they air. WWHL lands the next morning too.":"WWHL airs Sunday to Thursday nights, but Bravo moves its time night to night (some nights after midnight), so check each night above."}</p>`;
   $("luT").textContent=pk7?"Weekly Peacock Drops":"Current Weekly Lineup"}
 renderLineup();
@@ -848,7 +852,7 @@ const freshen=()=>{const n=nyNow();if(stamp(n)!==loadStamp)return location.reloa
 {const nx=now.h<6?etMs(now.d,"06:00"):etMs(addDays(now.d,1),"00:00");setTimeout(freshen,Math.max(1000,nx-Date.now()+1500))}
 /* a new build went live (schedule fix or design update): reload once. Matters most for people who saved the site to their Home Screen,
    where the page can stay open for days and there's no pull-to-refresh. The ?v= on the reload skips any cached copy of the old page. */
-const BUILD="c4dfa28e64a7";let lastCheck=0;
+const BUILD="ca94f1f25c11";let lastCheck=0;
 try{const u=new URL(location.href);if(u.searchParams.has("v")){u.searchParams.delete("v");history.replaceState(null,"",u.pathname+u.search+u.hash)}}catch(e){}
 const checkBuild=()=>{if(Date.now()-lastCheck<60000||location.protocol==="file:")return;lastCheck=Date.now();
   fetch("/version.txt",{cache:"no-store"}).then(r=>r.ok?r.text():"").then(v=>{v=v.trim();if(!/^[0-9a-f]{12}$/.test(v)||v===BUILD)return;

@@ -224,6 +224,8 @@ a.pk:hover{border-color:var(--pea1);color:#fff}
 .pkv .lr.now .dn{color:var(--pea1)}
 .slots{display:flex;flex-direction:column;gap:8px}
 .sl{font-size:15.5px;display:grid;grid-template-columns:4.9rem minmax(0,1fr) auto;gap:0 10px;align-items:center}
+.sl.nt{grid-template-columns:.9rem minmax(0,1fr) auto}
+.sl.nt .dot{margin-right:0}
 .sl .who{line-height:1.3}
 .sl .tm{font-size:14px}
 .sl .ss{color:var(--mut)}
@@ -233,8 +235,10 @@ a.pk:hover{border-color:var(--pea1);color:#fff}
 @media(max-width:360px){.lr{grid-template-columns:minmax(0,1fr);gap:6px}#lu>.glass{padding:4px 14px}.sl{grid-template-columns:auto minmax(0,1fr) auto;gap:0 8px}}
 .pl{display:inline-block;padding:3px 0;text-decoration:none;font-weight:700;background-image:linear-gradient(var(--c1,currentColor),var(--c1,currentColor));background-size:0 2px;background-position:0 100%;background-repeat:no-repeat;transition:background-size .25s var(--ease)}
 .pl:hover{background-size:100% 2px}
-.pli{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;color:#1a1200;background:linear-gradient(135deg,var(--pea1),var(--pea2));text-decoration:none;align-self:center}
-.pli svg{width:10px;height:10px;fill:currentColor;stroke:none;margin-left:1px}
+.pli{position:relative;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;color:var(--pea1);background:rgba(255,224,0,.12);box-shadow:inset 0 0 0 1px rgba(255,224,0,.32);text-decoration:none;align-self:center;transition:background .2s,color .2s}
+.pli::after{content:"";position:absolute;inset:-9px}/* keeps a 44px tap target */
+.pli:hover,.pli:focus-visible{background:linear-gradient(135deg,var(--pea1),var(--pea2));color:#1a1200}
+.pli svg{width:9px;height:9px;fill:currentColor;stroke:none;margin-left:1px}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c1);box-shadow:0 0 5px -1px var(--c1);margin-right:6px;vertical-align:2px}
 
 /* ========== premieres ========== */
@@ -554,13 +558,13 @@ const asFor=(d,eps)=>AFTERSHOWS.filter(a=>a.on&&a.time&&eps.some(e=>e[2]===a.sho
 /* Peacock view rows */
 const pkStatus=(live,u,drop)=>u?(live?`<a class="pk live" href="${esc(u)}">${ic("play")}Watch on Peacock</a>`:`<a class="pk" href="${esc(u)}">${ic("clock")}Drops ${esc(fd(drop,{weekday:"short"}))} 6 AM</a>`):"";
 const pkRow=e=>{const drop=dropOf(e),live=isLive(drop);return row({show:e[2],name:esc(e[2]),
-  time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:esc(e[3]),
+  time:live?'<span class="lv">Streaming</span>':"",desc:esc(e[3]),
   more:`${fnLine(e[2])}${e[5]?`<div class="syn">${esc(e[5])}</div>`:""}<div class="metaln"><span class="aired">${ic("tv")}${e[6]?"Early drop · airs on Bravo":"Aired on Bravo"} ${esc(fd(e[0],{weekday:"short"}))} ${esc(tTxt(e[1]))}</span>${pkStatus(live,peacockUrl(e[2],e[7]),drop)}${showLink(e[2])}</div>`})};
-const wwPkRow=(w,d)=>{const live=isLive(d);return row({show:"WWHL",name:`<span class="vh">WWHL: </span>${esc(w.nm)}`,time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:"Watch What Happens Live",
+const wwPkRow=(w,d)=>{const live=isLive(d);return row({show:"WWHL",name:`<span class="vh">WWHL: </span>${esc(w.nm)}`,time:live?'<span class="lv">Streaming</span>':"",desc:"Watch What Happens Live",
   more:`<div class="metaln">${w.st?pill(w.st):""}${pkStatus(live,WWHL.peacock,d)}<a class="intl" href="/wwhl">${ic("list")}All guests</a></div>`})};
 
 const asPkRows=d=>AFTERSHOWS.filter(a=>a.on&&a.pk&&EPISODES.some(e=>e[2]===a.show&&e[0]===addDays(d,-1))).map(a=>{const live=isLive(d);return row({show:a.show,badgeHtml:badge(a.show,ic("chat")),
-  name:`${esc(a.show)} After Show`,time:live?'<span class="lv">Streaming</span>':tH("06:00"),desc:`On Peacock the morning after ${esc(a.show)}`,
+  name:`${esc(a.show)} After Show`,time:live?'<span class="lv">Streaming</span>':"",desc:`On Peacock the morning after ${esc(a.show)}`,
   more:`<div class="metaln">${pill(a.st)}<span class="aired">${ic("chat")}Online ${esc(fd(addDays(d,-1),{weekday:"short"}))} ${esc(tTxt(a.time))}</span><a class="pk" href="${esc(a.url)}">${ic("link")}Where to watch</a></div>`})});
 
 /* ---------- Next 7 nights: Bravo view (air dates) or Peacock view (streaming drop dates) ---------- */
@@ -582,7 +586,7 @@ function renderDays(keepOpen){
       body=(eps.length?[...eps.map(e=>({t:e[1],html:epRow(e)})),...asFor(d,eps)].sort((x,y)=>x.t.localeCompare(y.t)).map(x=>x.html).join(""):"")+(w?wwRow(w,d):"");
       if(!eps.length)q=untracked?"Not tracked yet":d<=LISTED_THROUGH?"Nothing new":"Not listed yet";
     }
-    out+=`<article class="day glass${i===0?" now":""}${i<0?" past":""}${body?"":" empty"}" data-date="${d}" aria-label="${esc(lbl)}, ${esc(short(d))}"><div class="dh"><b>${esc(lbl)}</b>${q?`<i class="nn">${esc(q)}</i>`:""}<span class="dd">${esc(short(d))}</span></div>${body}</article>`}
+    out+=`<article class="day glass${i===0?" now":""}${i<0?" past":""}${body?"":" empty"}" data-date="${d}" aria-label="${esc(lbl)}, ${esc(short(d))}"><div class="dh"><b>${esc(lbl)}</b>${q?`<i class="nn">${esc(q)}</i>`:""}<span class="dd">${pk7&&body?"6:00 AM · ":""}${esc(short(d))}</span></div>${body}</article>`}
   $("days").innerHTML=out;
   open.forEach(id=>{const b=document.querySelector(`#days [aria-controls="${id}"]`);if(b){b.setAttribute("aria-expanded","true");b.closest(".xr").classList.add("open")}});
   $("wkT").textContent=pk7?"Next 7 Days":"Next 7 Nights";
@@ -603,7 +607,7 @@ const onPeacockAlready=show=>{const r=EPISODES.filter(e=>e[2]===show);return r.l
 function renderLineup(){const pk7=VIEW==="peacock";
   const G=pk7?GRID.map((g,i)=>[g[0],GRID[(i+6)%7][1].filter(s=>!/After Show/.test(s[2])&&!onPeacockAlready(s[1])).map(s=>["06:00",s[1],s[2],""])]):GRID;
   const slot=s=>{const after=/After Show/.test(s[2]),u=sh(s[1])[4];
-    return `<span class="sl" style="${vars(s[1])}"><span class="tm"><span class="dot" aria-hidden="true"></span>${tH(s[0])}</span><span class="who">${hasPage(s[1])?`<a class="pl" href="/${slugOf(s[1])}">${esc(fn(s[1]))}</a>`:`<b>${esc(fn(s[1]))}</b>`} <span class="ss">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>${u&&!after?`<a class="pli" href="${esc(u)}" aria-label="${esc(fn(s[1]))} on Peacock">${ic("play")}</a>`:"<span></span>"}</span>`};
+    return `<span class="sl${pk7?" nt":""}" style="${vars(s[1])}"><span class="tm"><span class="dot" aria-hidden="true"></span>${pk7?"":tH(s[0])}</span><span class="who">${hasPage(s[1])?`<a class="pl" href="/${slugOf(s[1])}">${esc(fn(s[1]))}</a>`:`<b>${esc(fn(s[1]))}</b>`} <span class="ss">${esc(s[2])}</span>${s[3]?`<em>${esc(s[3])}</em>`:""}</span>${u&&!after?`<a class="pli" href="${esc(u)}" aria-label="${esc(fn(s[1]))} on Peacock">${ic("play")}</a>`:"<span></span>"}</span>`};
   $("lu").innerHTML=`<div class="glass">${G.map((g,i)=>`<div class="lr${i===dow?" now":""}"><span class="dn">${g[0]}</span>${g[1].length?`<div class="slots">${g[1].map(slot).join("")}</div>`:`<span class="none">No new originals</span>`}</div>`).join("")}</div><p class="note" style="margin-top:10px">${pk7?"New episodes hit Peacock at 6:00 AM the morning after they air. WWHL lands the next morning too.":"WWHL airs Sunday to Thursday nights, but Bravo moves its time night to night (some nights after midnight), so check each night above."}</p>`;
   $("luT").textContent=pk7?"Weekly Peacock Drops":"Current Weekly Lineup"}
 renderLineup();
