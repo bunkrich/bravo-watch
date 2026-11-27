@@ -401,20 +401,29 @@ def run():
         pages.append(sl)
         page_names[sl] = name
     # compact feed for the home-screen widget
+    ET_TZ = ZoneInfo("America/New_York")
+    def start_iso(d, t):  # real start instant with its ET offset, so the widget can show "on now"
+        if not re.fullmatch(r"\d{2}:\d{2}", t or ""): return None
+        return dt.datetime.fromisoformat(f"{d}T{t}").replace(tzinfo=ET_TZ).isoformat()
+    def ep_mins(x):
+        if len(x) > 8 and x[8]: return int(x[8])
+        return 90 if re.search(r"90 min", x[3], re.I) else 120 if re.search(r"two.hour|2 hours", x[3], re.I) else 60
     days = []
     for i in range(-1, 9):
         dd = (today + dt.timedelta(days=i)).isoformat()
         bravo = []
         for x in sorted([x for x in c["EPISODES"] if x[0] == dd], key=lambda x: x[1]):
             m = shows_meta.get(x[2]) or [x[2][:3], "#7b6be0", "#3f2f9c"]
-            bravo.append({"show": x[2], "code": m[0], "color": m[1], "time": t12(x[1]), "title": x[3], "url": f"{SITE}/{slug(x[2])}"})
+            bravo.append({"show": x[2], "code": m[0], "color": m[1], "time": t12(x[1]), "title": x[3], "url": f"{SITE}/{slug(x[2])}",
+                          "start": start_iso(dd, x[1]), "mins": ep_mins(x)})
         ww = c["WWHL"]
         a = wwhl_airing(ww, dd)
         if a:
             g = ww.get("guests", {}).get(dd)
             late = a[1][:10] > dd
             bravo.append({"show": "WWHL", "code": "WWHL", "color": (shows_meta.get("WWHL") or ["", "#22d3f0"])[1], "time": (D(a[1][:10]).strftime("%a ") if late else "") + t12(a[1][11:]),
-                          "title": g[0] if g else "Guests TBA", "url": f"{SITE}/wwhl"})
+                          "title": g[0] if g else "Guests TBA", "url": f"{SITE}/wwhl",
+                          "start": start_iso(a[1][:10], a[1][11:16]), "mins": int(a[3]) if len(a) > 3 and a[3] else 30})
         peacock = []
         for x in sorted([x for x in c["EPISODES"] if not streaming(x) and drop_of(x) == dd], key=lambda x: x[1]):
             m = shows_meta.get(x[2]) or [x[2][:3], "#7b6be0", "#3f2f9c"]

@@ -8,12 +8,27 @@ const PK = MODE === "peacock";
 const FAMILY = config.widgetFamily || "large";
 const SMALL = FAMILY === "small";
 // vertical room for the list, in points (header + footer already taken out)
-const ROOM = { small: 108, medium: 104, large: 292, extraLarge: 292 }[FAMILY] || 292;
+const ROOM = { small: 100, medium: 92, large: 292, extraLarge: 292 }[FAMILY] || 292;
 const ROW_H = 21, DAY_H = 22; // a row incl. its gap · a day label incl. gaps
 
 const INK = new Color("#f5f1ff"), MUT = new Color("#aea3c8"), DIM = new Color("#7d7299");
 const PINK = new Color("#ff4fae");
 const ACCENT = PK ? new Color("#ffe000") : new Color("#4dc9ff"); // Peacock gold · Bravo cyan, like the site
+
+// the site's TV icon for the header, cached so it still shows offline
+async function loadLogo() {
+  const fm = FileManager.local();
+  const path = fm.joinPath(fm.cacheDirectory(), "clubhouse-tonight-icon.png");
+  try {
+    const r = new Request("https://clubhousetonight.com/icon-192.png");
+    r.timeoutInterval = 6;
+    const img = await r.loadImage();
+    fm.writeImage(path, img);
+    return img;
+  } catch (e) {
+    try { return fm.fileExists(path) ? fm.readImage(path) : null; } catch (e2) { return null; }
+  }
+}
 
 async function load() {
   const fm = FileManager.local();
@@ -52,7 +67,13 @@ function cleanTitle(it) {
 // "8:00 PM" → "8 PM", "Mon 3:00 AM" → "3 AM", "~9:30 PM" → "9:30 PM"
 const shortTime = t => t.replace("~", "").replace(/^[A-Z][a-z]{2} /, "").replace(":00 ", " ");
 
-const data = await load();
+const [data, logo] = await Promise.all([load(), loadLogo()]);
+const NOW = Date.now();
+// on now / already over, from the airing's real start + runtime (Bravo view only)
+const startMs = it => (it.start ? new Date(it.start).getTime() : NaN);
+const isLive = it => { const s = startMs(it); return s <= NOW && NOW < s + (it.mins || 60) * 6e4; };
+const isOver = it => { const s = startMs(it); return NOW >= s + (it.mins || 60) * 6e4; };
+const LIVE = new Color("#ff2d55");
 const w = new ListWidget();
 const g = new LinearGradient();
 g.colors = [new Color("#1d0d33"), new Color("#0b0718")];
@@ -60,12 +81,25 @@ g.locations = [0, 1];
 w.backgroundGradient = g;
 w.setPadding(SMALL ? 14 : 16, 16, 14, 16);
 w.url = "https://clubhousetonight.com/" + (PK ? "?view=peacock" : "");
-w.refreshAfterDate = new Date(Date.now() + 60 * 60 * 1000);
+// refresh hourly, or sooner when a show starts or ends (iOS may still wait a bit longer)
+let nextChange = NOW + 60 * 60 * 1000;
+if (data && !PK) for (const d of data.days) for (const it of d.bravo || []) {
+  const s = startMs(it); if (isNaN(s)) continue;
+  for (const t of [s, s + (it.mins || 60) * 6e4]) if (t > NOW && t < nextChange) nextChange = t + 30e3;
+}
+w.refreshAfterDate = new Date(nextChange);
 
 // header: Clubhouse Tonight ............ On Peacock · 6 AM
 const head = w.addStack();
 head.centerAlignContent();
-const t1 = head.addText("Clubhouse ");
+if (logo) {
+  const li = head.addImage(logo);
+  const sz = SMALL ? 16 : 20;
+  li.imageSize = new Size(sz, sz);
+  li.cornerRadius = sz * 0.22;
+  head.addSpacer(SMALL ? 5 : 7);
+}
+const t1 = head.addText(SMALL && logo ? "" : "Clubhouse ");
 t1.font = Font.heavySystemFont(SMALL ? 13 : 16); t1.textColor = INK;
 const t2 = head.addText("Tonight");
 t2.font = Font.heavySystemFont(SMALL ? 13 : 16); t2.textColor = PINK;
@@ -128,18 +162,26 @@ if (!data) {
         const tc = r.addStack();
         tc.size = new Size(SMALL ? 36 : 40, 17);
         tc.centerAlignContent();
-        const tm = tc.addText(shortTime(it.time));
-        tm.font = Font.semiboldMonospacedSystemFont(11); tm.textColor = INK; tm.lineLimit = 1; tm.minimumScaleFactor = 0.75;
+        if (isLive(it)) {
+          const dot = tc.addText("●");
+          dot.font = Font.systemFont(8); dot.textColor = LIVE;
+          tc.addSpacer(3);
+          const lv = tc.addText("LIVE");
+          lv.font = Font.heavySystemFont(10); lv.textColor = LIVE; lv.lineLimit = 1;
+        } else {
+          const tm = tc.addText(shortTime(it.time));
+          tm.font = Font.semiboldMonospacedSystemFont(11); tm.textColor = isOver(it) ? DIM : INK; tm.lineLimit = 1; tm.minimumScaleFactor = 0.75;
+        }
         tc.addSpacer();
         r.addSpacer(4);
       }
       pill(r, it);
-      if (!SMALL) {
-        r.addSpacer(10);
+      if (!SMALL || PK) {                            // small Bravo has no room for titles; small Peacock does
+        r.addSpacer(SMALL ? 7 : 10);
         const tba = /TBA/i.test(it.title);
         const ti = r.addText(cleanTitle(it));
         ti.font = tba ? Font.systemFont(13) : Font.mediumSystemFont(13);
-        ti.textColor = tba ? DIM : INK; ti.lineLimit = 1;
+        ti.textColor = tba || (!PK && isOver(it)) ? DIM : INK; ti.lineLimit = 1;
       }
       r.addSpacer();
     });
