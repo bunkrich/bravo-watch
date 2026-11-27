@@ -25,7 +25,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Clubhouse Tonight: next 7 nights on Bravo, premieres, WWHL guests, Peacock drops">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Clubhouse Tonight","alternateName":"Bravo Watch Calendar","url":"https://clubhousetonight.com/","description":"Unofficial fan calendar of Bravo TV airings, premieres, WWHL guests and Peacock drops."}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Clubhouse Tonight","alternateName":"Bravo Watch Calendar","url":"https://clubhousetonight.com/","description":"Unofficial fan calendar of Bravo TV airings, premieres, WWHL guests and Peacock drops.","dateModified":"2026-11-27","publisher":{"@type":"Organization","name":"Clubhouse Tonight","url":"https://clubhousetonight.com/"}}</script>
 <style>
 /* Clubhouse Tonight — homepage styles
    LOOK      a neon night-time TV guide: frosted "liquid glass" cards over a dark colour wash, every show glowing in
@@ -852,7 +852,7 @@ const freshen=()=>{const n=nyNow();if(stamp(n)!==loadStamp)return location.reloa
 {const nx=now.h<6?etMs(now.d,"06:00"):etMs(addDays(now.d,1),"00:00");setTimeout(freshen,Math.max(1000,nx-Date.now()+1500))}
 /* a new build went live (schedule fix or design update): reload once. Matters most for people who saved the site to their Home Screen,
    where the page can stay open for days and there's no pull-to-refresh. The ?v= on the reload skips any cached copy of the old page. */
-const BUILD="ca94f1f25c11";let lastCheck=0;
+const BUILD="372355af4447";let lastCheck=0;
 try{const u=new URL(location.href);if(u.searchParams.has("v")){u.searchParams.delete("v");history.replaceState(null,"",u.pathname+u.search+u.hash)}}catch(e){}
 const checkBuild=()=>{if(Date.now()-lastCheck<60000||location.protocol==="file:")return;lastCheck=Date.now();
   fetch("/version.txt",{cache:"no-store"}).then(r=>r.ok?r.text():"").then(v=>{v=v.trim();if(!/^[0-9a-f]{12}$/.test(v)||v===BUILD)return;

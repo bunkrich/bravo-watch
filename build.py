@@ -17,7 +17,7 @@ import showpages
 pages=showpages.run()
 for p in old:
   if p not in pages and os.path.exists(p+".html"): os.remove(p+".html")
-open(CAND,"w").write(t.replace("/*DATA*/",d).replace("__BUILD__",BUILD).replace("__PAGES__",json.dumps(pages)))
+open(CAND,"w").write(t.replace("/*DATA*/",d).replace("__BUILD__",BUILD).replace("__PAGES__",json.dumps(pages)).replace("__UPDATED__",lm))
 
 # widget setup page (code embedded from widget.js so it never drifts)
 import html as _h

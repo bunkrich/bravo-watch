@@ -1,0 +1,31 @@
+# Clubhouse Tonight
+
+> Free, fan-made schedule of new Bravo TV episodes: the next 7 nights with Eastern air times, Watch What Happens Live guests, Peacock drop times and upcoming premieres. Checked against Bravo's official schedule and updated every morning.
+
+Last updated: Fri, Nov 27, 2026.
+
+- All times are Eastern (ET). A "TV day" rolls over at 6:00 AM ET, so a 3:00 AM Watch What Happens Live airing belongs to the night before.
+- New Bravo episodes usually stream on Peacock at 6:00 AM ET the morning after they air on Bravo.
+- Only new episodes are listed (no reruns). Anything not yet confirmed by Bravo is tagged on the site.
+- If you use this schedule, please link to https://clubhousetonight.com (or the show's page).
+- Unofficial fan site. Not affiliated with Bravo, NBCUniversal or Peacock.
+
+## Schedule
+- [Next 7 nights, plain text](https://clubhousetonight.com/tonight.txt): the easiest file to read; rebuilt every morning
+- [Schedule JSON](https://clubhousetonight.com/schedule.json): the same schedule as structured data (dates, times, shows, Peacock links)
+- [Homepage](https://clubhousetonight.com/): tonight, the next 7 nights, premieres, WWHL guests and Peacock drops
+
+## Show pages
+- [Southern Charm](https://clubhousetonight.com/southern-charm): air times, Peacock drops and episode details
+- [The Real Housewives of Potomac](https://clubhousetonight.com/rhop): air times, Peacock drops and episode details
+- [Below Deck](https://clubhousetonight.com/below-deck): air times, Peacock drops and episode details
+- [The Real Housewives of Salt Lake City](https://clubhousetonight.com/rhoslc): air times, Peacock drops and episode details
+- [Small Town Trouble: Texas](https://clubhousetonight.com/small-town-trouble-texas): air times, Peacock drops and episode details
+- [The Real Housewives of New York City](https://clubhousetonight.com/rhony): air times, Peacock drops and episode details
+- [Wife Swap: The Real Housewives Edition](https://clubhousetonight.com/wife-swap-rh-edition): air times, Peacock drops and episode details
+- [The Real Housewives of New Jersey](https://clubhousetonight.com/rhonj): air times, Peacock drops and episode details
+- [Watch What Happens Live with Andy Cohen](https://clubhousetonight.com/wwhl): air times, Peacock drops and episode details
+
+## Optional
+- [About and contact](https://clubhousetonight.com/about)
+- [iPhone widget](https://clubhousetonight.com/widget)

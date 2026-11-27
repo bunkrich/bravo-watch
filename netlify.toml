@@ -90,11 +90,25 @@
   status = 404
   force = true
 [[headers]]
+  for = "/*.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+[[headers]]
   for = "/version.txt"
   [headers.values]
     Cache-Control = "no-cache"
 [[redirects]]
   from = "/prerendered.json"
+  to = "/404.html"
+  status = 404
+  force = true
+[[redirects]]
+  from = "/netlify/*"
+  to = "/404.html"
+  status = 404
+  force = true
+[[redirects]]
+  from = "/aifiles.py"
   to = "/404.html"
   status = 404
   force = true

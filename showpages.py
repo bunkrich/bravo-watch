@@ -175,6 +175,7 @@ def run():
         if s and s not in active:
             active.append(s)
     active.append("WWHL")
+    page_names = {}
 
     def colours(s):
         m = shows_meta.get(s)
@@ -378,6 +379,7 @@ def run():
 <meta property="og:title" content="{e(name)} schedule · Clubhouse Tonight"><meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{SITE}/{sl}"><meta property="og:image" content="{SITE}/og.jpg?v=3"><meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{json.dumps(ld)}</script>
+<script type="application/ld+json">{json.dumps({"@context": "https://schema.org", "@type": "WebPage", "url": f"{SITE}/{sl}", "name": title, "dateModified": c["UPDATED"], "isPartOf": {"@type": "WebSite", "name": "Clubhouse Tonight", "url": SITE + "/"}})}</script>
 <style>html{{background:#0b0718;padding-top:env(safe-area-inset-top)}}{CSS}</style>
 </head>
 <body data-show="{e(s)}" style="{cvars(s)}">
@@ -397,6 +399,7 @@ def run():
 """
         open(f"{sl}.html", "w").write(page)
         pages.append(sl)
+        page_names[sl] = name
     # compact feed for the home-screen widget
     days = []
     for i in range(-1, 9):
@@ -425,7 +428,11 @@ def run():
             g = ww.get("guests", {}).get(prev)
             peacock.append({"show": "WWHL", "code": "WWHL", "color": (shows_meta.get("WWHL") or ["", "#22d3f0"])[1], "time": "6:00 AM", "title": g[0] if g else "Guests TBA", "url": ww.get("peacock", "")})
         days.append({"date": dd, "bravo": bravo, "peacock": peacock})
-    json.dump({"updated": c["UPDATED"], "site": SITE, "days": days}, open("schedule.json", "w"), separators=(",", ":"))
+    json.dump({"updated": c["UPDATED"], "site": SITE, "source": "Clubhouse Tonight", "attribution": f"If you use this schedule, please link to {SITE}",
+               "timezone": "America/New_York", "note": "Times are Eastern. TV days roll over at 6:00 AM ET. New Bravo episodes usually land on Peacock at 6:00 AM ET the next morning.",
+               "text": f"{SITE}/tonight.txt", "days": days}, open("schedule.json", "w"), separators=(",", ":"))
+    import aifiles
+    aifiles.write(c, days, pages, page_names, today, fn, nice, t12)
     json.dump(pages, open("showpages.json", "w"))
     print(f"show pages: {len(pages)} ({', '.join(pages)})")
     return pages
