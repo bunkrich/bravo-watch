@@ -3,8 +3,8 @@
    Daily Dish schedule/premiere posts, official Bravo social; 2) Peacock episode pages (after air); 3) TV listings
    (whenitsout, TV Weekly) for future titles = status "li"; 4) press/fan reports (EntertainmentNow, Bravo and Cocktails) = "rep".
    Two sources that disagree = "chk" until Bravo settles it. Synopses: short paraphrase in our own words, never copied. */
-const UPDATED = "2026-11-27";
-const LISTED_THROUGH = "2026-12-09"; /* last date episode listings are filled in */
+const UPDATED = "2026-11-28";
+const LISTED_THROUGH = "2026-12-10"; /* last date episode listings are filled in */
 const SHOWS = { /* code, colour pair [bright, deep] taken from each show's current Bravo key art/logo, icon, Peacock page */
   "WWHL":["WWHL","#22d3f0","#c40e26","mic","https://www.peacocktv.com/watch-online/tv/watch-what-happens-live-with-andy-cohen/8809822949267363112"],
   "Still Flipping Out":["SFO","#a78bfa","#6d28d9","tv","https://www.peacocktv.com/watch-online/tv/still-flipping-out/7620720323445966112"],
@@ -74,7 +74,6 @@ const WWHL = { /* Watch What Happens Live. Bravo moves its airtime night to nigh
     "2026-12-07":[198,"2026-12-08 03:30","ok"],"2026-12-08":[199,"2026-12-09 03:30","ok"],"2026-12-09":[200,"2026-12-10 03:00","ok"]
   },
   guests:{ /* viewing night "YYYY-MM-DD":["Guest & Guest","st"]. Guests are confirmed separately from airtimes. */
-    "2026-11-19":["Jennifer Lawrence & Josh Hutcherson","ok"]
   }
 };
 const HISTORY = [ /* past premieres, newest first: date, show, season, night/time, source */
@@ -93,7 +92,6 @@ const HISTORY = [ /* past premieres, newest first: date, show, season, night/tim
   ["2026-01-08","The Valley: Persian Style","S1 series premiere","Thu 9:00 PM"]
 ];
 const EPISODES = [ /* date, time, show, "S E · title · note", status, synopsis (optional), Peacock: early drop date, or "streaming" if already on Peacock before the Bravo airing, or null (= next day 6 AM), Peacock episode URL (optional), runtime in minutes from Bravo's grid (optional; default 60) */
-  ["2026-11-19","21:00","Southern Charm","S12 E2 \u00b7 Battle of Whits","ok","Madison jumps to Salley's defense and throws a get-together where Venita lets a secret slip."],
   ["2026-11-22","20:00","RHOP","S11 E7 \u00b7 Cold Beach, Hot Gossip","ok","The Rehoboth trip wraps with a drag show and one last blowup."],
   ["2026-11-23","20:00","Below Deck","S13 E7 \u00b7 Who's the Boss?","ok","A shake-up on the deck team makes for an emotional night, while Chef Moe rides high."],
   ["2026-11-25","20:00","RHOSLC","S7 E11 \u00b7 Maui Mystery, Solved","ok","The group hunts for whoever has been leaking info to Mary, Meredith lands a big DJ gig, and the Maui trip exposes the culprit."],
@@ -110,6 +108,7 @@ const EPISODES = [ /* date, time, show, "S E · title · note", status, synopsis
   ["2026-12-08","20:00","RHONY","S16 E13 \u00b7 Good Vibes Only","ok","",null,"",90],
   ["2026-12-09","20:00","RHOSLC","S7 E13 \u00b7 Hostess With the Roastest","ok",""],
   ["2026-12-09","21:00","Small Town Trouble: Texas","S1 E4 \u00b7 The Forbidden Apple","ok","",null,"",90],
+  ["2026-12-10","","Southern Charm","S12 E5 \u00b7 Ready, Aim, Blame \u00b7 time not on Bravo's grid yet","li",""],
   ["2026-12-13","20:00","RHOP","S11 E10","li",""],
   ["2026-12-14","20:00","Below Deck","S13 E10 \u00b7 Nauti Boys","li",""],
   ["2026-12-30","21:00","Wife Swap: RH Edition","S2 E1\u20132 \u00b7 Nine Kids and a Baby Gorgeous / Mommy Cheerest","ok","Lisa Barlow and Angela Oakley swap lives in the two-episode premiere."],
@@ -144,6 +143,7 @@ const GRID = [
   ["Sat",[]]
 ];
 const CHANGES = [ /* logged, change (may use <b>), status, source URL */
+  ["Nov 28","<b>Southern Charm</b> Ep. 5 \u201cReady, Aim, Blame\u201d listed for Thu Dec 10; airtime not confirmed yet","li","https://epguides.com/SouthernCharm/"],
   ["Nov 26","<b>WWHL</b> returns Sun Nov 29. Bravo's airtimes move night to night: Mon 9:00 PM, Wed 10:00 PM, other nights after midnight","ok","https://www.bravotv.com/schedule/watch-what-happens-live"],
   ["Nov 26","<b>Southern Charm</b> stays at 8:00 PM on Dec 3 (Bravo listing), not back to 9:00 PM","ok","https://www.bravotv.com/schedule"],
   ["Nov 25","<b>Southern Charm</b> Ep. 3 moves an hour early to 8:00 PM on Thanksgiving","ok","https://www.bravotv.com/schedule"],
@@ -154,12 +154,12 @@ const CHANGES = [ /* logged, change (may use <b>), status, source URL */
   ["Nov","<b>Still Flipping Out</b> S1 ended; Mon 9:00 PM is open","li","https://whenitsout.com/tv/channel/bravo/"]
 ];
 const RADAR = [ /* item, detail, status, source URL, last verified (YYYY-MM-DD). Remove an item the day it premieres and add it to HISTORY. check.js fails the build if any item is unverified for 7+ days. */
-  ["RHOBH S16","Expected February, after RHOSLC; Leah Remini and Tracy Tutor reported joining","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/","2026-11-27"],
-  ["RHOA S18","Expected March, after RHOP","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/","2026-11-27"],
-  ["RHORI S2","Renewed in May; expected April","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/","2026-11-27"],
-  ["Summer House S11","Filmed this summer, with a Below Deck Med crossover; 2027, no date yet","ok","https://www.bravotv.com/the-daily-dish/below-deck-mediterranean-summer-house-crossover-preview-video-details","2026-11-27"],
-  ["Married to Medicine S13","Renewed at May upfronts; no date yet","ok","https://www.nbcuniversal.com/article/bravo-unveils-new-series-vanderpump-rules-lisa-las-vegas-and-secrets-lies-texas-wives-alongside","2026-11-27"],
-  ["Holiday weeks","Skips around Christmas and New Year's not announced yet","chk","https://www.bravotv.com/the-daily-dish/bravo-winter-2026-schedule-full-lineup","2026-11-27"]
+  ["RHOBH S16","Expected February, after RHOSLC; Leah Remini and Tracy Tutor reported joining","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/","2026-11-28"],
+  ["RHOA S18","Expected March, after RHOP","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/","2026-11-28"],
+  ["RHORI S2","Renewed in May; expected April","rep","https://entertainmentnow.com/real-housewives/bravo-2027-real-housewives-premiere-schedule/","2026-11-28"],
+  ["Summer House S11","Filmed this summer, with a Below Deck Med crossover; 2027, no date yet","ok","https://www.bravotv.com/the-daily-dish/below-deck-mediterranean-summer-house-crossover-preview-video-details","2026-11-28"],
+  ["Married to Medicine S13","Renewed at May upfronts; no date yet","ok","https://www.nbcuniversal.com/article/bravo-unveils-new-series-vanderpump-rules-lisa-las-vegas-and-secrets-lies-texas-wives-alongside","2026-11-28"],
+  ["Holiday weeks","Skips around Christmas and New Year's not announced yet","chk","https://www.bravotv.com/the-daily-dish/bravo-winter-2026-schedule-full-lineup","2026-11-28"]
 ];
 const SOURCES = [
   ["Bravo: Winter 2026 schedule","https://www.bravotv.com/the-daily-dish/bravo-winter-2026-schedule-full-lineup"],

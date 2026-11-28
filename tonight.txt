@@ -1,14 +1,10 @@
 Clubhouse Tonight · What's new on Bravo, the next 7 nights
-Source: https://clubhousetonight.com · Updated Fri, Nov 27, 2026 · All times Eastern (ET)
+Source: https://clubhousetonight.com · Updated Sat, Nov 28, 2026 · All times Eastern (ET)
 TV days roll over at 6:00 AM ET, so a late-night airing stays under the night before.
 New Bravo episodes usually land on Peacock at 6:00 AM ET the next morning.
 If you use this schedule, please link to https://clubhousetonight.com (or the show's page).
 
-TONIGHT · FRI, NOV 27
-  Bravo: no new episodes
-  Peacock 6:00 AM  Southern Charm · S12 E3 · No Bunny Business · an hour early for Thanksgiving
-
-SAT, NOV 28
+TONIGHT · SAT, NOV 28
   Bravo: no new episodes
 
 SUN, NOV 29
@@ -42,10 +38,15 @@ THU, DEC 3
   Peacock 6:00 AM  Small Town Trouble: Texas · S1 E3 · All Hail the Corn Queen
   Peacock 6:00 AM  Watch What Happens Live with Andy Cohen · guests not announced yet
 
+FRI, DEC 4
+  Bravo: no new episodes
+  Peacock 6:00 AM  Southern Charm · S12 E4 · A Historic Divide · 8:00 PM again
+  Peacock 6:00 AM  Watch What Happens Live with Andy Cohen · guests not announced yet
+
 UPCOMING PREMIERES
   Wed, Dec 30, 2026, 9:00 PM ET  Wife Swap: The Real Housewives Edition S2 · Wed 9:00 PM · two-episode premiere, then Wednesdays
   Tue, Jan 19, 2027  The Real Housewives of New Jersey S15 · Tuesday · time not announced yet
 
-Show pages: https://clubhousetonight.com/southern-charm · https://clubhousetonight.com/rhop · https://clubhousetonight.com/below-deck · https://clubhousetonight.com/rhoslc · https://clubhousetonight.com/small-town-trouble-texas · https://clubhousetonight.com/rhony · https://clubhousetonight.com/wife-swap-rh-edition · https://clubhousetonight.com/rhonj · https://clubhousetonight.com/wwhl
+Show pages: https://clubhousetonight.com/rhop · https://clubhousetonight.com/below-deck · https://clubhousetonight.com/rhoslc · https://clubhousetonight.com/small-town-trouble-texas · https://clubhousetonight.com/southern-charm · https://clubhousetonight.com/rhony · https://clubhousetonight.com/wife-swap-rh-edition · https://clubhousetonight.com/rhonj · https://clubhousetonight.com/wwhl
 JSON feed: https://clubhousetonight.com/schedule.json
 Not affiliated with Bravo, NBCUniversal or Peacock.
